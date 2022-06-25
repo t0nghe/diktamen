@@ -6,8 +6,8 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_PASSWORD: localdev
-      POSTGRES_USER: localdev
+      POSTGRES_PASSWORD: example
+      POSTGRES_USER: postgres
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - ./database:/var/lib/postgresql/data/pgdata
