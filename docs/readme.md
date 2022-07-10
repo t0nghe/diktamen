@@ -65,6 +65,8 @@ The user only needs to supply the word that's missing.
 
 GraphQL service running on Go. The reason for using Go is it's a good practice to learn it.
 
+
+
 NLP features will be implemented as a standalone service in Python.
 
 Communication between services are done using ZeroMQ, it seems to be a very simple alternative to other message brokers. 
