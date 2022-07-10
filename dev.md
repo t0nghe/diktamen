@@ -2,4 +2,7 @@
 
 Command to start up DB:
 
-- `docker compose -f dev.yml up`
+```bash
+cd postgres
+docker compose -f dev.yml up
+```

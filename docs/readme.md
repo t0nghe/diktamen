@@ -8,6 +8,12 @@ Issues (tasks) are organized into week-based milestones. These are my equivalent
 
 Decisions over and thinking behind features and tech choices are documented in `docs` folder as if they are code. Writings in this folder should be dry and concise. Make sure they are ready for a third party to read at all times.
 
+Use commitlint format in commit messages:
+
+- `type(scope): detail`
+
+Types include: `feat`, `bugfix`, `doc`, `refactor`, `test`.
+
 ## Main features
 
 Take audiobooks and podcasts with transcripts. Segment text according to sentence boundaries and align recording segments with sentences.
@@ -57,9 +63,11 @@ The user only needs to supply the word that's missing.
 
 ### Backend
 
-GraphQL service running on Flask written in Python. The reason for using Python is there will be NLP tasks.
+GraphQL service running on Go. The reason for using Go is it's a good practice to learn it.
 
-Ariadne is used as GraphQL server. 
+NLP features will be implemented as a standalone service in Python.
+
+Communication between services are done using ZeroMQ, it seems to be a very simple alternative to other message brokers. 
 
 ### Frontend
 
