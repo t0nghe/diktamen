@@ -8,29 +8,41 @@ import (
 	"backend-go/graph/model"
 	"context"
 	"fmt"
-	"math/rand"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	todo := &model.Todo{
-		Text:   input.Text,
-		ID:     fmt.Sprintf("T%d", rand.Int()),
-		User:   &model.User{ID: input.UserID, Name: "user" + input.UserID},
-		UserID: input.UserID,
-	}
-	r.todos = append(r.todos, todo)
-	return todo, nil
+// UserSignUp is the resolver for the userSignUp field.
+func (r *mutationResolver) UserSignUp(ctx context.Context, input model.UserCredentials) (*model.Message, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	return r.todos, nil
+// UserLogIn is the resolver for the userLogIn field.
+func (r *mutationResolver) UserLogIn(ctx context.Context, input model.UserCredentials) (*model.LoginToken, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
-// User is the resolver for the user field.
-func (r *todoResolver) User(ctx context.Context, obj *model.Todo) (*model.User, error) {
-	return &model.User{ID: obj.UserID, Name: "user" + obj.UserID}, nil
+// UserAttempt is the resolver for the userAttempt field.
+func (r *mutationResolver) UserAttempt(ctx context.Context, input *model.UserAttempt) (*model.Message, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+// ListUserArticles is the resolver for the listUserArticles field.
+func (r *queryResolver) ListUserArticles(ctx context.Context, username string) ([]*model.UserArticle, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+// GetUserFullArticle is the resolver for the getUserFullArticle field.
+func (r *queryResolver) GetUserFullArticle(ctx context.Context, username string) (*model.FullArticle, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+// FetchSentAudio is the resolver for the fetchSentAudio field.
+func (r *queryResolver) FetchSentAudio(ctx context.Context, username string, sentID string) (*model.SentDetails, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+// ScoreArticle is the resolver for the scoreArticle field.
+func (r *queryResolver) ScoreArticle(ctx context.Context, username string, articleID string) ([]*model.SentScore, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -39,9 +51,5 @@ func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResol
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
-// Todo returns generated.TodoResolver implementation.
-func (r *Resolver) Todo() generated.TodoResolver { return &todoResolver{r} }
-
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-type todoResolver struct{ *Resolver }
