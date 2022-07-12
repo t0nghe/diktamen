@@ -2,27 +2,82 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
+type Message {
+  success: Boolean!
+  message: String!
 }
 
-type User {
-  id: ID!
-  name: String!
+type LoginToken {
+  success: Boolean!
+  token: String!
 }
 
-type Query {
-  todos: [Todo!]!
+input UserCredentials {
+  username: String!
+  passwordHash: String!
+  email: String
 }
 
-input NewTodo {
-  text: String!
-  userId: String!
+type UserArticle {
+  articleId: String!
+  articleTitle: String!
+  articleSentCount: Int!
+  userNextUpIndex: String!
+}
+
+type Sentence {
+  sentId: String!
+  sentIndexInArticle: Int!
+  userTried: Boolean!
+  userAttempt: [String]
+}
+
+type LenWordTuple {
+  index: Int! # In some implementations of GraphQL engines, arrays are not ordered.
+  letters: Int!
+  wordForm: String!
+}
+
+type SentDetails {
+  sentId: String!
+  mediaUri: String!
+  wordForms: [LenWordTuple!]!
+}
+
+type FullArticle {
+  articleId: String!
+  articleTitle: String!
+  articleSentCount: Int!
+  userNextUpIndex: String!
+  sentences: [Sentence!]!
+}
+
+type SentScore {
+  sentId: String!
+  mediaUri: String!
+  originalText: String!
+  comparison: String! # HTML
+  wordCount: Int!
+  incorrectCount: Int!
+}
+
+input UserAttempt {
+  username: String!
+  sentId: String!
+  inputWordFormsJsonString: String! # To replace [LenWordTuple!]!, FIXME This is hacky. 
+  # Reason for doing this is this error:
+  # cannot use [LenWordTuple] as argument inputWordForms because OBJECT is not a valid input type
 }
 
 type Mutation {
-  createTodo(input: NewTodo!): Todo!
+  userSignUp(input: UserCredentials!): Message!
+  userLogIn(input: UserCredentials!): LoginToken!
+  userAttempt(input: UserAttempt): Message! # The user is not immediately given any feedback. This will only be a message for the frontend to consume.
+}
+
+type Query {
+  listUserArticles(username: String!): [UserArticle!]!
+  getUserFullArticle(username: String!): FullArticle
+  fetchSentAudio(username: String!, sentId: String!): SentDetails
+  scoreArticle(username: String!, articleId: String!): [SentScore!]!
 }
