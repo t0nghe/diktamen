@@ -38,12 +38,14 @@ The user will then be reminded of old cards on a schedule looser than the Anki a
 
 ### User stories
 
-- When the user registers, they should be given a brief vocabulary test and a brief listening test. 
-- When the user logs in, they should be shown a list of available articles. On each article, a progress bar indicates how much they've progressed in that article.
-- When the user clicks an article, they are brought to their last unsolved sentence in that article.
-- When the user is working on an article and is shown an unsolved sentence, they are shown a play button and 1) an empty input field; or 2) a sentence with hard to understand words hidden.
+- US01: User can register.
+- US02: User can log in after registration.
+- US03: When the user registers and logs in for the first time, they should be given a brief vocabulary test and a brief listening test. (TBD)
+- US04: When the user logs in, they should be shown a list of available articles. On each article, a progress bar indicates how much they've progressed in that article.
+- US05: When the user clicks an article, they are brought to their last unsolved sentence in that article.
+- US06: When the user is working on an article and is shown an unsolved sentence, they are shown a play button and 1) an empty input field; or 2) a sentence with hard to understand words hidden.
 
-More details to come.
+For implementation details see [allActions.md](./allActions.md)
 
 ### Design
 
@@ -64,8 +66,6 @@ The user only needs to supply the word that's missing.
 ### Backend
 
 GraphQL service running on Go. The reason for using Go is it's a good practice to learn it.
-
-
 
 NLP features will be implemented as a standalone service in Python.
 
