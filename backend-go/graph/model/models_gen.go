@@ -10,6 +10,11 @@ type FullArticle struct {
 	Sentences        []*Sentence `json:"sentences"`
 }
 
+type InputMessage struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
 type LenWordTuple struct {
 	Index    int    `json:"index"`
 	Letters  int    `json:"letters"`
@@ -17,13 +22,13 @@ type LenWordTuple struct {
 }
 
 type LoginToken struct {
-	Success bool   `json:"success"`
-	Token   string `json:"token"`
+	Success bool    `json:"success"`
+	Token   *string `json:"token"`
 }
 
 type Message struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
+	Success bool    `json:"success"`
+	Message *string `json:"message"`
 }
 
 type SentDetails struct {
@@ -56,7 +61,6 @@ type UserArticle struct {
 }
 
 type UserAttempt struct {
-	Username                 string `json:"username"`
 	SentID                   string `json:"sentId"`
 	InputWordFormsJSONString string `json:"inputWordFormsJsonString"`
 }

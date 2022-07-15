@@ -4,12 +4,12 @@
 
 type Message {
   success: Boolean!
-  message: String!
+  message: String
 }
 
 type LoginToken {
   success: Boolean!
-  token: String!
+  token: String # If unsucessful, token field will be empty.
 }
 
 input UserCredentials {
@@ -18,15 +18,20 @@ input UserCredentials {
   email: String
 }
 
+input InputMessage {
+  success: Boolean!
+  message: String!
+}
+
 type UserArticle {
-  articleId: String!
+  articleId: ID!
   articleTitle: String!
   articleSentCount: Int!
   userNextUpIndex: String!
 }
 
 type Sentence {
-  sentId: String!
+  sentId: ID!
   sentIndexInArticle: Int!
   userTried: Boolean!
   userAttempt: [String]
@@ -39,13 +44,13 @@ type LenWordTuple {
 }
 
 type SentDetails {
-  sentId: String!
+  sentId: ID!
   mediaUri: String!
   wordForms: [LenWordTuple!]!
 }
 
 type FullArticle {
-  articleId: String!
+  articleId: ID!
   articleTitle: String!
   articleSentCount: Int!
   userNextUpIndex: String!
@@ -53,7 +58,7 @@ type FullArticle {
 }
 
 type SentScore {
-  sentId: String!
+  sentId: ID!
   mediaUri: String!
   originalText: String!
   comparison: String! # HTML
@@ -61,9 +66,8 @@ type SentScore {
   incorrectCount: Int!
 }
 
-input UserAttempt {
-  username: String!
-  sentId: String!
+input UserAttempt { # username will be found in the token in http header
+  sentId: ID!
   inputWordFormsJsonString: String! # To replace [LenWordTuple!]!, FIXME This is hacky. 
   # Reason for doing this is this error:
   # cannot use [LenWordTuple] as argument inputWordForms because OBJECT is not a valid input type
@@ -73,11 +77,13 @@ type Mutation {
   userSignUp(input: UserCredentials!): Message!
   userLogIn(input: UserCredentials!): LoginToken!
   userAttempt(input: UserAttempt): Message! # The user is not immediately given any feedback. This will only be a message for the frontend to consume.
+  createDummyMessage(input: InputMessage): Message!
 }
 
 type Query {
-  listUserArticles(username: String!): [UserArticle!]!
-  getUserFullArticle(username: String!): FullArticle
-  fetchSentAudio(username: String!, sentId: String!): SentDetails
-  scoreArticle(username: String!, articleId: String!): [SentScore!]!
+  listUserArticles: [UserArticle!]!
+  getUserFullArticle(articleId: ID!): FullArticle
+  fetchSentAudio(sentId: String!): SentDetails
+  scoreArticle(articleId: ID!): [SentScore!]!
+  dummyMessage: [Message] # This is a dummy query.
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"backend-go/graph"
 	"backend-go/graph/generated"
+	dbconn "backend-go/internal/pkg/database"
 	"log"
 	"net/http"
 	"os"
@@ -11,13 +12,16 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 )
 
-const defaultPort = "8080"
+const defaultPort = "9090"
 
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
+
+	dbconn.InitDb()
+	defer dbconn.CloseDb()
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 
