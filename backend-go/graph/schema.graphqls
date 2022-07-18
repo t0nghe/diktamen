@@ -34,7 +34,7 @@ type Sentence {
   sentId: ID!
   sentIndexInArticle: Int!
   userTried: Boolean!
-  userAttempt: [String]
+  userDictation: [String]
 }
 
 type LenWordTuple {
@@ -66,7 +66,7 @@ type SentScore {
   incorrectCount: Int!
 }
 
-input UserAttempt { # username will be found in the token in http header
+input UserDictation { # username will be found in the token in http header
   sentId: ID!
   inputWordFormsJsonString: String! # To replace [LenWordTuple!]!, FIXME This is hacky. 
   # Reason for doing this is this error:
@@ -76,7 +76,7 @@ input UserAttempt { # username will be found in the token in http header
 type Mutation {
   userSignUp(input: UserCredentials!): Message!
   userLogIn(input: UserCredentials!): LoginToken!
-  userAttempt(input: UserAttempt): Message! # The user is not immediately given any feedback. This will only be a message for the frontend to consume.
+  userDictation(input: UserDictation): Message! # The user is not immediately given any feedback. This will only be a message for the frontend to consume.
   createDummyMessage(input: InputMessage): Message!
 }
 

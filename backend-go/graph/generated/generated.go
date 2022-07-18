@@ -70,7 +70,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateDummyMessage func(childComplexity int, input *model.InputMessage) int
-		UserAttempt        func(childComplexity int, input *model.UserAttempt) int
+		UserDictation      func(childComplexity int, input *model.UserDictation) int
 		UserLogIn          func(childComplexity int, input model.UserCredentials) int
 		UserSignUp         func(childComplexity int, input model.UserCredentials) int
 	}
@@ -101,7 +101,7 @@ type ComplexityRoot struct {
 	Sentence struct {
 		SentID             func(childComplexity int) int
 		SentIndexInArticle func(childComplexity int) int
-		UserAttempt        func(childComplexity int) int
+		UserDictation      func(childComplexity int) int
 		UserTried          func(childComplexity int) int
 	}
 
@@ -116,7 +116,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	UserSignUp(ctx context.Context, input model.UserCredentials) (*model.Message, error)
 	UserLogIn(ctx context.Context, input model.UserCredentials) (*model.LoginToken, error)
-	UserAttempt(ctx context.Context, input *model.UserAttempt) (*model.Message, error)
+	UserDictation(ctx context.Context, input *model.UserDictation) (*model.Message, error)
 	CreateDummyMessage(ctx context.Context, input *model.InputMessage) (*model.Message, error)
 }
 type QueryResolver interface {
@@ -238,17 +238,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateDummyMessage(childComplexity, args["input"].(*model.InputMessage)), true
 
-	case "Mutation.userAttempt":
-		if e.complexity.Mutation.UserAttempt == nil {
+	case "Mutation.userDictation":
+		if e.complexity.Mutation.UserDictation == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_userAttempt_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_userDictation_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UserAttempt(childComplexity, args["input"].(*model.UserAttempt)), true
+		return e.complexity.Mutation.UserDictation(childComplexity, args["input"].(*model.UserDictation)), true
 
 	case "Mutation.userLogIn":
 		if e.complexity.Mutation.UserLogIn == nil {
@@ -401,12 +401,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Sentence.SentIndexInArticle(childComplexity), true
 
-	case "Sentence.userAttempt":
-		if e.complexity.Sentence.UserAttempt == nil {
+	case "Sentence.userDictation":
+		if e.complexity.Sentence.UserDictation == nil {
 			break
 		}
 
-		return e.complexity.Sentence.UserAttempt(childComplexity), true
+		return e.complexity.Sentence.UserDictation(childComplexity), true
 
 	case "Sentence.userTried":
 		if e.complexity.Sentence.UserTried == nil {
@@ -452,8 +452,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputInputMessage,
-		ec.unmarshalInputUserAttempt,
 		ec.unmarshalInputUserCredentials,
+		ec.unmarshalInputUserDictation,
 	)
 	first := true
 
@@ -550,7 +550,7 @@ type Sentence {
   sentId: ID!
   sentIndexInArticle: Int!
   userTried: Boolean!
-  userAttempt: [String]
+  userDictation: [String]
 }
 
 type LenWordTuple {
@@ -582,7 +582,7 @@ type SentScore {
   incorrectCount: Int!
 }
 
-input UserAttempt { # username will be found in the token in http header
+input UserDictation { # username will be found in the token in http header
   sentId: ID!
   inputWordFormsJsonString: String! # To replace [LenWordTuple!]!, FIXME This is hacky. 
   # Reason for doing this is this error:
@@ -592,7 +592,7 @@ input UserAttempt { # username will be found in the token in http header
 type Mutation {
   userSignUp(input: UserCredentials!): Message!
   userLogIn(input: UserCredentials!): LoginToken!
-  userAttempt(input: UserAttempt): Message! # The user is not immediately given any feedback. This will only be a message for the frontend to consume.
+  userDictation(input: UserDictation): Message! # The user is not immediately given any feedback. This will only be a message for the frontend to consume.
   createDummyMessage(input: InputMessage): Message!
 }
 
@@ -625,13 +625,13 @@ func (ec *executionContext) field_Mutation_createDummyMessage_args(ctx context.C
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_userAttempt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_userDictation_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.UserAttempt
+	var arg0 *model.UserDictation
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOUserAttempt2ᚖbackendᚑgoᚋgraphᚋmodelᚐUserAttempt(ctx, tmp)
+		arg0, err = ec.unmarshalOUserDictation2ᚖbackendᚑgoᚋgraphᚋmodelᚐUserDictation(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -989,8 +989,8 @@ func (ec *executionContext) fieldContext_FullArticle_sentences(ctx context.Conte
 				return ec.fieldContext_Sentence_sentIndexInArticle(ctx, field)
 			case "userTried":
 				return ec.fieldContext_Sentence_userTried(ctx, field)
-			case "userAttempt":
-				return ec.fieldContext_Sentence_userAttempt(ctx, field)
+			case "userDictation":
+				return ec.fieldContext_Sentence_userDictation(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Sentence", field.Name)
 		},
@@ -1422,8 +1422,8 @@ func (ec *executionContext) fieldContext_Mutation_userLogIn(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_userAttempt(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_userAttempt(ctx, field)
+func (ec *executionContext) _Mutation_userDictation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_userDictation(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1436,7 +1436,7 @@ func (ec *executionContext) _Mutation_userAttempt(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UserAttempt(rctx, fc.Args["input"].(*model.UserAttempt))
+		return ec.resolvers.Mutation().UserDictation(rctx, fc.Args["input"].(*model.UserDictation))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1453,7 +1453,7 @@ func (ec *executionContext) _Mutation_userAttempt(ctx context.Context, field gra
 	return ec.marshalNMessage2ᚖbackendᚑgoᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_userAttempt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_userDictation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -1476,7 +1476,7 @@ func (ec *executionContext) fieldContext_Mutation_userAttempt(ctx context.Contex
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_userAttempt_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_userDictation_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -2503,8 +2503,8 @@ func (ec *executionContext) fieldContext_Sentence_userTried(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Sentence_userAttempt(ctx context.Context, field graphql.CollectedField, obj *model.Sentence) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Sentence_userAttempt(ctx, field)
+func (ec *executionContext) _Sentence_userDictation(ctx context.Context, field graphql.CollectedField, obj *model.Sentence) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Sentence_userDictation(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2517,7 +2517,7 @@ func (ec *executionContext) _Sentence_userAttempt(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.UserAttempt, nil
+		return obj.UserDictation, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2531,7 +2531,7 @@ func (ec *executionContext) _Sentence_userAttempt(ctx context.Context, field gra
 	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Sentence_userAttempt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Sentence_userDictation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Sentence",
 		Field:      field,
@@ -4529,42 +4529,6 @@ func (ec *executionContext) unmarshalInputInputMessage(ctx context.Context, obj 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUserAttempt(ctx context.Context, obj interface{}) (model.UserAttempt, error) {
-	var it model.UserAttempt
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"sentId", "inputWordFormsJsonString"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "sentId":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sentId"))
-			it.SentID, err = ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "inputWordFormsJsonString":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("inputWordFormsJsonString"))
-			it.InputWordFormsJSONString, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputUserCredentials(ctx context.Context, obj interface{}) (model.UserCredentials, error) {
 	var it model.UserCredentials
 	asMap := map[string]interface{}{}
@@ -4600,6 +4564,42 @@ func (ec *executionContext) unmarshalInputUserCredentials(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			it.Email, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUserDictation(ctx context.Context, obj interface{}) (model.UserDictation, error) {
+	var it model.UserDictation
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"sentId", "inputWordFormsJsonString"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "sentId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sentId"))
+			it.SentID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "inputWordFormsJsonString":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("inputWordFormsJsonString"))
+			it.InputWordFormsJSONString, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4816,10 +4816,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "userAttempt":
+		case "userDictation":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_userAttempt(ctx, field)
+				return ec._Mutation_userDictation(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -5129,9 +5129,9 @@ func (ec *executionContext) _Sentence(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "userAttempt":
+		case "userDictation":
 
-			out.Values[i] = ec._Sentence_userAttempt(ctx, field, obj)
+			out.Values[i] = ec._Sentence_userDictation(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -6217,11 +6217,11 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) unmarshalOUserAttempt2ᚖbackendᚑgoᚋgraphᚋmodelᚐUserAttempt(ctx context.Context, v interface{}) (*model.UserAttempt, error) {
+func (ec *executionContext) unmarshalOUserDictation2ᚖbackendᚑgoᚋgraphᚋmodelᚐUserDictation(ctx context.Context, v interface{}) (*model.UserDictation, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalInputUserAttempt(ctx, v)
+	res, err := ec.unmarshalInputUserDictation(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

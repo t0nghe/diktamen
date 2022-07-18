@@ -8,7 +8,7 @@ Issues (tasks) are organized into week-based milestones. These are my equivalent
 
 Decisions over and thinking behind features and tech choices are documented in `docs` folder as if they are code. Writings in this folder should be dry and concise. Make sure they are ready for a third party to read at all times.
 
-Use commitlint format in commit messages:
+Use `commitlint` format in commit messages:
 
 - `type(scope): detail`
 
@@ -75,7 +75,7 @@ Communication between services are done using ZeroMQ, it seems to be a very simp
 
 The frontend web interface will be implemented twice. First in Vue.js then in React.js. The purpose of this is to keep myself familiar with both frameworks.
 
-- Audio player: Wavesurfer.js
+- Audio player: `Wavesurfer.js`
 
 ### Deployment
 

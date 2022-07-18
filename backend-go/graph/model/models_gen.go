@@ -50,7 +50,7 @@ type Sentence struct {
 	SentID             string    `json:"sentId"`
 	SentIndexInArticle int       `json:"sentIndexInArticle"`
 	UserTried          bool      `json:"userTried"`
-	UserAttempt        []*string `json:"userAttempt"`
+	UserDictation      []*string `json:"userDictation"`
 }
 
 type UserArticle struct {
@@ -60,13 +60,13 @@ type UserArticle struct {
 	UserNextUpIndex  string `json:"userNextUpIndex"`
 }
 
-type UserAttempt struct {
-	SentID                   string `json:"sentId"`
-	InputWordFormsJSONString string `json:"inputWordFormsJsonString"`
-}
-
 type UserCredentials struct {
 	Username     string  `json:"username"`
 	PasswordHash string  `json:"passwordHash"`
 	Email        *string `json:"email"`
+}
+
+type UserDictation struct {
+	SentID                   string `json:"sentId"`
+	InputWordFormsJSONString string `json:"inputWordFormsJsonString"`
 }

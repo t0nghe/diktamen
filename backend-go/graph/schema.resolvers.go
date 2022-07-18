@@ -21,8 +21,8 @@ func (r *mutationResolver) UserLogIn(ctx context.Context, input model.UserCreden
 	panic(fmt.Errorf("not implemented"))
 }
 
-// UserAttempt is the resolver for the userAttempt field.
-func (r *mutationResolver) UserAttempt(ctx context.Context, input *model.UserAttempt) (*model.Message, error) {
+// UserDictation is the resolver for the userDictation field.
+func (r *mutationResolver) UserDictation(ctx context.Context, input *model.UserDictation) (*model.Message, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -64,9 +64,7 @@ func (r *queryResolver) ScoreArticle(ctx context.Context, articleID string) ([]*
 // DummyMessage is the resolver for the dummyMessage field.
 func (r *queryResolver) DummyMessage(ctx context.Context) ([]*model.Message, error) {
 	var resultMsgs []*model.Message
-	var dbMsgs []dummymessages.DummyMessage
-
-	dbMsgs = dummymessages.GetDummyMessages()
+	dbMsgs := dummymessages.GetDummyMessages()
 
 	for _, msg := range dbMsgs {
 		// using &msg.Message on line 67
@@ -90,3 +88,13 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *mutationResolver) UserAttempt(ctx context.Context, input *model.UserDictation) (*model.Message, error) {
+	panic(fmt.Errorf("not implemented"))
+}
