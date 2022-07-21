@@ -3,3 +3,4 @@ back-python/Pipfile.lock
 back-python/Pipfile
 nlp-python/Pipfile.lock
 nlp-python/.env
+*.sql

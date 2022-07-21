@@ -6,19 +6,34 @@ package graph
 import (
 	"backend-go/graph/generated"
 	"backend-go/graph/model"
+	"backend-go/internal/auth"
 	"backend-go/internal/dummymessages"
+	"backend-go/internal/queries"
 	"context"
 	"fmt"
 )
 
-// UserSignUp is the resolver for the userSignUp field.
+// UserSignUp allows the user to sign up via GraphQL mutation `userSignUp` using a username and an email.
 func (r *mutationResolver) UserSignUp(ctx context.Context, input model.UserCredentials) (*model.Message, error) {
-	panic(fmt.Errorf("not implemented"))
+	email := *input.Email
+	err := auth.CreateUser(input.Username, email, input.Password)
+	var success bool
+	var message string
+	if err != nil {
+		success = false
+		message = err.Error()
+	} else {
+		success = true
+		message = "Successful"
+	}
+	return &model.Message{Success: success, Message: &message}, err
 }
 
-// UserLogIn is the resolver for the userLogIn field.
+// UserLogin allows the user to log in via mutation `userLogin`.
 func (r *mutationResolver) UserLogIn(ctx context.Context, input model.UserCredentials) (*model.LoginToken, error) {
-	panic(fmt.Errorf("not implemented"))
+	token, err := auth.UserLogin(input.Username, input.Password)
+
+	return &model.LoginToken{Success: true, Token: &token}, err
 }
 
 // UserDictation is the resolver for the userDictation field.
@@ -26,7 +41,7 @@ func (r *mutationResolver) UserDictation(ctx context.Context, input *model.UserD
 	panic(fmt.Errorf("not implemented"))
 }
 
-// CreateDummyMessage is the resolver for the createDummyMessage field.
+// CreateDummyMessage is a resolver used to show if the server works.
 func (r *mutationResolver) CreateDummyMessage(ctx context.Context, input *model.InputMessage) (*model.Message, error) {
 	var dmsg dummymessages.DummyMessage
 	dmsg.Success = input.Success
@@ -40,14 +55,51 @@ func (r *mutationResolver) CreateDummyMessage(ctx context.Context, input *model.
 	return gqlReturnMsg, nil
 }
 
-// ListUserArticles is the resolver for the listUserArticles field.
+// ListUserArticles resolver returns all articles with the progress of the user.
 func (r *queryResolver) ListUserArticles(ctx context.Context) ([]*model.UserArticle, error) {
-	panic(fmt.Errorf("not implemented"))
+	userId := auth.FromContext(ctx, "user_id")
+	fmt.Println(userId)
+	if userId == 0 {
+		return nil, fmt.Errorf("please log in")
+	}
+	ret, err := queries.GetUserArticlesList(userId)
+
+	fmt.Println(ret)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return ret, nil
+}
+
+// ListUserUnseenArticles is the resolver for the listUserUnseenArticles field.
+func (r *queryResolver) ListUserUnseenArticles(ctx context.Context) ([]*model.UserArticle, error) {
+	userId := auth.FromContext(ctx, "user_id")
+	if userId == 0 {
+		return nil, fmt.Errorf("please log in")
+	}
+
+	ret, err := queries.GetUserUnseenArticlesList(userId)
+
+	fmt.Println(ret)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return ret, nil
 }
 
 // GetUserFullArticle is the resolver for the getUserFullArticle field.
 func (r *queryResolver) GetUserFullArticle(ctx context.Context, articleID string) (*model.FullArticle, error) {
-	panic(fmt.Errorf("not implemented"))
+	userId := auth.FromContext(ctx, "user_id")
+	if userId == 0 {
+		return nil, fmt.Errorf("please log in")
+	}
+	queries.QueryUserFullArticle(userId, articleID)
+
+	return nil, nil
 }
 
 // FetchSentAudio is the resolver for the fetchSentAudio field.

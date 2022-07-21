@@ -45,11 +45,11 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	FullArticle struct {
-		ArticleID        func(childComplexity int) int
-		ArticleSentCount func(childComplexity int) int
-		ArticleTitle     func(childComplexity int) int
-		Sentences        func(childComplexity int) int
-		UserNextUpIndex  func(childComplexity int) int
+		ArticleID         func(childComplexity int) int
+		ArticleSentCount  func(childComplexity int) int
+		ArticleTitle      func(childComplexity int) int
+		Sentences         func(childComplexity int) int
+		UserFinishedIndex func(childComplexity int) int
 	}
 
 	LenWordTuple struct {
@@ -76,11 +76,12 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		DummyMessage       func(childComplexity int) int
-		FetchSentAudio     func(childComplexity int, sentID string) int
-		GetUserFullArticle func(childComplexity int, articleID string) int
-		ListUserArticles   func(childComplexity int) int
-		ScoreArticle       func(childComplexity int, articleID string) int
+		DummyMessage           func(childComplexity int) int
+		FetchSentAudio         func(childComplexity int, sentID string) int
+		GetUserFullArticle     func(childComplexity int, articleID string) int
+		ListUserArticles       func(childComplexity int) int
+		ListUserUnseenArticles func(childComplexity int) int
+		ScoreArticle           func(childComplexity int, articleID string) int
 	}
 
 	SentDetails struct {
@@ -106,10 +107,10 @@ type ComplexityRoot struct {
 	}
 
 	UserArticle struct {
-		ArticleID        func(childComplexity int) int
-		ArticleSentCount func(childComplexity int) int
-		ArticleTitle     func(childComplexity int) int
-		UserNextUpIndex  func(childComplexity int) int
+		ArticleID         func(childComplexity int) int
+		ArticleSentCount  func(childComplexity int) int
+		ArticleTitle      func(childComplexity int) int
+		UserFinishedIndex func(childComplexity int) int
 	}
 }
 
@@ -121,6 +122,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	ListUserArticles(ctx context.Context) ([]*model.UserArticle, error)
+	ListUserUnseenArticles(ctx context.Context) ([]*model.UserArticle, error)
 	GetUserFullArticle(ctx context.Context, articleID string) (*model.FullArticle, error)
 	FetchSentAudio(ctx context.Context, sentID string) (*model.SentDetails, error)
 	ScoreArticle(ctx context.Context, articleID string) ([]*model.SentScore, error)
@@ -170,12 +172,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.FullArticle.Sentences(childComplexity), true
 
-	case "FullArticle.userNextUpIndex":
-		if e.complexity.FullArticle.UserNextUpIndex == nil {
+	case "FullArticle.userFinishedIndex":
+		if e.complexity.FullArticle.UserFinishedIndex == nil {
 			break
 		}
 
-		return e.complexity.FullArticle.UserNextUpIndex(childComplexity), true
+		return e.complexity.FullArticle.UserFinishedIndex(childComplexity), true
 
 	case "LenWordTuple.index":
 		if e.complexity.LenWordTuple.Index == nil {
@@ -312,6 +314,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.ListUserArticles(childComplexity), true
 
+	case "Query.listUserUnseenArticles":
+		if e.complexity.Query.ListUserUnseenArticles == nil {
+			break
+		}
+
+		return e.complexity.Query.ListUserUnseenArticles(childComplexity), true
+
 	case "Query.scoreArticle":
 		if e.complexity.Query.ScoreArticle == nil {
 			break
@@ -436,12 +445,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UserArticle.ArticleTitle(childComplexity), true
 
-	case "UserArticle.userNextUpIndex":
-		if e.complexity.UserArticle.UserNextUpIndex == nil {
+	case "UserArticle.userFinishedIndex":
+		if e.complexity.UserArticle.UserFinishedIndex == nil {
 			break
 		}
 
-		return e.complexity.UserArticle.UserNextUpIndex(childComplexity), true
+		return e.complexity.UserArticle.UserFinishedIndex(childComplexity), true
 
 	}
 	return 0, false
@@ -530,7 +539,7 @@ type LoginToken {
 
 input UserCredentials {
   username: String!
-  passwordHash: String!
+  password: String!
   email: String
 }
 
@@ -543,7 +552,7 @@ type UserArticle {
   articleId: ID!
   articleTitle: String!
   articleSentCount: Int!
-  userNextUpIndex: String!
+  userFinishedIndex: Int
 }
 
 type Sentence {
@@ -569,7 +578,7 @@ type FullArticle {
   articleId: ID!
   articleTitle: String!
   articleSentCount: Int!
-  userNextUpIndex: String!
+  userFinishedIndex: String!
   sentences: [Sentence!]!
 }
 
@@ -598,6 +607,7 @@ type Mutation {
 
 type Query {
   listUserArticles: [UserArticle!]!
+  listUserUnseenArticles: [UserArticle!]!
   getUserFullArticle(articleId: ID!): FullArticle
   fetchSentAudio(sentId: String!): SentDetails
   scoreArticle(articleId: ID!): [SentScore!]!
@@ -900,8 +910,8 @@ func (ec *executionContext) fieldContext_FullArticle_articleSentCount(ctx contex
 	return fc, nil
 }
 
-func (ec *executionContext) _FullArticle_userNextUpIndex(ctx context.Context, field graphql.CollectedField, obj *model.FullArticle) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_FullArticle_userNextUpIndex(ctx, field)
+func (ec *executionContext) _FullArticle_userFinishedIndex(ctx context.Context, field graphql.CollectedField, obj *model.FullArticle) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FullArticle_userFinishedIndex(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -914,7 +924,7 @@ func (ec *executionContext) _FullArticle_userNextUpIndex(ctx context.Context, fi
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.UserNextUpIndex, nil
+		return obj.UserFinishedIndex, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -931,7 +941,7 @@ func (ec *executionContext) _FullArticle_userNextUpIndex(ctx context.Context, fi
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_FullArticle_userNextUpIndex(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_FullArticle_userFinishedIndex(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "FullArticle",
 		Field:      field,
@@ -1589,8 +1599,62 @@ func (ec *executionContext) fieldContext_Query_listUserArticles(ctx context.Cont
 				return ec.fieldContext_UserArticle_articleTitle(ctx, field)
 			case "articleSentCount":
 				return ec.fieldContext_UserArticle_articleSentCount(ctx, field)
-			case "userNextUpIndex":
-				return ec.fieldContext_UserArticle_userNextUpIndex(ctx, field)
+			case "userFinishedIndex":
+				return ec.fieldContext_UserArticle_userFinishedIndex(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserArticle", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_listUserUnseenArticles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_listUserUnseenArticles(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ListUserUnseenArticles(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.UserArticle)
+	fc.Result = res
+	return ec.marshalNUserArticle2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐUserArticleᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_listUserUnseenArticles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "articleId":
+				return ec.fieldContext_UserArticle_articleId(ctx, field)
+			case "articleTitle":
+				return ec.fieldContext_UserArticle_articleTitle(ctx, field)
+			case "articleSentCount":
+				return ec.fieldContext_UserArticle_articleSentCount(ctx, field)
+			case "userFinishedIndex":
+				return ec.fieldContext_UserArticle_userFinishedIndex(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserArticle", field.Name)
 		},
@@ -1640,8 +1704,8 @@ func (ec *executionContext) fieldContext_Query_getUserFullArticle(ctx context.Co
 				return ec.fieldContext_FullArticle_articleTitle(ctx, field)
 			case "articleSentCount":
 				return ec.fieldContext_FullArticle_articleSentCount(ctx, field)
-			case "userNextUpIndex":
-				return ec.fieldContext_FullArticle_userNextUpIndex(ctx, field)
+			case "userFinishedIndex":
+				return ec.fieldContext_FullArticle_userFinishedIndex(ctx, field)
 			case "sentences":
 				return ec.fieldContext_FullArticle_sentences(ctx, field)
 			}
@@ -2676,8 +2740,8 @@ func (ec *executionContext) fieldContext_UserArticle_articleSentCount(ctx contex
 	return fc, nil
 }
 
-func (ec *executionContext) _UserArticle_userNextUpIndex(ctx context.Context, field graphql.CollectedField, obj *model.UserArticle) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_UserArticle_userNextUpIndex(ctx, field)
+func (ec *executionContext) _UserArticle_userFinishedIndex(ctx context.Context, field graphql.CollectedField, obj *model.UserArticle) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserArticle_userFinishedIndex(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2690,31 +2754,28 @@ func (ec *executionContext) _UserArticle_userNextUpIndex(ctx context.Context, fi
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.UserNextUpIndex, nil
+		return obj.UserFinishedIndex, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_UserArticle_userNextUpIndex(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_UserArticle_userFinishedIndex(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "UserArticle",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4536,7 +4597,7 @@ func (ec *executionContext) unmarshalInputUserCredentials(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"username", "passwordHash", "email"}
+	fieldsInOrder := [...]string{"username", "password", "email"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4551,11 +4612,11 @@ func (ec *executionContext) unmarshalInputUserCredentials(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "passwordHash":
+		case "password":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("passwordHash"))
-			it.PasswordHash, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			it.Password, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4648,9 +4709,9 @@ func (ec *executionContext) _FullArticle(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "userNextUpIndex":
+		case "userFinishedIndex":
 
-			out.Values[i] = ec._FullArticle_userNextUpIndex(ctx, field, obj)
+			out.Values[i] = ec._FullArticle_userFinishedIndex(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -4874,6 +4935,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_listUserArticles(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "listUserUnseenArticles":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_listUserUnseenArticles(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -5175,13 +5259,10 @@ func (ec *executionContext) _UserArticle(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "userNextUpIndex":
+		case "userFinishedIndex":
 
-			out.Values[i] = ec._UserArticle_userNextUpIndex(ctx, field, obj)
+			out.Values[i] = ec._UserArticle_userFinishedIndex(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6112,6 +6193,22 @@ func (ec *executionContext) unmarshalOInputMessage2ᚖbackendᚑgoᚋgraphᚋmod
 	}
 	res, err := ec.unmarshalInputInputMessage(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
+	return res
 }
 
 func (ec *executionContext) marshalOMessage2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐMessage(ctx context.Context, sel ast.SelectionSet, v []*model.Message) graphql.Marshaler {

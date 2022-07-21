@@ -3,11 +3,11 @@
 package model
 
 type FullArticle struct {
-	ArticleID        string      `json:"articleId"`
-	ArticleTitle     string      `json:"articleTitle"`
-	ArticleSentCount int         `json:"articleSentCount"`
-	UserNextUpIndex  string      `json:"userNextUpIndex"`
-	Sentences        []*Sentence `json:"sentences"`
+	ArticleID         string      `json:"articleId"`
+	ArticleTitle      string      `json:"articleTitle"`
+	ArticleSentCount  int         `json:"articleSentCount"`
+	UserFinishedIndex string      `json:"userFinishedIndex"`
+	Sentences         []*Sentence `json:"sentences"`
 }
 
 type InputMessage struct {
@@ -54,16 +54,16 @@ type Sentence struct {
 }
 
 type UserArticle struct {
-	ArticleID        string `json:"articleId"`
-	ArticleTitle     string `json:"articleTitle"`
-	ArticleSentCount int    `json:"articleSentCount"`
-	UserNextUpIndex  string `json:"userNextUpIndex"`
+	ArticleID         string `json:"articleId"`
+	ArticleTitle      string `json:"articleTitle"`
+	ArticleSentCount  int    `json:"articleSentCount"`
+	UserFinishedIndex *int   `json:"userFinishedIndex"`
 }
 
 type UserCredentials struct {
-	Username     string  `json:"username"`
-	PasswordHash string  `json:"passwordHash"`
-	Email        *string `json:"email"`
+	Username string  `json:"username"`
+	Password string  `json:"password"`
+	Email    *string `json:"email"`
 }
 
 type UserDictation struct {

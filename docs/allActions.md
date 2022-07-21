@@ -23,7 +23,7 @@ This document list all the actions a user can do.
 - Related story: US04
 - Related query: listUserArticles
     - input: username, auth header
-    - response: [ { articleId, articleTitle, articleSentCount, userNextUpIndex }]
+    - response: [ { articleId, articleTitle, articleSentCount, userFinishedIndex }]
 
 If `articleUserSentCount` is 0, we know this user hasn't started listening to this article. Otherwise, we display a progress bar.
 
@@ -38,11 +38,8 @@ When the user clicks on an article, we get: 1) ordered array of sentence ID's in
         articleId, 
         articleTitle,
         articleSentCount,
-        userNextUpIndex,
-        sentences:  {
-            sentIndexInArticle int, sentId string, userTried bool, userAttempt []string
-            }
-        ]
+        userFinishedIndex,
+        sentIDs: [Int!]! // This way it's easier on the backend. 
 
 ## A05 - get the audio for a sentence, so that the user can play
 

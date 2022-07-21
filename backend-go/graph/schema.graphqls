@@ -14,7 +14,7 @@ type LoginToken {
 
 input UserCredentials {
   username: String!
-  passwordHash: String!
+  password: String!
   email: String
 }
 
@@ -27,7 +27,7 @@ type UserArticle {
   articleId: ID!
   articleTitle: String!
   articleSentCount: Int!
-  userNextUpIndex: String!
+  userFinishedIndex: Int
 }
 
 type Sentence {
@@ -53,8 +53,8 @@ type FullArticle {
   articleId: ID!
   articleTitle: String!
   articleSentCount: Int!
-  userNextUpIndex: String!
-  sentences: [Sentence!]!
+  userFinishedIndex: String!
+  sentIDs: [Int!]!
 }
 
 type SentScore {
@@ -82,6 +82,7 @@ type Mutation {
 
 type Query {
   listUserArticles: [UserArticle!]!
+  listUserUnseenArticles: [UserArticle!]!
   getUserFullArticle(articleId: ID!): FullArticle
   fetchSentAudio(sentId: String!): SentDetails
   scoreArticle(articleId: ID!): [SentScore!]!
