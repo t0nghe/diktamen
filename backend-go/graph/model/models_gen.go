@@ -2,25 +2,6 @@
 
 package model
 
-type FullArticle struct {
-	ArticleID         string      `json:"articleId"`
-	ArticleTitle      string      `json:"articleTitle"`
-	ArticleSentCount  int         `json:"articleSentCount"`
-	UserFinishedIndex string      `json:"userFinishedIndex"`
-	Sentences         []*Sentence `json:"sentences"`
-}
-
-type InputMessage struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
-type LenWordTuple struct {
-	Index    int    `json:"index"`
-	Letters  int    `json:"letters"`
-	WordForm string `json:"wordForm"`
-}
-
 type LoginToken struct {
 	Success bool    `json:"success"`
 	Token   *string `json:"token"`
@@ -31,30 +12,48 @@ type Message struct {
 	Message *string `json:"message"`
 }
 
-type SentDetails struct {
-	SentID    string          `json:"sentId"`
-	MediaURI  string          `json:"mediaUri"`
-	WordForms []*LenWordTuple `json:"wordForms"`
+type SeenSent struct {
+	SentID         *int   `json:"sentId"`
+	IndexInArticle *int   `json:"indexInArticle"`
+	TryText        string `json:"tryText"`
 }
 
-type SentScore struct {
-	SentID         string `json:"sentId"`
-	MediaURI       string `json:"mediaUri"`
-	OriginalText   string `json:"originalText"`
-	Comparison     string `json:"comparison"`
-	WordCount      int    `json:"wordCount"`
-	IncorrectCount int    `json:"incorrectCount"`
+type TriedSentWord struct {
+	Length         int     `json:"length"`
+	IsCloze        bool    `json:"isCloze"`
+	Wordform       string  `json:"wordform"`
+	IndexInSent    int     `json:"indexInSent"`
+	LastInputText  string  `json:"lastInputText"`
+	LastInputScore float64 `json:"lastInputScore"`
 }
 
-type Sentence struct {
-	SentID             string    `json:"sentId"`
-	SentIndexInArticle int       `json:"sentIndexInArticle"`
-	UserTried          bool      `json:"userTried"`
-	UserDictation      []*string `json:"userDictation"`
+type TrySentInput struct {
+	UserID        int    `json:"userId"`
+	SentID        int    `json:"sentId"`
+	UserInputJSON string `json:"userInputJson"`
+}
+
+type TrySentScore struct {
+	Success *bool    `json:"success"`
+	Score   *float64 `json:"score"`
+}
+
+type UnseenSent struct {
+	SentID         *int              `json:"sentId"`
+	IndexInArticle *int              `json:"indexInArticle"`
+	MediaURI       *string           `json:"mediaUri"`
+	SentWords      []*UnseenSentWord `json:"sentWords"`
+}
+
+type UnseenSentWord struct {
+	Length      int    `json:"length"`
+	IsCloze     bool   `json:"isCloze"`
+	Wordform    string `json:"wordform"`
+	IndexInSent int    `json:"indexInSent"`
 }
 
 type UserArticle struct {
-	ArticleID         string `json:"articleId"`
+	ArticleID         *int   `json:"articleId"`
 	ArticleTitle      string `json:"articleTitle"`
 	ArticleSentCount  int    `json:"articleSentCount"`
 	UserFinishedIndex *int   `json:"userFinishedIndex"`
@@ -64,9 +63,4 @@ type UserCredentials struct {
 	Username string  `json:"username"`
 	Password string  `json:"password"`
 	Email    *string `json:"email"`
-}
-
-type UserDictation struct {
-	SentID                   string `json:"sentId"`
-	InputWordFormsJSONString string `json:"inputWordFormsJsonString"`
 }

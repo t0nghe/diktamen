@@ -9,7 +9,7 @@ type Message {
 
 type LoginToken {
   success: Boolean!
-  token: String # If unsucessful, token field will be empty.
+  token: String #
 }
 
 input UserCredentials {
@@ -18,73 +18,62 @@ input UserCredentials {
   email: String
 }
 
-input InputMessage {
-  success: Boolean!
-  message: String!
-}
-
 type UserArticle {
-  articleId: ID!
+  articleId: Int
   articleTitle: String!
   articleSentCount: Int!
   userFinishedIndex: Int
 }
 
-type Sentence {
-  sentId: ID!
-  sentIndexInArticle: Int!
-  userTried: Boolean!
-  userDictation: [String]
+type SeenSent {
+  sentId: Int
+  indexInArticle: Int
+  tryText: String!
 }
 
-type LenWordTuple {
-  index: Int! # In some implementations of GraphQL engines, arrays are not ordered.
-  letters: Int!
-  wordForm: String!
+type UnseenSentWord {
+  length: Int!
+  isCloze: Boolean!
+  wordform: String!
+  indexInSent: Int!
 }
 
-type SentDetails {
-  sentId: ID!
-  mediaUri: String!
-  wordForms: [LenWordTuple!]!
+type TriedSentWord { # to be used in examineIncorrectSentences & displayDueSentences
+  length: Int!
+  isCloze: Boolean!
+  wordform: String!
+  indexInSent: Int!
+  lastInputText: String!
+  lastInputScore: Float!
 }
 
-type FullArticle {
-  articleId: ID!
-  articleTitle: String!
-  articleSentCount: Int!
-  userFinishedIndex: String!
-  sentIDs: [Int!]!
+type UnseenSent {
+  sentId: Int
+  indexInArticle: Int
+  mediaUri: String
+  sentWords: [UnseenSentWord]
 }
 
-type SentScore {
-  sentId: ID!
-  mediaUri: String!
-  originalText: String!
-  comparison: String! # HTML
-  wordCount: Int!
-  incorrectCount: Int!
+input TrySentInput {
+  userId: Int!
+  sentId: Int!
+  userInputJson: String!
 }
 
-input UserDictation { # username will be found in the token in http header
-  sentId: ID!
-  inputWordFormsJsonString: String! # To replace [LenWordTuple!]!, FIXME This is hacky. 
-  # Reason for doing this is this error:
-  # cannot use [LenWordTuple] as argument inputWordForms because OBJECT is not a valid input type
+type TrySentScore {
+  success: Boolean # if the operation is successful
+  score: Float # score of the user
 }
 
 type Mutation {
   userSignUp(input: UserCredentials!): Message!
   userLogIn(input: UserCredentials!): LoginToken!
-  userDictation(input: UserDictation): Message! # The user is not immediately given any feedback. This will only be a message for the frontend to consume.
-  createDummyMessage(input: InputMessage): Message!
+  trySent(input: TrySentInput): TrySentScore!
 }
 
 type Query {
   listUserArticles: [UserArticle!]!
   listUserUnseenArticles: [UserArticle!]!
-  getUserFullArticle(articleId: ID!): FullArticle
-  fetchSentAudio(sentId: String!): SentDetails
-  scoreArticle(articleId: ID!): [SentScore!]!
-  dummyMessage: [Message] # This is a dummy query.
+  displayUnseenSents(articleId: Int): [UnseenSent]
+  displaySeenSents(articleId: Int): [SeenSent]
 }

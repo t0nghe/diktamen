@@ -7,7 +7,6 @@ import (
 	"backend-go/graph/generated"
 	"backend-go/graph/model"
 	"backend-go/internal/auth"
-	"backend-go/internal/dummymessages"
 	"backend-go/internal/queries"
 	"context"
 	"fmt"
@@ -36,23 +35,9 @@ func (r *mutationResolver) UserLogIn(ctx context.Context, input model.UserCreden
 	return &model.LoginToken{Success: true, Token: &token}, err
 }
 
-// UserDictation is the resolver for the userDictation field.
-func (r *mutationResolver) UserDictation(ctx context.Context, input *model.UserDictation) (*model.Message, error) {
+// TrySent is the resolver for the trySent field.
+func (r *mutationResolver) TrySent(ctx context.Context, input *model.TrySentInput) (*model.TrySentScore, error) {
 	panic(fmt.Errorf("not implemented"))
-}
-
-// CreateDummyMessage is a resolver used to show if the server works.
-func (r *mutationResolver) CreateDummyMessage(ctx context.Context, input *model.InputMessage) (*model.Message, error) {
-	var dmsg dummymessages.DummyMessage
-	dmsg.Success = input.Success
-	dmsg.Message = input.Message
-	dmsgId := dmsg.Save()
-	msgStr := fmt.Sprintf("Message ID %d saved.", dmsgId)
-	gqlReturnMsg := &model.Message{
-		Success: true,
-		Message: &msgStr,
-	}
-	return gqlReturnMsg, nil
 }
 
 // ListUserArticles resolver returns all articles with the progress of the user.
@@ -91,45 +76,26 @@ func (r *queryResolver) ListUserUnseenArticles(ctx context.Context) ([]*model.Us
 	return ret, nil
 }
 
-// GetUserFullArticle is the resolver for the getUserFullArticle field.
-func (r *queryResolver) GetUserFullArticle(ctx context.Context, articleID string) (*model.FullArticle, error) {
+// DisplayUnseenSents queries for sentences the user has not seen in an article.
+func (r *queryResolver) DisplayUnseenSents(ctx context.Context, articleID *int) ([]*model.UnseenSent, error) {
+	// check if user is logged in
 	userId := auth.FromContext(ctx, "user_id")
 	if userId == 0 {
 		return nil, fmt.Errorf("please log in")
 	}
-	queries.QueryUserFullArticle(userId, articleID)
 
-	return nil, nil
-}
-
-// FetchSentAudio is the resolver for the fetchSentAudio field.
-func (r *queryResolver) FetchSentAudio(ctx context.Context, sentID string) (*model.SentDetails, error) {
-	sentDetails := &model.SentDetails{SentID: sentID, MediaURI: "https://abc.com/file.mp3"}
-	return sentDetails, nil
-}
-
-// ScoreArticle is the resolver for the scoreArticle field.
-func (r *queryResolver) ScoreArticle(ctx context.Context, articleID string) ([]*model.SentScore, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-// DummyMessage is the resolver for the dummyMessage field.
-func (r *queryResolver) DummyMessage(ctx context.Context) ([]*model.Message, error) {
-	var resultMsgs []*model.Message
-	dbMsgs := dummymessages.GetDummyMessages()
-
-	for _, msg := range dbMsgs {
-		// using &msg.Message on line 67
-		// all returned records will be the string
-		// as the last item.
-		currentMsg := msg.Message
-		resultMsg := &model.Message{
-			Success: msg.Success,
-			Message: &currentMsg,
-		}
-		resultMsgs = append(resultMsgs, resultMsg)
+	// query for sentences in an article, where userid and articleid match; and userFinishedIndex is 0
+	result, err := queries.QueryUserUnseenSents(userId, *articleID)
+	if err != nil {
+		return nil, err
 	}
-	return resultMsgs, nil
+
+	return result, nil
+}
+
+// DisplaySeenSents is the resolver for the displaySeenSents field.
+func (r *queryResolver) DisplaySeenSents(ctx context.Context, articleID *int) ([]*model.SeenSent, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -140,13 +106,3 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *mutationResolver) UserAttempt(ctx context.Context, input *model.UserDictation) (*model.Message, error) {
-	panic(fmt.Errorf("not implemented"))
-}

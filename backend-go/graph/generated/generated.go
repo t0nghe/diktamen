@@ -44,20 +44,6 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	FullArticle struct {
-		ArticleID         func(childComplexity int) int
-		ArticleSentCount  func(childComplexity int) int
-		ArticleTitle      func(childComplexity int) int
-		Sentences         func(childComplexity int) int
-		UserFinishedIndex func(childComplexity int) int
-	}
-
-	LenWordTuple struct {
-		Index    func(childComplexity int) int
-		Letters  func(childComplexity int) int
-		WordForm func(childComplexity int) int
-	}
-
 	LoginToken struct {
 		Success func(childComplexity int) int
 		Token   func(childComplexity int) int
@@ -69,41 +55,50 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateDummyMessage func(childComplexity int, input *model.InputMessage) int
-		UserDictation      func(childComplexity int, input *model.UserDictation) int
-		UserLogIn          func(childComplexity int, input model.UserCredentials) int
-		UserSignUp         func(childComplexity int, input model.UserCredentials) int
+		TrySent    func(childComplexity int, input *model.TrySentInput) int
+		UserLogIn  func(childComplexity int, input model.UserCredentials) int
+		UserSignUp func(childComplexity int, input model.UserCredentials) int
 	}
 
 	Query struct {
-		DummyMessage           func(childComplexity int) int
-		FetchSentAudio         func(childComplexity int, sentID string) int
-		GetUserFullArticle     func(childComplexity int, articleID string) int
+		DisplaySeenSents       func(childComplexity int, articleID *int) int
+		DisplayUnseenSents     func(childComplexity int, articleID *int) int
 		ListUserArticles       func(childComplexity int) int
 		ListUserUnseenArticles func(childComplexity int) int
-		ScoreArticle           func(childComplexity int, articleID string) int
 	}
 
-	SentDetails struct {
-		MediaURI  func(childComplexity int) int
-		SentID    func(childComplexity int) int
-		WordForms func(childComplexity int) int
-	}
-
-	SentScore struct {
-		Comparison     func(childComplexity int) int
-		IncorrectCount func(childComplexity int) int
-		MediaURI       func(childComplexity int) int
-		OriginalText   func(childComplexity int) int
+	SeenSent struct {
+		IndexInArticle func(childComplexity int) int
 		SentID         func(childComplexity int) int
-		WordCount      func(childComplexity int) int
+		TryText        func(childComplexity int) int
 	}
 
-	Sentence struct {
-		SentID             func(childComplexity int) int
-		SentIndexInArticle func(childComplexity int) int
-		UserDictation      func(childComplexity int) int
-		UserTried          func(childComplexity int) int
+	TriedSentWord struct {
+		IndexInSent    func(childComplexity int) int
+		IsCloze        func(childComplexity int) int
+		LastInputScore func(childComplexity int) int
+		LastInputText  func(childComplexity int) int
+		Length         func(childComplexity int) int
+		Wordform       func(childComplexity int) int
+	}
+
+	TrySentScore struct {
+		Score   func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
+	UnseenSent struct {
+		IndexInArticle func(childComplexity int) int
+		MediaURI       func(childComplexity int) int
+		SentID         func(childComplexity int) int
+		SentWords      func(childComplexity int) int
+	}
+
+	UnseenSentWord struct {
+		IndexInSent func(childComplexity int) int
+		IsCloze     func(childComplexity int) int
+		Length      func(childComplexity int) int
+		Wordform    func(childComplexity int) int
 	}
 
 	UserArticle struct {
@@ -117,16 +112,13 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	UserSignUp(ctx context.Context, input model.UserCredentials) (*model.Message, error)
 	UserLogIn(ctx context.Context, input model.UserCredentials) (*model.LoginToken, error)
-	UserDictation(ctx context.Context, input *model.UserDictation) (*model.Message, error)
-	CreateDummyMessage(ctx context.Context, input *model.InputMessage) (*model.Message, error)
+	TrySent(ctx context.Context, input *model.TrySentInput) (*model.TrySentScore, error)
 }
 type QueryResolver interface {
 	ListUserArticles(ctx context.Context) ([]*model.UserArticle, error)
 	ListUserUnseenArticles(ctx context.Context) ([]*model.UserArticle, error)
-	GetUserFullArticle(ctx context.Context, articleID string) (*model.FullArticle, error)
-	FetchSentAudio(ctx context.Context, sentID string) (*model.SentDetails, error)
-	ScoreArticle(ctx context.Context, articleID string) ([]*model.SentScore, error)
-	DummyMessage(ctx context.Context) ([]*model.Message, error)
+	DisplayUnseenSents(ctx context.Context, articleID *int) ([]*model.UnseenSent, error)
+	DisplaySeenSents(ctx context.Context, articleID *int) ([]*model.SeenSent, error)
 }
 
 type executableSchema struct {
@@ -143,62 +135,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
-
-	case "FullArticle.articleId":
-		if e.complexity.FullArticle.ArticleID == nil {
-			break
-		}
-
-		return e.complexity.FullArticle.ArticleID(childComplexity), true
-
-	case "FullArticle.articleSentCount":
-		if e.complexity.FullArticle.ArticleSentCount == nil {
-			break
-		}
-
-		return e.complexity.FullArticle.ArticleSentCount(childComplexity), true
-
-	case "FullArticle.articleTitle":
-		if e.complexity.FullArticle.ArticleTitle == nil {
-			break
-		}
-
-		return e.complexity.FullArticle.ArticleTitle(childComplexity), true
-
-	case "FullArticle.sentences":
-		if e.complexity.FullArticle.Sentences == nil {
-			break
-		}
-
-		return e.complexity.FullArticle.Sentences(childComplexity), true
-
-	case "FullArticle.userFinishedIndex":
-		if e.complexity.FullArticle.UserFinishedIndex == nil {
-			break
-		}
-
-		return e.complexity.FullArticle.UserFinishedIndex(childComplexity), true
-
-	case "LenWordTuple.index":
-		if e.complexity.LenWordTuple.Index == nil {
-			break
-		}
-
-		return e.complexity.LenWordTuple.Index(childComplexity), true
-
-	case "LenWordTuple.letters":
-		if e.complexity.LenWordTuple.Letters == nil {
-			break
-		}
-
-		return e.complexity.LenWordTuple.Letters(childComplexity), true
-
-	case "LenWordTuple.wordForm":
-		if e.complexity.LenWordTuple.WordForm == nil {
-			break
-		}
-
-		return e.complexity.LenWordTuple.WordForm(childComplexity), true
 
 	case "LoginToken.success":
 		if e.complexity.LoginToken.Success == nil {
@@ -228,29 +164,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Message.Success(childComplexity), true
 
-	case "Mutation.createDummyMessage":
-		if e.complexity.Mutation.CreateDummyMessage == nil {
+	case "Mutation.trySent":
+		if e.complexity.Mutation.TrySent == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_createDummyMessage_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_trySent_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateDummyMessage(childComplexity, args["input"].(*model.InputMessage)), true
-
-	case "Mutation.userDictation":
-		if e.complexity.Mutation.UserDictation == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_userDictation_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.UserDictation(childComplexity, args["input"].(*model.UserDictation)), true
+		return e.complexity.Mutation.TrySent(childComplexity, args["input"].(*model.TrySentInput)), true
 
 	case "Mutation.userLogIn":
 		if e.complexity.Mutation.UserLogIn == nil {
@@ -276,36 +200,29 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UserSignUp(childComplexity, args["input"].(model.UserCredentials)), true
 
-	case "Query.dummyMessage":
-		if e.complexity.Query.DummyMessage == nil {
+	case "Query.displaySeenSents":
+		if e.complexity.Query.DisplaySeenSents == nil {
 			break
 		}
 
-		return e.complexity.Query.DummyMessage(childComplexity), true
-
-	case "Query.fetchSentAudio":
-		if e.complexity.Query.FetchSentAudio == nil {
-			break
-		}
-
-		args, err := ec.field_Query_fetchSentAudio_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_displaySeenSents_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.FetchSentAudio(childComplexity, args["sentId"].(string)), true
+		return e.complexity.Query.DisplaySeenSents(childComplexity, args["articleId"].(*int)), true
 
-	case "Query.getUserFullArticle":
-		if e.complexity.Query.GetUserFullArticle == nil {
+	case "Query.displayUnseenSents":
+		if e.complexity.Query.DisplayUnseenSents == nil {
 			break
 		}
 
-		args, err := ec.field_Query_getUserFullArticle_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_displayUnseenSents_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.GetUserFullArticle(childComplexity, args["articleId"].(string)), true
+		return e.complexity.Query.DisplayUnseenSents(childComplexity, args["articleId"].(*int)), true
 
 	case "Query.listUserArticles":
 		if e.complexity.Query.ListUserArticles == nil {
@@ -321,108 +238,138 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.ListUserUnseenArticles(childComplexity), true
 
-	case "Query.scoreArticle":
-		if e.complexity.Query.ScoreArticle == nil {
+	case "SeenSent.indexInArticle":
+		if e.complexity.SeenSent.IndexInArticle == nil {
 			break
 		}
 
-		args, err := ec.field_Query_scoreArticle_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
+		return e.complexity.SeenSent.IndexInArticle(childComplexity), true
 
-		return e.complexity.Query.ScoreArticle(childComplexity, args["articleId"].(string)), true
-
-	case "SentDetails.mediaUri":
-		if e.complexity.SentDetails.MediaURI == nil {
+	case "SeenSent.sentId":
+		if e.complexity.SeenSent.SentID == nil {
 			break
 		}
 
-		return e.complexity.SentDetails.MediaURI(childComplexity), true
+		return e.complexity.SeenSent.SentID(childComplexity), true
 
-	case "SentDetails.sentId":
-		if e.complexity.SentDetails.SentID == nil {
+	case "SeenSent.tryText":
+		if e.complexity.SeenSent.TryText == nil {
 			break
 		}
 
-		return e.complexity.SentDetails.SentID(childComplexity), true
+		return e.complexity.SeenSent.TryText(childComplexity), true
 
-	case "SentDetails.wordForms":
-		if e.complexity.SentDetails.WordForms == nil {
+	case "TriedSentWord.indexInSent":
+		if e.complexity.TriedSentWord.IndexInSent == nil {
 			break
 		}
 
-		return e.complexity.SentDetails.WordForms(childComplexity), true
+		return e.complexity.TriedSentWord.IndexInSent(childComplexity), true
 
-	case "SentScore.comparison":
-		if e.complexity.SentScore.Comparison == nil {
+	case "TriedSentWord.isCloze":
+		if e.complexity.TriedSentWord.IsCloze == nil {
 			break
 		}
 
-		return e.complexity.SentScore.Comparison(childComplexity), true
+		return e.complexity.TriedSentWord.IsCloze(childComplexity), true
 
-	case "SentScore.incorrectCount":
-		if e.complexity.SentScore.IncorrectCount == nil {
+	case "TriedSentWord.lastInputScore":
+		if e.complexity.TriedSentWord.LastInputScore == nil {
 			break
 		}
 
-		return e.complexity.SentScore.IncorrectCount(childComplexity), true
+		return e.complexity.TriedSentWord.LastInputScore(childComplexity), true
 
-	case "SentScore.mediaUri":
-		if e.complexity.SentScore.MediaURI == nil {
+	case "TriedSentWord.lastInputText":
+		if e.complexity.TriedSentWord.LastInputText == nil {
 			break
 		}
 
-		return e.complexity.SentScore.MediaURI(childComplexity), true
+		return e.complexity.TriedSentWord.LastInputText(childComplexity), true
 
-	case "SentScore.originalText":
-		if e.complexity.SentScore.OriginalText == nil {
+	case "TriedSentWord.length":
+		if e.complexity.TriedSentWord.Length == nil {
 			break
 		}
 
-		return e.complexity.SentScore.OriginalText(childComplexity), true
+		return e.complexity.TriedSentWord.Length(childComplexity), true
 
-	case "SentScore.sentId":
-		if e.complexity.SentScore.SentID == nil {
+	case "TriedSentWord.wordform":
+		if e.complexity.TriedSentWord.Wordform == nil {
 			break
 		}
 
-		return e.complexity.SentScore.SentID(childComplexity), true
+		return e.complexity.TriedSentWord.Wordform(childComplexity), true
 
-	case "SentScore.wordCount":
-		if e.complexity.SentScore.WordCount == nil {
+	case "TrySentScore.score":
+		if e.complexity.TrySentScore.Score == nil {
 			break
 		}
 
-		return e.complexity.SentScore.WordCount(childComplexity), true
+		return e.complexity.TrySentScore.Score(childComplexity), true
 
-	case "Sentence.sentId":
-		if e.complexity.Sentence.SentID == nil {
+	case "TrySentScore.success":
+		if e.complexity.TrySentScore.Success == nil {
 			break
 		}
 
-		return e.complexity.Sentence.SentID(childComplexity), true
+		return e.complexity.TrySentScore.Success(childComplexity), true
 
-	case "Sentence.sentIndexInArticle":
-		if e.complexity.Sentence.SentIndexInArticle == nil {
+	case "UnseenSent.indexInArticle":
+		if e.complexity.UnseenSent.IndexInArticle == nil {
 			break
 		}
 
-		return e.complexity.Sentence.SentIndexInArticle(childComplexity), true
+		return e.complexity.UnseenSent.IndexInArticle(childComplexity), true
 
-	case "Sentence.userDictation":
-		if e.complexity.Sentence.UserDictation == nil {
+	case "UnseenSent.mediaUri":
+		if e.complexity.UnseenSent.MediaURI == nil {
 			break
 		}
 
-		return e.complexity.Sentence.UserDictation(childComplexity), true
+		return e.complexity.UnseenSent.MediaURI(childComplexity), true
 
-	case "Sentence.userTried":
-		if e.complexity.Sentence.UserTried == nil {
+	case "UnseenSent.sentId":
+		if e.complexity.UnseenSent.SentID == nil {
 			break
 		}
 
-		return e.complexity.Sentence.UserTried(childComplexity), true
+		return e.complexity.UnseenSent.SentID(childComplexity), true
+
+	case "UnseenSent.sentWords":
+		if e.complexity.UnseenSent.SentWords == nil {
+			break
+		}
+
+		return e.complexity.UnseenSent.SentWords(childComplexity), true
+
+	case "UnseenSentWord.indexInSent":
+		if e.complexity.UnseenSentWord.IndexInSent == nil {
+			break
+		}
+
+		return e.complexity.UnseenSentWord.IndexInSent(childComplexity), true
+
+	case "UnseenSentWord.isCloze":
+		if e.complexity.UnseenSentWord.IsCloze == nil {
+			break
+		}
+
+		return e.complexity.UnseenSentWord.IsCloze(childComplexity), true
+
+	case "UnseenSentWord.length":
+		if e.complexity.UnseenSentWord.Length == nil {
+			break
+		}
+
+		return e.complexity.UnseenSentWord.Length(childComplexity), true
+
+	case "UnseenSentWord.wordform":
+		if e.complexity.UnseenSentWord.Wordform == nil {
+			break
+		}
+
+		return e.complexity.UnseenSentWord.Wordform(childComplexity), true
 
 	case "UserArticle.articleId":
 		if e.complexity.UserArticle.ArticleID == nil {
@@ -460,9 +407,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputInputMessage,
+		ec.unmarshalInputTrySentInput,
 		ec.unmarshalInputUserCredentials,
-		ec.unmarshalInputUserDictation,
 	)
 	first := true
 
@@ -534,7 +480,7 @@ type Message {
 
 type LoginToken {
   success: Boolean!
-  token: String # If unsucessful, token field will be empty.
+  token: String #
 }
 
 input UserCredentials {
@@ -543,75 +489,64 @@ input UserCredentials {
   email: String
 }
 
-input InputMessage {
-  success: Boolean!
-  message: String!
-}
-
 type UserArticle {
-  articleId: ID!
+  articleId: Int
   articleTitle: String!
   articleSentCount: Int!
   userFinishedIndex: Int
 }
 
-type Sentence {
-  sentId: ID!
-  sentIndexInArticle: Int!
-  userTried: Boolean!
-  userDictation: [String]
+type SeenSent {
+  sentId: Int
+  indexInArticle: Int
+  tryText: String!
 }
 
-type LenWordTuple {
-  index: Int! # In some implementations of GraphQL engines, arrays are not ordered.
-  letters: Int!
-  wordForm: String!
+type UnseenSentWord {
+  length: Int!
+  isCloze: Boolean!
+  wordform: String!
+  indexInSent: Int!
 }
 
-type SentDetails {
-  sentId: ID!
-  mediaUri: String!
-  wordForms: [LenWordTuple!]!
+type TriedSentWord { # to be used in examineIncorrectSentences & displayDueSentences
+  length: Int!
+  isCloze: Boolean!
+  wordform: String!
+  indexInSent: Int!
+  lastInputText: String!
+  lastInputScore: Float!
 }
 
-type FullArticle {
-  articleId: ID!
-  articleTitle: String!
-  articleSentCount: Int!
-  userFinishedIndex: String!
-  sentences: [Sentence!]!
+type UnseenSent {
+  sentId: Int
+  indexInArticle: Int
+  mediaUri: String
+  sentWords: [UnseenSentWord]
 }
 
-type SentScore {
-  sentId: ID!
-  mediaUri: String!
-  originalText: String!
-  comparison: String! # HTML
-  wordCount: Int!
-  incorrectCount: Int!
+input TrySentInput {
+  userId: Int!
+  sentId: Int!
+  userInputJson: String!
 }
 
-input UserDictation { # username will be found in the token in http header
-  sentId: ID!
-  inputWordFormsJsonString: String! # To replace [LenWordTuple!]!, FIXME This is hacky. 
-  # Reason for doing this is this error:
-  # cannot use [LenWordTuple] as argument inputWordForms because OBJECT is not a valid input type
+type TrySentScore {
+  success: Boolean # if the operation is successful
+  score: Float # score of the user
 }
 
 type Mutation {
   userSignUp(input: UserCredentials!): Message!
   userLogIn(input: UserCredentials!): LoginToken!
-  userDictation(input: UserDictation): Message! # The user is not immediately given any feedback. This will only be a message for the frontend to consume.
-  createDummyMessage(input: InputMessage): Message!
+  trySent(input: TrySentInput): TrySentScore!
 }
 
 type Query {
   listUserArticles: [UserArticle!]!
   listUserUnseenArticles: [UserArticle!]!
-  getUserFullArticle(articleId: ID!): FullArticle
-  fetchSentAudio(sentId: String!): SentDetails
-  scoreArticle(articleId: ID!): [SentScore!]!
-  dummyMessage: [Message] # This is a dummy query.
+  displayUnseenSents(articleId: Int): [UnseenSent]
+  displaySeenSents(articleId: Int): [SeenSent]
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -620,28 +555,13 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_createDummyMessage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_trySent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.InputMessage
+	var arg0 *model.TrySentInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOInputMessage2ᚖbackendᚑgoᚋgraphᚋmodelᚐInputMessage(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_userDictation_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.UserDictation
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOUserDictation2ᚖbackendᚑgoᚋgraphᚋmodelᚐUserDictation(ctx, tmp)
+		arg0, err = ec.unmarshalOTrySentInput2ᚖbackendᚑgoᚋgraphᚋmodelᚐTrySentInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -695,28 +615,13 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_fetchSentAudio_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_displaySeenSents_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["sentId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sentId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["sentId"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_getUserFullArticle_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
+	var arg0 *int
 	if tmp, ok := rawArgs["articleId"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("articleId"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -725,13 +630,13 @@ func (ec *executionContext) field_Query_getUserFullArticle_args(ctx context.Cont
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_scoreArticle_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_displayUnseenSents_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
+	var arg0 *int
 	if tmp, ok := rawArgs["articleId"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("articleId"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -777,368 +682,6 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
-
-func (ec *executionContext) _FullArticle_articleId(ctx context.Context, field graphql.CollectedField, obj *model.FullArticle) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_FullArticle_articleId(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ArticleID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_FullArticle_articleId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "FullArticle",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _FullArticle_articleTitle(ctx context.Context, field graphql.CollectedField, obj *model.FullArticle) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_FullArticle_articleTitle(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ArticleTitle, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_FullArticle_articleTitle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "FullArticle",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _FullArticle_articleSentCount(ctx context.Context, field graphql.CollectedField, obj *model.FullArticle) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_FullArticle_articleSentCount(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ArticleSentCount, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_FullArticle_articleSentCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "FullArticle",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _FullArticle_userFinishedIndex(ctx context.Context, field graphql.CollectedField, obj *model.FullArticle) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_FullArticle_userFinishedIndex(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UserFinishedIndex, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_FullArticle_userFinishedIndex(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "FullArticle",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _FullArticle_sentences(ctx context.Context, field graphql.CollectedField, obj *model.FullArticle) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_FullArticle_sentences(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Sentences, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Sentence)
-	fc.Result = res
-	return ec.marshalNSentence2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐSentenceᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_FullArticle_sentences(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "FullArticle",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "sentId":
-				return ec.fieldContext_Sentence_sentId(ctx, field)
-			case "sentIndexInArticle":
-				return ec.fieldContext_Sentence_sentIndexInArticle(ctx, field)
-			case "userTried":
-				return ec.fieldContext_Sentence_userTried(ctx, field)
-			case "userDictation":
-				return ec.fieldContext_Sentence_userDictation(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Sentence", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _LenWordTuple_index(ctx context.Context, field graphql.CollectedField, obj *model.LenWordTuple) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_LenWordTuple_index(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Index, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_LenWordTuple_index(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "LenWordTuple",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _LenWordTuple_letters(ctx context.Context, field graphql.CollectedField, obj *model.LenWordTuple) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_LenWordTuple_letters(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Letters, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_LenWordTuple_letters(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "LenWordTuple",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _LenWordTuple_wordForm(ctx context.Context, field graphql.CollectedField, obj *model.LenWordTuple) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_LenWordTuple_wordForm(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.WordForm, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_LenWordTuple_wordForm(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "LenWordTuple",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
 
 func (ec *executionContext) _LoginToken_success(ctx context.Context, field graphql.CollectedField, obj *model.LoginToken) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_LoginToken_success(ctx, field)
@@ -1432,8 +975,8 @@ func (ec *executionContext) fieldContext_Mutation_userLogIn(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_userDictation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_userDictation(ctx, field)
+func (ec *executionContext) _Mutation_trySent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_trySent(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1446,7 +989,7 @@ func (ec *executionContext) _Mutation_userDictation(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UserDictation(rctx, fc.Args["input"].(*model.UserDictation))
+		return ec.resolvers.Mutation().TrySent(rctx, fc.Args["input"].(*model.TrySentInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1458,12 +1001,12 @@ func (ec *executionContext) _Mutation_userDictation(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Message)
+	res := resTmp.(*model.TrySentScore)
 	fc.Result = res
-	return ec.marshalNMessage2ᚖbackendᚑgoᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
+	return ec.marshalNTrySentScore2ᚖbackendᚑgoᚋgraphᚋmodelᚐTrySentScore(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_userDictation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_trySent(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -1472,11 +1015,11 @@ func (ec *executionContext) fieldContext_Mutation_userDictation(ctx context.Cont
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "success":
-				return ec.fieldContext_Message_success(ctx, field)
-			case "message":
-				return ec.fieldContext_Message_message(ctx, field)
+				return ec.fieldContext_TrySentScore_success(ctx, field)
+			case "score":
+				return ec.fieldContext_TrySentScore_score(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type TrySentScore", field.Name)
 		},
 	}
 	defer func() {
@@ -1486,68 +1029,7 @@ func (ec *executionContext) fieldContext_Mutation_userDictation(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_userDictation_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createDummyMessage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createDummyMessage(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateDummyMessage(rctx, fc.Args["input"].(*model.InputMessage))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Message)
-	fc.Result = res
-	return ec.marshalNMessage2ᚖbackendᚑgoᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createDummyMessage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "success":
-				return ec.fieldContext_Message_success(ctx, field)
-			case "message":
-				return ec.fieldContext_Message_message(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createDummyMessage_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_trySent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -1662,8 +1144,8 @@ func (ec *executionContext) fieldContext_Query_listUserUnseenArticles(ctx contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_getUserFullArticle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_getUserFullArticle(ctx, field)
+func (ec *executionContext) _Query_displayUnseenSents(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_displayUnseenSents(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1676,7 +1158,7 @@ func (ec *executionContext) _Query_getUserFullArticle(ctx context.Context, field
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetUserFullArticle(rctx, fc.Args["articleId"].(string))
+		return ec.resolvers.Query().DisplayUnseenSents(rctx, fc.Args["articleId"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1685,76 +1167,12 @@ func (ec *executionContext) _Query_getUserFullArticle(ctx context.Context, field
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.FullArticle)
+	res := resTmp.([]*model.UnseenSent)
 	fc.Result = res
-	return ec.marshalOFullArticle2ᚖbackendᚑgoᚋgraphᚋmodelᚐFullArticle(ctx, field.Selections, res)
+	return ec.marshalOUnseenSent2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐUnseenSent(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_getUserFullArticle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "articleId":
-				return ec.fieldContext_FullArticle_articleId(ctx, field)
-			case "articleTitle":
-				return ec.fieldContext_FullArticle_articleTitle(ctx, field)
-			case "articleSentCount":
-				return ec.fieldContext_FullArticle_articleSentCount(ctx, field)
-			case "userFinishedIndex":
-				return ec.fieldContext_FullArticle_userFinishedIndex(ctx, field)
-			case "sentences":
-				return ec.fieldContext_FullArticle_sentences(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type FullArticle", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_getUserFullArticle_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_fetchSentAudio(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_fetchSentAudio(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().FetchSentAudio(rctx, fc.Args["sentId"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.SentDetails)
-	fc.Result = res
-	return ec.marshalOSentDetails2ᚖbackendᚑgoᚋgraphᚋmodelᚐSentDetails(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_fetchSentAudio(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_displayUnseenSents(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -1763,13 +1181,15 @@ func (ec *executionContext) fieldContext_Query_fetchSentAudio(ctx context.Contex
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "sentId":
-				return ec.fieldContext_SentDetails_sentId(ctx, field)
+				return ec.fieldContext_UnseenSent_sentId(ctx, field)
+			case "indexInArticle":
+				return ec.fieldContext_UnseenSent_indexInArticle(ctx, field)
 			case "mediaUri":
-				return ec.fieldContext_SentDetails_mediaUri(ctx, field)
-			case "wordForms":
-				return ec.fieldContext_SentDetails_wordForms(ctx, field)
+				return ec.fieldContext_UnseenSent_mediaUri(ctx, field)
+			case "sentWords":
+				return ec.fieldContext_UnseenSent_sentWords(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type SentDetails", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type UnseenSent", field.Name)
 		},
 	}
 	defer func() {
@@ -1779,15 +1199,15 @@ func (ec *executionContext) fieldContext_Query_fetchSentAudio(ctx context.Contex
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_fetchSentAudio_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_displayUnseenSents_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_scoreArticle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_scoreArticle(ctx, field)
+func (ec *executionContext) _Query_displaySeenSents(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_displaySeenSents(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1800,24 +1220,21 @@ func (ec *executionContext) _Query_scoreArticle(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ScoreArticle(rctx, fc.Args["articleId"].(string))
+		return ec.resolvers.Query().DisplaySeenSents(rctx, fc.Args["articleId"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.SentScore)
+	res := resTmp.([]*model.SeenSent)
 	fc.Result = res
-	return ec.marshalNSentScore2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐSentScoreᚄ(ctx, field.Selections, res)
+	return ec.marshalOSeenSent2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐSeenSent(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_scoreArticle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_displaySeenSents(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -1826,19 +1243,13 @@ func (ec *executionContext) fieldContext_Query_scoreArticle(ctx context.Context,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "sentId":
-				return ec.fieldContext_SentScore_sentId(ctx, field)
-			case "mediaUri":
-				return ec.fieldContext_SentScore_mediaUri(ctx, field)
-			case "originalText":
-				return ec.fieldContext_SentScore_originalText(ctx, field)
-			case "comparison":
-				return ec.fieldContext_SentScore_comparison(ctx, field)
-			case "wordCount":
-				return ec.fieldContext_SentScore_wordCount(ctx, field)
-			case "incorrectCount":
-				return ec.fieldContext_SentScore_incorrectCount(ctx, field)
+				return ec.fieldContext_SeenSent_sentId(ctx, field)
+			case "indexInArticle":
+				return ec.fieldContext_SeenSent_indexInArticle(ctx, field)
+			case "tryText":
+				return ec.fieldContext_SeenSent_tryText(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type SentScore", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type SeenSent", field.Name)
 		},
 	}
 	defer func() {
@@ -1848,56 +1259,9 @@ func (ec *executionContext) fieldContext_Query_scoreArticle(ctx context.Context,
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_scoreArticle_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_displaySeenSents_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_dummyMessage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_dummyMessage(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().DummyMessage(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Message)
-	fc.Result = res
-	return ec.marshalOMessage2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_dummyMessage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "success":
-				return ec.fieldContext_Message_success(ctx, field)
-			case "message":
-				return ec.fieldContext_Message_message(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
-		},
 	}
 	return fc, nil
 }
@@ -2031,8 +1395,8 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _SentDetails_sentId(ctx context.Context, field graphql.CollectedField, obj *model.SentDetails) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SentDetails_sentId(ctx, field)
+func (ec *executionContext) _SeenSent_sentId(ctx context.Context, field graphql.CollectedField, obj *model.SeenSent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SeenSent_sentId(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2052,31 +1416,28 @@ func (ec *executionContext) _SentDetails_sentId(ctx context.Context, field graph
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_SentDetails_sentId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_SeenSent_sentId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "SentDetails",
+		Object:     "SeenSent",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _SentDetails_mediaUri(ctx context.Context, field graphql.CollectedField, obj *model.SentDetails) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SentDetails_mediaUri(ctx, field)
+func (ec *executionContext) _SeenSent_indexInArticle(ctx context.Context, field graphql.CollectedField, obj *model.SeenSent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SeenSent_indexInArticle(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2089,7 +1450,48 @@ func (ec *executionContext) _SentDetails_mediaUri(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.MediaURI, nil
+		return obj.IndexInArticle, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SeenSent_indexInArticle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SeenSent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SeenSent_tryText(ctx context.Context, field graphql.CollectedField, obj *model.SeenSent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SeenSent_tryText(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TryText, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2106,9 +1508,9 @@ func (ec *executionContext) _SentDetails_mediaUri(ctx context.Context, field gra
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_SentDetails_mediaUri(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_SeenSent_tryText(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "SentDetails",
+		Object:     "SeenSent",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2119,8 +1521,8 @@ func (ec *executionContext) fieldContext_SentDetails_mediaUri(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _SentDetails_wordForms(ctx context.Context, field graphql.CollectedField, obj *model.SentDetails) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SentDetails_wordForms(ctx, field)
+func (ec *executionContext) _TriedSentWord_length(ctx context.Context, field graphql.CollectedField, obj *model.TriedSentWord) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TriedSentWord_length(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2133,235 +1535,7 @@ func (ec *executionContext) _SentDetails_wordForms(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.WordForms, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.LenWordTuple)
-	fc.Result = res
-	return ec.marshalNLenWordTuple2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐLenWordTupleᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SentDetails_wordForms(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SentDetails",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "index":
-				return ec.fieldContext_LenWordTuple_index(ctx, field)
-			case "letters":
-				return ec.fieldContext_LenWordTuple_letters(ctx, field)
-			case "wordForm":
-				return ec.fieldContext_LenWordTuple_wordForm(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type LenWordTuple", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SentScore_sentId(ctx context.Context, field graphql.CollectedField, obj *model.SentScore) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SentScore_sentId(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SentID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SentScore_sentId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SentScore",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SentScore_mediaUri(ctx context.Context, field graphql.CollectedField, obj *model.SentScore) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SentScore_mediaUri(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.MediaURI, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SentScore_mediaUri(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SentScore",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SentScore_originalText(ctx context.Context, field graphql.CollectedField, obj *model.SentScore) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SentScore_originalText(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.OriginalText, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SentScore_originalText(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SentScore",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SentScore_comparison(ctx context.Context, field graphql.CollectedField, obj *model.SentScore) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SentScore_comparison(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Comparison, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SentScore_comparison(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SentScore",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SentScore_wordCount(ctx context.Context, field graphql.CollectedField, obj *model.SentScore) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SentScore_wordCount(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.WordCount, nil
+		return obj.Length, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2378,9 +1552,9 @@ func (ec *executionContext) _SentScore_wordCount(ctx context.Context, field grap
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_SentScore_wordCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_TriedSentWord_length(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "SentScore",
+		Object:     "TriedSentWord",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2391,8 +1565,8 @@ func (ec *executionContext) fieldContext_SentScore_wordCount(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _SentScore_incorrectCount(ctx context.Context, field graphql.CollectedField, obj *model.SentScore) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SentScore_incorrectCount(ctx, field)
+func (ec *executionContext) _TriedSentWord_isCloze(ctx context.Context, field graphql.CollectedField, obj *model.TriedSentWord) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TriedSentWord_isCloze(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2405,139 +1579,7 @@ func (ec *executionContext) _SentScore_incorrectCount(ctx context.Context, field
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.IncorrectCount, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SentScore_incorrectCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SentScore",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Sentence_sentId(ctx context.Context, field graphql.CollectedField, obj *model.Sentence) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Sentence_sentId(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SentID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Sentence_sentId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Sentence",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Sentence_sentIndexInArticle(ctx context.Context, field graphql.CollectedField, obj *model.Sentence) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Sentence_sentIndexInArticle(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SentIndexInArticle, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Sentence_sentIndexInArticle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Sentence",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Sentence_userTried(ctx context.Context, field graphql.CollectedField, obj *model.Sentence) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Sentence_userTried(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UserTried, nil
+		return obj.IsCloze, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2554,9 +1596,9 @@ func (ec *executionContext) _Sentence_userTried(ctx context.Context, field graph
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Sentence_userTried(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_TriedSentWord_isCloze(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Sentence",
+		Object:     "TriedSentWord",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2567,8 +1609,8 @@ func (ec *executionContext) fieldContext_Sentence_userTried(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Sentence_userDictation(ctx context.Context, field graphql.CollectedField, obj *model.Sentence) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Sentence_userDictation(ctx, field)
+func (ec *executionContext) _TriedSentWord_wordform(ctx context.Context, field graphql.CollectedField, obj *model.TriedSentWord) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TriedSentWord_wordform(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2581,7 +1623,183 @@ func (ec *executionContext) _Sentence_userDictation(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.UserDictation, nil
+		return obj.Wordform, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TriedSentWord_wordform(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TriedSentWord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TriedSentWord_indexInSent(ctx context.Context, field graphql.CollectedField, obj *model.TriedSentWord) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TriedSentWord_indexInSent(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IndexInSent, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TriedSentWord_indexInSent(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TriedSentWord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TriedSentWord_lastInputText(ctx context.Context, field graphql.CollectedField, obj *model.TriedSentWord) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TriedSentWord_lastInputText(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastInputText, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TriedSentWord_lastInputText(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TriedSentWord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TriedSentWord_lastInputScore(ctx context.Context, field graphql.CollectedField, obj *model.TriedSentWord) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TriedSentWord_lastInputScore(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastInputScore, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TriedSentWord_lastInputScore(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TriedSentWord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrySentScore_success(ctx context.Context, field graphql.CollectedField, obj *model.TrySentScore) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrySentScore_success(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Success, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2590,19 +1808,410 @@ func (ec *executionContext) _Sentence_userDictation(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*string)
+	res := resTmp.(*bool)
 	fc.Result = res
-	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Sentence_userDictation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_TrySentScore_success(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Sentence",
+		Object:     "TrySentScore",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrySentScore_score(ctx context.Context, field graphql.CollectedField, obj *model.TrySentScore) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrySentScore_score(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Score, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrySentScore_score(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrySentScore",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UnseenSent_sentId(ctx context.Context, field graphql.CollectedField, obj *model.UnseenSent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UnseenSent_sentId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SentID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UnseenSent_sentId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UnseenSent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UnseenSent_indexInArticle(ctx context.Context, field graphql.CollectedField, obj *model.UnseenSent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UnseenSent_indexInArticle(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IndexInArticle, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UnseenSent_indexInArticle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UnseenSent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UnseenSent_mediaUri(ctx context.Context, field graphql.CollectedField, obj *model.UnseenSent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UnseenSent_mediaUri(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MediaURI, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UnseenSent_mediaUri(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UnseenSent",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UnseenSent_sentWords(ctx context.Context, field graphql.CollectedField, obj *model.UnseenSent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UnseenSent_sentWords(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SentWords, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.UnseenSentWord)
+	fc.Result = res
+	return ec.marshalOUnseenSentWord2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐUnseenSentWord(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UnseenSent_sentWords(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UnseenSent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "length":
+				return ec.fieldContext_UnseenSentWord_length(ctx, field)
+			case "isCloze":
+				return ec.fieldContext_UnseenSentWord_isCloze(ctx, field)
+			case "wordform":
+				return ec.fieldContext_UnseenSentWord_wordform(ctx, field)
+			case "indexInSent":
+				return ec.fieldContext_UnseenSentWord_indexInSent(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UnseenSentWord", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UnseenSentWord_length(ctx context.Context, field graphql.CollectedField, obj *model.UnseenSentWord) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UnseenSentWord_length(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Length, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UnseenSentWord_length(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UnseenSentWord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UnseenSentWord_isCloze(ctx context.Context, field graphql.CollectedField, obj *model.UnseenSentWord) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UnseenSentWord_isCloze(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsCloze, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UnseenSentWord_isCloze(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UnseenSentWord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UnseenSentWord_wordform(ctx context.Context, field graphql.CollectedField, obj *model.UnseenSentWord) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UnseenSentWord_wordform(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Wordform, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UnseenSentWord_wordform(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UnseenSentWord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UnseenSentWord_indexInSent(ctx context.Context, field graphql.CollectedField, obj *model.UnseenSentWord) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UnseenSentWord_indexInSent(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IndexInSent, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UnseenSentWord_indexInSent(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UnseenSentWord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2629,14 +2238,11 @@ func (ec *executionContext) _UserArticle_articleId(ctx context.Context, field gr
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_UserArticle_articleId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2646,7 +2252,7 @@ func (ec *executionContext) fieldContext_UserArticle_articleId(ctx context.Conte
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4554,33 +4160,41 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputInputMessage(ctx context.Context, obj interface{}) (model.InputMessage, error) {
-	var it model.InputMessage
+func (ec *executionContext) unmarshalInputTrySentInput(ctx context.Context, obj interface{}) (model.TrySentInput, error) {
+	var it model.TrySentInput
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"success", "message"}
+	fieldsInOrder := [...]string{"userId", "sentId", "userInputJson"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "success":
+		case "userId":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("success"))
-			it.Success, err = ec.unmarshalNBoolean2bool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+			it.UserID, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "message":
+		case "sentId":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sentId"))
+			it.SentID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "userInputJson":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userInputJson"))
+			it.UserInputJSON, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4634,42 +4248,6 @@ func (ec *executionContext) unmarshalInputUserCredentials(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUserDictation(ctx context.Context, obj interface{}) (model.UserDictation, error) {
-	var it model.UserDictation
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"sentId", "inputWordFormsJsonString"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "sentId":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sentId"))
-			it.SentID, err = ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "inputWordFormsJsonString":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("inputWordFormsJsonString"))
-			it.InputWordFormsJSONString, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -4677,104 +4255,6 @@ func (ec *executionContext) unmarshalInputUserDictation(ctx context.Context, obj
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
-
-var fullArticleImplementors = []string{"FullArticle"}
-
-func (ec *executionContext) _FullArticle(ctx context.Context, sel ast.SelectionSet, obj *model.FullArticle) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, fullArticleImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("FullArticle")
-		case "articleId":
-
-			out.Values[i] = ec._FullArticle_articleId(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "articleTitle":
-
-			out.Values[i] = ec._FullArticle_articleTitle(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "articleSentCount":
-
-			out.Values[i] = ec._FullArticle_articleSentCount(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "userFinishedIndex":
-
-			out.Values[i] = ec._FullArticle_userFinishedIndex(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "sentences":
-
-			out.Values[i] = ec._FullArticle_sentences(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var lenWordTupleImplementors = []string{"LenWordTuple"}
-
-func (ec *executionContext) _LenWordTuple(ctx context.Context, sel ast.SelectionSet, obj *model.LenWordTuple) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, lenWordTupleImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("LenWordTuple")
-		case "index":
-
-			out.Values[i] = ec._LenWordTuple_index(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "letters":
-
-			out.Values[i] = ec._LenWordTuple_letters(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "wordForm":
-
-			out.Values[i] = ec._LenWordTuple_wordForm(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
 
 var loginTokenImplementors = []string{"LoginToken"}
 
@@ -4877,19 +4357,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "userDictation":
+		case "trySent":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_userDictation(ctx, field)
-			})
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "createDummyMessage":
-
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createDummyMessage(ctx, field)
+				return ec._Mutation_trySent(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -4971,7 +4442,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
-		case "getUserFullArticle":
+		case "displayUnseenSents":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -4980,7 +4451,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_getUserFullArticle(ctx, field)
+				res = ec._Query_displayUnseenSents(ctx, field)
 				return res
 			}
 
@@ -4991,7 +4462,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
-		case "fetchSentAudio":
+		case "displaySeenSents":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -5000,50 +4471,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_fetchSentAudio(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
-		case "scoreArticle":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_scoreArticle(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
-		case "dummyMessage":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_dummyMessage(ctx, field)
+				res = ec._Query_displaySeenSents(ctx, field)
 				return res
 			}
 
@@ -5077,33 +4505,27 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var sentDetailsImplementors = []string{"SentDetails"}
+var seenSentImplementors = []string{"SeenSent"}
 
-func (ec *executionContext) _SentDetails(ctx context.Context, sel ast.SelectionSet, obj *model.SentDetails) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, sentDetailsImplementors)
+func (ec *executionContext) _SeenSent(ctx context.Context, sel ast.SelectionSet, obj *model.SeenSent) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, seenSentImplementors)
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("SentDetails")
+			out.Values[i] = graphql.MarshalString("SeenSent")
 		case "sentId":
 
-			out.Values[i] = ec._SentDetails_sentId(ctx, field, obj)
+			out.Values[i] = ec._SeenSent_sentId(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "mediaUri":
+		case "indexInArticle":
 
-			out.Values[i] = ec._SentDetails_mediaUri(ctx, field, obj)
+			out.Values[i] = ec._SeenSent_indexInArticle(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "wordForms":
+		case "tryText":
 
-			out.Values[i] = ec._SentDetails_wordForms(ctx, field, obj)
+			out.Values[i] = ec._SeenSent_tryText(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -5119,54 +4541,54 @@ func (ec *executionContext) _SentDetails(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var sentScoreImplementors = []string{"SentScore"}
+var triedSentWordImplementors = []string{"TriedSentWord"}
 
-func (ec *executionContext) _SentScore(ctx context.Context, sel ast.SelectionSet, obj *model.SentScore) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, sentScoreImplementors)
+func (ec *executionContext) _TriedSentWord(ctx context.Context, sel ast.SelectionSet, obj *model.TriedSentWord) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, triedSentWordImplementors)
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("SentScore")
-		case "sentId":
+			out.Values[i] = graphql.MarshalString("TriedSentWord")
+		case "length":
 
-			out.Values[i] = ec._SentScore_sentId(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "mediaUri":
-
-			out.Values[i] = ec._SentScore_mediaUri(ctx, field, obj)
+			out.Values[i] = ec._TriedSentWord_length(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "originalText":
+		case "isCloze":
 
-			out.Values[i] = ec._SentScore_originalText(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "comparison":
-
-			out.Values[i] = ec._SentScore_comparison(ctx, field, obj)
+			out.Values[i] = ec._TriedSentWord_isCloze(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "wordCount":
+		case "wordform":
 
-			out.Values[i] = ec._SentScore_wordCount(ctx, field, obj)
+			out.Values[i] = ec._TriedSentWord_wordform(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "incorrectCount":
+		case "indexInSent":
 
-			out.Values[i] = ec._SentScore_incorrectCount(ctx, field, obj)
+			out.Values[i] = ec._TriedSentWord_indexInSent(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "lastInputText":
+
+			out.Values[i] = ec._TriedSentWord_lastInputText(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "lastInputScore":
+
+			out.Values[i] = ec._TriedSentWord_lastInputScore(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -5182,41 +4604,110 @@ func (ec *executionContext) _SentScore(ctx context.Context, sel ast.SelectionSet
 	return out
 }
 
-var sentenceImplementors = []string{"Sentence"}
+var trySentScoreImplementors = []string{"TrySentScore"}
 
-func (ec *executionContext) _Sentence(ctx context.Context, sel ast.SelectionSet, obj *model.Sentence) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, sentenceImplementors)
+func (ec *executionContext) _TrySentScore(ctx context.Context, sel ast.SelectionSet, obj *model.TrySentScore) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, trySentScoreImplementors)
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("Sentence")
+			out.Values[i] = graphql.MarshalString("TrySentScore")
+		case "success":
+
+			out.Values[i] = ec._TrySentScore_success(ctx, field, obj)
+
+		case "score":
+
+			out.Values[i] = ec._TrySentScore_score(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var unseenSentImplementors = []string{"UnseenSent"}
+
+func (ec *executionContext) _UnseenSent(ctx context.Context, sel ast.SelectionSet, obj *model.UnseenSent) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, unseenSentImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UnseenSent")
 		case "sentId":
 
-			out.Values[i] = ec._Sentence_sentId(ctx, field, obj)
+			out.Values[i] = ec._UnseenSent_sentId(ctx, field, obj)
+
+		case "indexInArticle":
+
+			out.Values[i] = ec._UnseenSent_indexInArticle(ctx, field, obj)
+
+		case "mediaUri":
+
+			out.Values[i] = ec._UnseenSent_mediaUri(ctx, field, obj)
+
+		case "sentWords":
+
+			out.Values[i] = ec._UnseenSent_sentWords(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var unseenSentWordImplementors = []string{"UnseenSentWord"}
+
+func (ec *executionContext) _UnseenSentWord(ctx context.Context, sel ast.SelectionSet, obj *model.UnseenSentWord) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, unseenSentWordImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UnseenSentWord")
+		case "length":
+
+			out.Values[i] = ec._UnseenSentWord_length(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "sentIndexInArticle":
+		case "isCloze":
 
-			out.Values[i] = ec._Sentence_sentIndexInArticle(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "userTried":
-
-			out.Values[i] = ec._Sentence_userTried(ctx, field, obj)
+			out.Values[i] = ec._UnseenSentWord_isCloze(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "userDictation":
+		case "wordform":
 
-			out.Values[i] = ec._Sentence_userDictation(ctx, field, obj)
+			out.Values[i] = ec._UnseenSentWord_wordform(ctx, field, obj)
 
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "indexInSent":
+
+			out.Values[i] = ec._UnseenSentWord_indexInSent(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5242,9 +4733,6 @@ func (ec *executionContext) _UserArticle(ctx context.Context, sel ast.SelectionS
 
 			out.Values[i] = ec._UserArticle_articleId(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "articleTitle":
 
 			out.Values[i] = ec._UserArticle_articleTitle(ctx, field, obj)
@@ -5607,19 +5095,19 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
-	res, err := graphql.UnmarshalID(v)
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	res := graphql.MarshalID(v)
+func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	res := graphql.MarshalFloatContext(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 	}
-	return res
+	return graphql.WrapContextMarshaler(ctx, res)
 }
 
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
@@ -5635,60 +5123,6 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) marshalNLenWordTuple2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐLenWordTupleᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.LenWordTuple) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNLenWordTuple2ᚖbackendᚑgoᚋgraphᚋmodelᚐLenWordTuple(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalNLenWordTuple2ᚖbackendᚑgoᚋgraphᚋmodelᚐLenWordTuple(ctx context.Context, sel ast.SelectionSet, v *model.LenWordTuple) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._LenWordTuple(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNLoginToken2backendᚑgoᚋgraphᚋmodelᚐLoginToken(ctx context.Context, sel ast.SelectionSet, v model.LoginToken) graphql.Marshaler {
@@ -5719,114 +5153,6 @@ func (ec *executionContext) marshalNMessage2ᚖbackendᚑgoᚋgraphᚋmodelᚐMe
 	return ec._Message(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNSentScore2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐSentScoreᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.SentScore) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNSentScore2ᚖbackendᚑgoᚋgraphᚋmodelᚐSentScore(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalNSentScore2ᚖbackendᚑgoᚋgraphᚋmodelᚐSentScore(ctx context.Context, sel ast.SelectionSet, v *model.SentScore) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._SentScore(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNSentence2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐSentenceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Sentence) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNSentence2ᚖbackendᚑgoᚋgraphᚋmodelᚐSentence(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalNSentence2ᚖbackendᚑgoᚋgraphᚋmodelᚐSentence(ctx context.Context, sel ast.SelectionSet, v *model.Sentence) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Sentence(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5840,6 +5166,20 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNTrySentScore2backendᚑgoᚋgraphᚋmodelᚐTrySentScore(ctx context.Context, sel ast.SelectionSet, v model.TrySentScore) graphql.Marshaler {
+	return ec._TrySentScore(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTrySentScore2ᚖbackendᚑgoᚋgraphᚋmodelᚐTrySentScore(ctx context.Context, sel ast.SelectionSet, v *model.TrySentScore) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TrySentScore(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNUserArticle2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐUserArticleᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.UserArticle) graphql.Marshaler {
@@ -6180,19 +5520,20 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalOFullArticle2ᚖbackendᚑgoᚋgraphᚋmodelᚐFullArticle(ctx context.Context, sel ast.SelectionSet, v *model.FullArticle) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._FullArticle(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOInputMessage2ᚖbackendᚑgoᚋgraphᚋmodelᚐInputMessage(ctx context.Context, v interface{}) (*model.InputMessage, error) {
+func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalInputInputMessage(ctx, v)
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalFloatContext(*v)
+	return graphql.WrapContextMarshaler(ctx, res)
 }
 
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
@@ -6211,7 +5552,7 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return res
 }
 
-func (ec *executionContext) marshalOMessage2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐMessage(ctx context.Context, sel ast.SelectionSet, v []*model.Message) graphql.Marshaler {
+func (ec *executionContext) marshalOSeenSent2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐSeenSent(ctx context.Context, sel ast.SelectionSet, v []*model.SeenSent) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -6238,7 +5579,7 @@ func (ec *executionContext) marshalOMessage2ᚕᚖbackendᚑgoᚋgraphᚋmodel�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOMessage2ᚖbackendᚑgoᚋgraphᚋmodelᚐMessage(ctx, sel, v[i])
+			ret[i] = ec.marshalOSeenSent2ᚖbackendᚑgoᚋgraphᚋmodelᚐSeenSent(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6252,50 +5593,11 @@ func (ec *executionContext) marshalOMessage2ᚕᚖbackendᚑgoᚋgraphᚋmodel�
 	return ret
 }
 
-func (ec *executionContext) marshalOMessage2ᚖbackendᚑgoᚋgraphᚋmodelᚐMessage(ctx context.Context, sel ast.SelectionSet, v *model.Message) graphql.Marshaler {
+func (ec *executionContext) marshalOSeenSent2ᚖbackendᚑgoᚋgraphᚋmodelᚐSeenSent(ctx context.Context, sel ast.SelectionSet, v *model.SeenSent) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return ec._Message(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOSentDetails2ᚖbackendᚑgoᚋgraphᚋmodelᚐSentDetails(ctx context.Context, sel ast.SelectionSet, v *model.SentDetails) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._SentDetails(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOString2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*string, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalOString2ᚖstring(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalOString2ᚕᚖstring(ctx context.Context, sel ast.SelectionSet, v []*string) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	for i := range v {
-		ret[i] = ec.marshalOString2ᚖstring(ctx, sel, v[i])
-	}
-
-	return ret
+	return ec._SeenSent(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
@@ -6314,12 +5616,108 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) unmarshalOUserDictation2ᚖbackendᚑgoᚋgraphᚋmodelᚐUserDictation(ctx context.Context, v interface{}) (*model.UserDictation, error) {
+func (ec *executionContext) unmarshalOTrySentInput2ᚖbackendᚑgoᚋgraphᚋmodelᚐTrySentInput(ctx context.Context, v interface{}) (*model.TrySentInput, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalInputUserDictation(ctx, v)
+	res, err := ec.unmarshalInputTrySentInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUnseenSent2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐUnseenSent(ctx context.Context, sel ast.SelectionSet, v []*model.UnseenSent) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOUnseenSent2ᚖbackendᚑgoᚋgraphᚋmodelᚐUnseenSent(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOUnseenSent2ᚖbackendᚑgoᚋgraphᚋmodelᚐUnseenSent(ctx context.Context, sel ast.SelectionSet, v *model.UnseenSent) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UnseenSent(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOUnseenSentWord2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐUnseenSentWord(ctx context.Context, sel ast.SelectionSet, v []*model.UnseenSentWord) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOUnseenSentWord2ᚖbackendᚑgoᚋgraphᚋmodelᚐUnseenSentWord(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOUnseenSentWord2ᚖbackendᚑgoᚋgraphᚋmodelᚐUnseenSentWord(ctx context.Context, sel ast.SelectionSet, v *model.UnseenSentWord) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UnseenSentWord(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

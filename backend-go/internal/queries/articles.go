@@ -5,7 +5,6 @@ import (
 	dbconn "backend-go/internal/pkg/database"
 	"fmt"
 	"log"
-	"strconv"
 )
 
 type articleRow struct {
@@ -38,7 +37,7 @@ func GetUserArticlesList(userId int) ([]*model.UserArticle, error) {
 			log.Fatal(err)
 		}
 
-		articleRecords = append(articleRecords, &model.UserArticle{ArticleID: strconv.Itoa(row.aid), ArticleTitle: row.attl, ArticleSentCount: row.asc, UserFinishedIndex: &row.ufi})
+		articleRecords = append(articleRecords, &model.UserArticle{ArticleID: &row.aid, ArticleTitle: row.attl, ArticleSentCount: row.asc, UserFinishedIndex: &row.ufi})
 	}
 
 	return articleRecords, nil
@@ -69,7 +68,7 @@ func GetUserUnseenArticlesList(userId int) ([]*model.UserArticle, error) {
 		}
 
 		zero := 0
-		articleRecords = append(articleRecords, &model.UserArticle{ArticleID: strconv.Itoa(row.aid), ArticleTitle: row.attl, ArticleSentCount: row.asc, UserFinishedIndex: &zero})
+		articleRecords = append(articleRecords, &model.UserArticle{ArticleID: &row.aid, ArticleTitle: row.attl, ArticleSentCount: row.asc, UserFinishedIndex: &zero})
 	}
 
 	return articleRecords, nil
