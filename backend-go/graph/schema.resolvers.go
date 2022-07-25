@@ -135,7 +135,15 @@ func (r *queryResolver) ExamineCorrectSents(ctx context.Context, articleID *int)
 
 // ExamineIncorrectSents is the resolver for the examineIncorrectSents field.
 func (r *queryResolver) ExamineIncorrectSents(ctx context.Context, articleID *int) ([]*model.IncorrectSeenSent, error) {
-	panic(fmt.Errorf("not implemented"))
+	userId := auth.FromContext(ctx, "user_id")
+	if userId == 0 {
+		return nil, fmt.Errorf("please log in")
+	}
+	result, err := queries.QueryExamineIncorrectSents(userId, *articleID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // DisplayDueSents is the resolver for the displayDueSents field.
@@ -147,11 +155,9 @@ func (r *queryResolver) DisplayDueSents(ctx context.Context) ([]*model.Incorrect
 func (r *queryResolver) ZzzDevQuery(ctx context.Context) (*int, error) {
 	// 	// DUMMY DB OPERATIONS
 
-	// 	k := score.ScoreDistance("värde", "verde")
-	// 	fmt.Println(k)
-	// 	j := score.ScoreDistance("året", "året")
-	// 	fmt.Println(j)
-	// 	// TO PREVENT ANY COMPLAINING
+	dope, _ := queries.GetTriedSentWords(14, 16)
+	fmt.Println("Inside zzzDevQuery: ", dope)
+
 	ret := -1
 	return &ret, nil
 }

@@ -184,7 +184,7 @@ func TrySentence(userId int, sentId int, userInput string) (float64, error) {
 		6. calcualte userInputScores, also by edit distance.
 			6.2. (length - editDistance) / length
 		7. calculate next_try_time:
-			7.1. if try score > 997%: now + 200 years
+			7.1. if try score > 99.8%: now + 200 years
 			7.2. else: 48hr * try_score * this_try_count
 		8. INSERT INTO user_dictation:
 			1. next_try_time (step 7), sent_id (input), try_count (step 2.1), try_score (step 5), try_text (step 4), try_time (now), user_id (input)
@@ -243,7 +243,7 @@ func TrySentence(userId int, sentId int, userInput string) (float64, error) {
 
 	/* STEP 7 - next_try_time */
 	var nextTryTime time.Time
-	if tryScore > 0.997 {
+	if tryScore > 0.998 {
 		// 10 years from now
 		nextTryTime = time.Now().Add(10 * 365 * 24 * time.Hour)
 	} else {
