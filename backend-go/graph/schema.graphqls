@@ -55,7 +55,6 @@ type UnseenSent {
 }
 
 input TrySentInput {
-  userId: Int!
   sentId: Int!
   userInputJson: String!
 }
@@ -63,6 +62,12 @@ input TrySentInput {
 type TrySentScore {
   success: Boolean # if the operation is successful
   score: Float # score of the user
+}
+
+type IncorrectSeenSent {
+  sentId: Int
+  indexInArticle: Int
+  sentWords: [TriedSentWord]!
 }
 
 type Mutation {
@@ -75,5 +80,11 @@ type Query {
   listUserArticles: [UserArticle!]!
   listUserUnseenArticles: [UserArticle!]!
   displayUnseenSents(articleId: Int): [UnseenSent]
+  # the two following queries are almost identical
   displaySeenSents(articleId: Int): [SeenSent]
+  examineCorrectSents(articleId: Int): [SeenSent]
+  # these two are quite similar too
+  examineIncorrectSents(articleId: Int): [IncorrectSeenSent]
+  displayDueSents: [IncorrectSeenSent]
+  zzzDevQuery: Int
 }
