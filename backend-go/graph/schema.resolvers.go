@@ -35,15 +35,25 @@ func (r *mutationResolver) UserLogIn(ctx context.Context, input model.UserCreden
 	return &model.LoginToken{Success: true, Token: &token}, err
 }
 
-// TrySent is the resolver for the trySent field.
+// TrySent takes user input, parses and scores user input.
 func (r *mutationResolver) TrySent(ctx context.Context, input *model.TrySentInput) (*model.TrySentScore, error) {
-	panic(fmt.Errorf("not implemented"))
+	userId := auth.FromContext(ctx, "user_id")
+	if userId == 0 {
+		return nil, fmt.Errorf("please log in")
+	}
+
+	score, err := queries.TrySentence(userId, input.SentID, input.UserInputJSON)
+	if err != nil {
+		return nil, err
+	}
+	success := true
+
+	return &model.TrySentScore{Success: &success, Score: &score}, nil
 }
 
 // ListUserArticles resolver returns all articles with the progress of the user.
 func (r *queryResolver) ListUserArticles(ctx context.Context) ([]*model.UserArticle, error) {
 	userId := auth.FromContext(ctx, "user_id")
-	fmt.Println(userId)
 	if userId == 0 {
 		return nil, fmt.Errorf("please log in")
 	}
@@ -93,9 +103,57 @@ func (r *queryResolver) DisplayUnseenSents(ctx context.Context, articleID *int) 
 	return result, nil
 }
 
-// DisplaySeenSents is the resolver for the displaySeenSents field.
+// DisplaySeenSents returns sentences in an article that the user hasn't tried.
 func (r *queryResolver) DisplaySeenSents(ctx context.Context, articleID *int) ([]*model.SeenSent, error) {
+	userId := auth.FromContext(ctx, "user_id")
+	if userId == 0 {
+		return nil, fmt.Errorf("please log in")
+	}
+
+	result, err := queries.QuerySeenSents(userId, *articleID)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// ExamineCorrectSents return user intput text on the last trial to be shown on examine page.
+func (r *queryResolver) ExamineCorrectSents(ctx context.Context, articleID *int) ([]*model.SeenSent, error) {
+	userId := auth.FromContext(ctx, "user_id")
+	if userId == 0 {
+		return nil, fmt.Errorf("please log in")
+	}
+
+	result, err := queries.QueryExamineCorrectSents(userId, *articleID)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// ExamineIncorrectSents is the resolver for the examineIncorrectSents field.
+func (r *queryResolver) ExamineIncorrectSents(ctx context.Context, articleID *int) ([]*model.IncorrectSeenSent, error) {
 	panic(fmt.Errorf("not implemented"))
+}
+
+// DisplayDueSents is the resolver for the displayDueSents field.
+func (r *queryResolver) DisplayDueSents(ctx context.Context) ([]*model.IncorrectSeenSent, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+// ZzzDevQuery is the resolver for the zzzDevQuery field.
+func (r *queryResolver) ZzzDevQuery(ctx context.Context) (*int, error) {
+	// 	// DUMMY DB OPERATIONS
+
+	// 	k := score.ScoreDistance("värde", "verde")
+	// 	fmt.Println(k)
+	// 	j := score.ScoreDistance("året", "året")
+	// 	fmt.Println(j)
+	// 	// TO PREVENT ANY COMPLAINING
+	ret := -1
+	return &ret, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

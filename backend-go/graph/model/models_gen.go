@@ -2,6 +2,12 @@
 
 package model
 
+type IncorrectSeenSent struct {
+	SentID         *int             `json:"sentId"`
+	IndexInArticle *int             `json:"indexInArticle"`
+	SentWords      []*TriedSentWord `json:"sentWords"`
+}
+
 type LoginToken struct {
 	Success bool    `json:"success"`
 	Token   *string `json:"token"`
@@ -28,7 +34,6 @@ type TriedSentWord struct {
 }
 
 type TrySentInput struct {
-	UserID        int    `json:"userId"`
 	SentID        int    `json:"sentId"`
 	UserInputJSON string `json:"userInputJson"`
 }
