@@ -44,6 +44,12 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	DueSent struct {
+		MediaURI  func(childComplexity int) int
+		SentID    func(childComplexity int) int
+		SentWords func(childComplexity int) int
+	}
+
 	IncorrectSeenSent struct {
 		IndexInArticle func(childComplexity int) int
 		SentID         func(childComplexity int) int
@@ -67,7 +73,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		DisplayDueSents        func(childComplexity int) int
+		DisplayDueSents        func(childComplexity int, daysAhead *int) int
 		DisplaySeenSents       func(childComplexity int, articleID *int) int
 		DisplayUnseenSents     func(childComplexity int, articleID *int) int
 		ExamineCorrectSents    func(childComplexity int, articleID *int) int
@@ -131,7 +137,7 @@ type QueryResolver interface {
 	DisplaySeenSents(ctx context.Context, articleID *int) ([]*model.SeenSent, error)
 	ExamineCorrectSents(ctx context.Context, articleID *int) ([]*model.SeenSent, error)
 	ExamineIncorrectSents(ctx context.Context, articleID *int) ([]*model.IncorrectSeenSent, error)
-	DisplayDueSents(ctx context.Context) ([]*model.IncorrectSeenSent, error)
+	DisplayDueSents(ctx context.Context, daysAhead *int) ([]*model.DueSent, error)
 	ZzzDevQuery(ctx context.Context) (*int, error)
 }
 
@@ -149,6 +155,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "DueSent.mediaUri":
+		if e.complexity.DueSent.MediaURI == nil {
+			break
+		}
+
+		return e.complexity.DueSent.MediaURI(childComplexity), true
+
+	case "DueSent.sentId":
+		if e.complexity.DueSent.SentID == nil {
+			break
+		}
+
+		return e.complexity.DueSent.SentID(childComplexity), true
+
+	case "DueSent.sentWords":
+		if e.complexity.DueSent.SentWords == nil {
+			break
+		}
+
+		return e.complexity.DueSent.SentWords(childComplexity), true
 
 	case "IncorrectSeenSent.indexInArticle":
 		if e.complexity.IncorrectSeenSent.IndexInArticle == nil {
@@ -240,7 +267,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.DisplayDueSents(childComplexity), true
+		args, err := ec.field_Query_displayDueSents_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.DisplayDueSents(childComplexity, args["daysAhead"].(*int)), true
 
 	case "Query.displaySeenSents":
 		if e.complexity.Query.DisplaySeenSents == nil {
@@ -614,6 +646,12 @@ type IncorrectSeenSent {
   sentWords: [TriedSentWord]!
 }
 
+type DueSent {
+  sentId: Int
+  mediaUri: String
+  sentWords: [TriedSentWord]!
+}
+
 type Mutation {
   userSignUp(input: UserCredentials!): Message!
   userLogIn(input: UserCredentials!): LoginToken!
@@ -629,7 +667,7 @@ type Query {
   examineCorrectSents(articleId: Int): [SeenSent]
   # these two are quite similar too
   examineIncorrectSents(articleId: Int): [IncorrectSeenSent]
-  displayDueSents: [IncorrectSeenSent]
+  displayDueSents(daysAhead: Int): [DueSent]
   zzzDevQuery: Int
 }`, BuiltIn: false},
 }
@@ -696,6 +734,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_displayDueSents_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int
+	if tmp, ok := rawArgs["daysAhead"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("daysAhead"))
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["daysAhead"] = arg0
 	return args, nil
 }
 
@@ -796,6 +849,146 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _DueSent_sentId(ctx context.Context, field graphql.CollectedField, obj *model.DueSent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DueSent_sentId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SentID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DueSent_sentId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DueSent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DueSent_mediaUri(ctx context.Context, field graphql.CollectedField, obj *model.DueSent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DueSent_mediaUri(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MediaURI, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DueSent_mediaUri(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DueSent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DueSent_sentWords(ctx context.Context, field graphql.CollectedField, obj *model.DueSent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DueSent_sentWords(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SentWords, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.TriedSentWord)
+	fc.Result = res
+	return ec.marshalNTriedSentWord2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐTriedSentWord(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DueSent_sentWords(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DueSent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "length":
+				return ec.fieldContext_TriedSentWord_length(ctx, field)
+			case "isCloze":
+				return ec.fieldContext_TriedSentWord_isCloze(ctx, field)
+			case "wordform":
+				return ec.fieldContext_TriedSentWord_wordform(ctx, field)
+			case "indexInSent":
+				return ec.fieldContext_TriedSentWord_indexInSent(ctx, field)
+			case "lastInputText":
+				return ec.fieldContext_TriedSentWord_lastInputText(ctx, field)
+			case "lastInputScore":
+				return ec.fieldContext_TriedSentWord_lastInputScore(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TriedSentWord", field.Name)
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _IncorrectSeenSent_sentId(ctx context.Context, field graphql.CollectedField, obj *model.IncorrectSeenSent) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_IncorrectSeenSent_sentId(ctx, field)
@@ -1654,7 +1847,7 @@ func (ec *executionContext) _Query_displayDueSents(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().DisplayDueSents(rctx)
+		return ec.resolvers.Query().DisplayDueSents(rctx, fc.Args["daysAhead"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1663,9 +1856,9 @@ func (ec *executionContext) _Query_displayDueSents(ctx context.Context, field gr
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.IncorrectSeenSent)
+	res := resTmp.([]*model.DueSent)
 	fc.Result = res
-	return ec.marshalOIncorrectSeenSent2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐIncorrectSeenSent(ctx, field.Selections, res)
+	return ec.marshalODueSent2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐDueSent(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_displayDueSents(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1677,14 +1870,25 @@ func (ec *executionContext) fieldContext_Query_displayDueSents(ctx context.Conte
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "sentId":
-				return ec.fieldContext_IncorrectSeenSent_sentId(ctx, field)
-			case "indexInArticle":
-				return ec.fieldContext_IncorrectSeenSent_indexInArticle(ctx, field)
+				return ec.fieldContext_DueSent_sentId(ctx, field)
+			case "mediaUri":
+				return ec.fieldContext_DueSent_mediaUri(ctx, field)
 			case "sentWords":
-				return ec.fieldContext_IncorrectSeenSent_sentWords(ctx, field)
+				return ec.fieldContext_DueSent_sentWords(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type IncorrectSeenSent", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type DueSent", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_displayDueSents_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -4712,6 +4916,42 @@ func (ec *executionContext) unmarshalInputUserCredentials(ctx context.Context, o
 
 // region    **************************** object.gotpl ****************************
 
+var dueSentImplementors = []string{"DueSent"}
+
+func (ec *executionContext) _DueSent(ctx context.Context, sel ast.SelectionSet, obj *model.DueSent) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, dueSentImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DueSent")
+		case "sentId":
+
+			out.Values[i] = ec._DueSent_sentId(ctx, field, obj)
+
+		case "mediaUri":
+
+			out.Values[i] = ec._DueSent_mediaUri(ctx, field, obj)
+
+		case "sentWords":
+
+			out.Values[i] = ec._DueSent_sentWords(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var incorrectSeenSentImplementors = []string{"IncorrectSeenSent"}
 
 func (ec *executionContext) _IncorrectSeenSent(ctx context.Context, sel ast.SelectionSet, obj *model.IncorrectSeenSent) graphql.Marshaler {
@@ -6128,6 +6368,54 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) marshalODueSent2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐDueSent(ctx context.Context, sel ast.SelectionSet, v []*model.DueSent) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalODueSent2ᚖbackendᚑgoᚋgraphᚋmodelᚐDueSent(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalODueSent2ᚖbackendᚑgoᚋgraphᚋmodelᚐDueSent(ctx context.Context, sel ast.SelectionSet, v *model.DueSent) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DueSent(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {

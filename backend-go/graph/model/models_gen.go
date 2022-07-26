@@ -2,6 +2,12 @@
 
 package model
 
+type DueSent struct {
+	SentID    *int             `json:"sentId"`
+	MediaURI  *string          `json:"mediaUri"`
+	SentWords []*TriedSentWord `json:"sentWords"`
+}
+
 type IncorrectSeenSent struct {
 	SentID         *int             `json:"sentId"`
 	IndexInArticle *int             `json:"indexInArticle"`
