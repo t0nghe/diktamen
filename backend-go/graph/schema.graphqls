@@ -70,6 +70,12 @@ type IncorrectSeenSent {
   sentWords: [TriedSentWord]!
 }
 
+type DueSent {
+  sentId: Int
+  mediaUri: String
+  sentWords: [TriedSentWord]!
+}
+
 type Mutation {
   userSignUp(input: UserCredentials!): Message!
   userLogIn(input: UserCredentials!): LoginToken!
@@ -85,6 +91,6 @@ type Query {
   examineCorrectSents(articleId: Int): [SeenSent]
   # these two are quite similar too
   examineIncorrectSents(articleId: Int): [IncorrectSeenSent]
-  displayDueSents: [IncorrectSeenSent]
+  displayDueSents(daysAhead: Int): [DueSent]
   zzzDevQuery: Int
 }
