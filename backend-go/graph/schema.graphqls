@@ -92,5 +92,5 @@ type Query {
   # these two are quite similar too
   examineIncorrectSents(articleId: Int): [IncorrectSeenSent]
   displayDueSents(daysAhead: Int): [DueSent]
-  zzzDevQuery: Int
+  randomInteger: Int
 }

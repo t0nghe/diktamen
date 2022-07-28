@@ -11,5 +11,12 @@ module.exports = {
   ],
   "env": {
     "vue/setup-compiler-macros": true
-  }
+  },
+  "prettier/prettier": [
+    "error",
+    {
+      "singleQuote": true,
+      "parser": "flow"
+    }
+  ]
 }

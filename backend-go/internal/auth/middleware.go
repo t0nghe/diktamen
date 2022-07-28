@@ -15,7 +15,6 @@ func Middleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { // It makes sense how the request needs to be a pointer. This makes sure the value of this request is accessible to multiple functions.
 			header := r.Header.Get("Authorization")
-			fmt.Println("header", header)
 
 			// next feels like Express
 			// If there's not an Authorization entry in the header of this request, the user is not logged in.

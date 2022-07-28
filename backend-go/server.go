@@ -12,6 +12,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
+	"github.com/rs/cors"
 )
 
 const defaultPort = "9090"
@@ -23,6 +24,14 @@ func main() {
 	}
 
 	router := chi.NewRouter()
+	// router.Use(cors.New(cors.Options{
+	// 	AllowedOrigins:   []string{"http://localhost:3000", "https://6f0e-194-103-157-156.ngrok.io"},
+	// 	AllowCredentials: true,
+	// 	AllowedHeaders:   []string{"Authorization"},
+	// 	AllowedMethods:   []string{http.MethodGet, http.MethodPost},
+	// 	Debug:            true,
+	// }).Handler)
+	router.Use(cors.AllowAll().Handler) // Try if this solves the problem.
 	router.Use(auth.Middleware())
 
 	dbconn.InitDb()

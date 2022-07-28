@@ -80,7 +80,7 @@ type ComplexityRoot struct {
 		ExamineIncorrectSents  func(childComplexity int, articleID *int) int
 		ListUserArticles       func(childComplexity int) int
 		ListUserUnseenArticles func(childComplexity int) int
-		ZzzDevQuery            func(childComplexity int) int
+		RandomInteger          func(childComplexity int) int
 	}
 
 	SeenSent struct {
@@ -138,7 +138,7 @@ type QueryResolver interface {
 	ExamineCorrectSents(ctx context.Context, articleID *int) ([]*model.SeenSent, error)
 	ExamineIncorrectSents(ctx context.Context, articleID *int) ([]*model.IncorrectSeenSent, error)
 	DisplayDueSents(ctx context.Context, daysAhead *int) ([]*model.DueSent, error)
-	ZzzDevQuery(ctx context.Context) (*int, error)
+	RandomInteger(ctx context.Context) (*int, error)
 }
 
 type executableSchema struct {
@@ -336,12 +336,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.ListUserUnseenArticles(childComplexity), true
 
-	case "Query.zzzDevQuery":
-		if e.complexity.Query.ZzzDevQuery == nil {
+	case "Query.randomInteger":
+		if e.complexity.Query.RandomInteger == nil {
 			break
 		}
 
-		return e.complexity.Query.ZzzDevQuery(childComplexity), true
+		return e.complexity.Query.RandomInteger(childComplexity), true
 
 	case "SeenSent.indexInArticle":
 		if e.complexity.SeenSent.IndexInArticle == nil {
@@ -668,7 +668,7 @@ type Query {
   # these two are quite similar too
   examineIncorrectSents(articleId: Int): [IncorrectSeenSent]
   displayDueSents(daysAhead: Int): [DueSent]
-  zzzDevQuery: Int
+  randomInteger: Int
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -1893,8 +1893,8 @@ func (ec *executionContext) fieldContext_Query_displayDueSents(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_zzzDevQuery(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_zzzDevQuery(ctx, field)
+func (ec *executionContext) _Query_randomInteger(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_randomInteger(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1907,7 +1907,7 @@ func (ec *executionContext) _Query_zzzDevQuery(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ZzzDevQuery(rctx)
+		return ec.resolvers.Query().RandomInteger(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1921,7 +1921,7 @@ func (ec *executionContext) _Query_zzzDevQuery(ctx context.Context, field graphq
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_zzzDevQuery(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_randomInteger(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -5274,7 +5274,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
-		case "zzzDevQuery":
+		case "randomInteger":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -5283,7 +5283,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_zzzDevQuery(ctx, field)
+				res = ec._Query_randomInteger(ctx, field)
 				return res
 			}
 
