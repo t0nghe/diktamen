@@ -10,6 +10,7 @@ import (
 	"backend-go/internal/queries"
 	"context"
 	"fmt"
+	"math/rand"
 )
 
 // UserSignUp allows the user to sign up via GraphQL mutation `userSignUp` using a username and an email.
@@ -159,13 +160,9 @@ func (r *queryResolver) DisplayDueSents(ctx context.Context, daysAhead *int) ([]
 	return result, nil
 }
 
-// ZzzDevQuery is the resolver for the zzzDevQuery field.
-func (r *queryResolver) ZzzDevQuery(ctx context.Context) (*int, error) {
-	// 	// DUMMY DB OPERATIONS
-
-	queries.QueryDueSents(14, 10)
-
-	ret := -1
+// RandomInteger is the resolver for the randomInteger field.
+func (r *queryResolver) RandomInteger(ctx context.Context) (*int, error) {
+	ret := rand.Intn(100)
 	return &ret, nil
 }
 
