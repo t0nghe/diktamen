@@ -1,47 +1,70 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-
+import { RouterLink, RouterView } from "vue-router";
 </script>
 
 <template>
   <header>
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-      </nav>
+    <div>LOGO</div>
+    <div>
+      Sanity check: <span>{{ randomInteger }}</span>
+    </div>
+    <nav class="nav-links">
+      <RouterLink to="/dev/components">List of Components</RouterLink>
+      <RouterLink to="/dev/graphql">Log In</RouterLink>
+      <RouterLink to="/dev/graphql/signup">Sign Up</RouterLink>
+      <RouterLink to="/dev/graphql/articles/seen">Seen Articles</RouterLink>
+      <RouterLink to="/dev/graphql/articles/unseen">Unseen Articles</RouterLink>
+      <RouterLink to="/dev/graphql/sents/seen">Seen Sentences</RouterLink>
+      <RouterLink to="/dev/graphql/sents/unseen">Unseen Sentences</RouterLink>
+      <RouterLink to="/dev/graphql/examine/correct"
+        >Examine Correct Dictations</RouterLink
+      >
+      <RouterLink to="/dev/graphql/examine/incorrect"
+        >Examine Incorrect Dictations</RouterLink
+      >
+      <RouterLink to="/dev/graphql/review/due">Review Due Cards</RouterLink>
+    </nav>
   </header>
 
   <hr />
 
   <RouterView />
-
-  <div>
-    {{ randomInteger }}
-  </div>
 </template>
 
 <script lang="ts">
-import gql from 'graphql-tag'
+import gql from "graphql-tag";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     RouterLink,
-    RouterView
+    RouterView,
   },
   data() {
     return {
-      randomInteger: 0
-    }
+      randomInteger: -1,
+    };
   },
   apollo: {
     randomInteger: gql`
       query {
         randomInteger
       }
-    `
-  }
-}
+    `,
+  },
+};
 </script>
 
-<style>
+<style lang="scss">
+.nav-links {
+  display: flex;
+  justify-content: space-around;
+
+  a {
+    margin: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+  }
+}
 </style>
