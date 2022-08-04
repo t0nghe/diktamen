@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ProgressCircle from "@/components/ArticleItem/ProgressCircle.vue";
+import ProgressCircle from "../../components/ArticleItem/ProgressCircle.vue";
 import { ref } from "vue";
 let pcPrimary = ref("#00bcd4");
 let pcSecondary = ref("#dcbc00");
@@ -62,8 +62,6 @@ let pcGoal = ref(10);
 </template>
 
 <style lang="scss">
-@import "@/assets/base.css";
-@import "@/assets/variables";
 
 #components {
   display: flex;

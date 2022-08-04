@@ -6,9 +6,9 @@ import ListComponents from "./views/dev/ListComponents.vue";
 <template>
   <header>
     <div>LOGO</div>
-    <!-- <div>
+    <div>
       Sanity check: <span>{{ randomInteger }}</span>
-    </div> -->
+    </div>
     <!-- <nav class="nav-links">
       <RouterLink to="/dev/components">List of Components</RouterLink>
       <RouterLink to="/dev/graphql">Log In</RouterLink>
@@ -26,9 +26,10 @@ import ListComponents from "./views/dev/ListComponents.vue";
       <RouterLink to="/dev/graphql/review/due">Review Due Cards</RouterLink>
     </nav> -->
   </header>
-  <ListComponents />
 
   <!-- <RouterView /> -->
+
+  <ListComponents />
 </template>
 
 <script lang="ts">
@@ -40,18 +41,18 @@ export default {
     RouterLink,
     RouterView,
   },
-  // data() {
-  //   return {
-  //     randomInteger: -1,
-  //   };
-  // },
-  // apollo: {
-  //   randomInteger: gql`
-  //     query {
-  //       randomInteger
-  //     }
-  //   `,
-  // },
+  data() {
+    return {
+      randomInteger: -1,
+    };
+  },
+  apollo: {
+    randomInteger: gql`
+      query {
+        randomInteger
+      }
+    `,
+  },
 };
 </script>
 

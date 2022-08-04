@@ -5,3 +5,4 @@ nlp-python/Pipfile.lock
 nlp-python/.env
 *.sql
 frontend-vue/yarn.lock
+frontend-vue/.env
