@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from "vue-router";
+import ListComponents from "./views/dev/ListComponents.vue";
 </script>
 
 <template>
   <header>
     <div>LOGO</div>
-    <div>
+    <!-- <div>
       Sanity check: <span>{{ randomInteger }}</span>
-    </div>
-    <nav class="nav-links">
+    </div> -->
+    <!-- <nav class="nav-links">
       <RouterLink to="/dev/components">List of Components</RouterLink>
       <RouterLink to="/dev/graphql">Log In</RouterLink>
       <RouterLink to="/dev/graphql/signup">Sign Up</RouterLink>
@@ -23,12 +24,11 @@ import { RouterLink, RouterView } from "vue-router";
         >Examine Incorrect Dictations</RouterLink
       >
       <RouterLink to="/dev/graphql/review/due">Review Due Cards</RouterLink>
-    </nav>
+    </nav> -->
   </header>
+  <ListComponents />
 
-  <hr />
-
-  <RouterView />
+  <!-- <RouterView /> -->
 </template>
 
 <script lang="ts">
@@ -40,18 +40,18 @@ export default {
     RouterLink,
     RouterView,
   },
-  data() {
-    return {
-      randomInteger: -1,
-    };
-  },
-  apollo: {
-    randomInteger: gql`
-      query {
-        randomInteger
-      }
-    `,
-  },
+  // data() {
+  //   return {
+  //     randomInteger: -1,
+  //   };
+  // },
+  // apollo: {
+  //   randomInteger: gql`
+  //     query {
+  //       randomInteger
+  //     }
+  //   `,
+  // },
 };
 </script>
 
