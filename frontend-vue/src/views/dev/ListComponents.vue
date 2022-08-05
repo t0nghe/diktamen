@@ -10,8 +10,8 @@ let pcGoal = ref(10);
 
 <template>
   <h2>LIST OF COMPONENTS</h2>
-  <div id="components">
-    <div class="component-item">
+  <ul id="components">
+    <li class="component-item">
       <h2>ProgressCircle</h2>
       <!-- TODO WRITE input elements to set circle props. -->
       Note: We still need to change the size.
@@ -58,12 +58,12 @@ let pcGoal = ref(10);
         :primary="pcPrimary"
         :secondary="pcSecondary"
       />
-    </div>
-    <div class="component-item">
+    </li>
+    <li class="component-item">
       <h2>ArticleItem</h2>
       <ArticleItem />
-    </div>
-  </div>
+    </li>
+  </ul>
 </template>
 
 <style lang="scss">
