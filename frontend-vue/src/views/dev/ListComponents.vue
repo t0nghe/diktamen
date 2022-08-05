@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ProgressCircle from "../../components/ArticleItem/ProgressCircle.vue";
+import ArticleItem from "../../components/ArticleItem/ArticleItem.vue";
 import { ref } from "vue";
 let pcPrimary = ref("#00bcd4");
 let pcSecondary = ref("#dcbc00");
@@ -10,7 +11,7 @@ let pcGoal = ref(10);
 <template>
   <h2>LIST OF COMPONENTS</h2>
   <div id="components">
-    <div>
+    <div class="component-item">
       <h2>ProgressCircle</h2>
       <!-- TODO WRITE input elements to set circle props. -->
       Note: We still need to change the size.
@@ -58,6 +59,10 @@ let pcGoal = ref(10);
         :secondary="pcSecondary"
       />
     </div>
+    <div class="component-item">
+      <h2>ArticleItem</h2>
+      <ArticleItem />
+    </div>
   </div>
 </template>
 
@@ -65,5 +70,9 @@ let pcGoal = ref(10);
 
 #components {
   display: flex;
+  
+  .component-item {
+    padding: 1rem;
+  }
 }
 </style>

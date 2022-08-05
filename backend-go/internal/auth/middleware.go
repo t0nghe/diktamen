@@ -24,7 +24,7 @@ func Middleware() func(http.Handler) http.Handler {
 				next.ServeHTTP(w, r)
 				return
 			}
-			tokenString := strings.TrimPrefix(header, "bearer ")
+			tokenString := strings.TrimPrefix(header, "Bearer ")
 			username, err := token.ParseToken(tokenString)
 			// fmt.Println("token parsed: ", username)
 			if err != nil {

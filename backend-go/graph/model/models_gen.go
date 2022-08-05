@@ -64,10 +64,11 @@ type UnseenSentWord struct {
 }
 
 type UserArticle struct {
-	ArticleID         *int   `json:"articleId"`
-	ArticleTitle      string `json:"articleTitle"`
-	ArticleSentCount  int    `json:"articleSentCount"`
-	UserFinishedIndex *int   `json:"userFinishedIndex"`
+	ArticleID          *int    `json:"articleId"`
+	ArticleTitle       string  `json:"articleTitle"`
+	ArticleSentCount   int     `json:"articleSentCount"`
+	ArticleDescription *string `json:"articleDescription"`
+	UserFinishedIndex  *int    `json:"userFinishedIndex"`
 }
 
 type UserCredentials struct {

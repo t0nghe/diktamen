@@ -27,8 +27,8 @@ const normGoal: ComputedRef<number> = computed(
 .progress {
   position: relative;
   /* These are manually changed in CSS. */
-  --progress-width: 100px;
-  --progress-stroke: 20px;
+  --progress-width: 80px;
+  --progress-stroke: 13px;
   /* These are props passed in from parent component. */
   --primary-color: v-bind(primary);
   --secondary-color: v-bind(secondary);
@@ -50,7 +50,7 @@ const normGoal: ComputedRef<number> = computed(
   left: var(--progress-stroke);
   font-size: 1rem;
   font-weight: bold;
-  color: var(--secondary-color);
+  color: var(--primary-color);
   background-color: white;
   border-radius: 50%;
   display: flex;
