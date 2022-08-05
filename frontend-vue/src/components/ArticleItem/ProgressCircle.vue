@@ -8,11 +8,11 @@ const props = defineProps<{
 }>();
 
 // Normalized progress and goal values.
-const normProg: ComputedRef<number> = computed(
-  (): number => Math.min(Math.max(props.prog, 0), props.goal)
+const normProg: ComputedRef<number> = computed((): number =>
+  Math.min(Math.max(props.prog, 0), props.goal)
 );
-const normGoal: ComputedRef<number> = computed(
-  (): number => Math.max(props.goal, 0)
+const normGoal: ComputedRef<number> = computed((): number =>
+  Math.max(props.goal, 0)
 );
 </script>
 

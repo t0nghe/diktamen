@@ -19,7 +19,13 @@ export default {
   data() {
     return {
       listUserUnseenArticles: [
-        { articleId: 0, articleTitle: "", articleSentCount: 0, articleDescription: "", userId: 0 },
+        {
+          articleId: 0,
+          articleTitle: "",
+          articleSentCount: 0,
+          articleDescription: "",
+          userId: 0,
+        },
       ],
     };
   },
