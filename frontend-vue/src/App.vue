@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from "vue-router";
-import ListComponents from "./views/dev/ListComponents.vue";
 </script>
 
 <template>
@@ -9,8 +8,8 @@ import ListComponents from "./views/dev/ListComponents.vue";
     <div>
       Sanity check: <span>{{ randomInteger }}</span>
     </div>
-    <!-- <nav class="nav-links">
-      <RouterLink to="/dev/components">List of Components</RouterLink>
+    <nav class="nav-links">
+      <RouterLink to="/">List of Components</RouterLink>
       <RouterLink to="/dev/graphql">Log In</RouterLink>
       <RouterLink to="/dev/graphql/signup">Sign Up</RouterLink>
       <RouterLink to="/dev/graphql/articles/seen">Seen Articles</RouterLink>
@@ -24,12 +23,10 @@ import ListComponents from "./views/dev/ListComponents.vue";
         >Examine Incorrect Dictations</RouterLink
       >
       <RouterLink to="/dev/graphql/review/due">Review Due Cards</RouterLink>
-    </nav> -->
+    </nav>
   </header>
 
-  <!-- <RouterView /> -->
-
-  <ListComponents />
+  <RouterView />
 </template>
 
 <script lang="ts">

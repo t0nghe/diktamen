@@ -1,11 +1,12 @@
 {
-  "name": "frontend-vite-again",
+  "name": "frontend-vue",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
+    "test:unit": "vitest --coverage --run",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -20,10 +21,14 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^3.0.0",
+    "@vue/test-utils": "^2.0.2",
+    "c8": "^7.12.0",
+    "jsdom": "^20.0.0",
     "node-sass": "^7.0.1",
     "sass-loader": "^13.0.2",
     "typescript": "^4.6.4",
     "vite": "^3.0.0",
+    "vitest": "^0.20.3",
     "vue-tsc": "^0.38.4"
   }
 }

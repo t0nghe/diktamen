@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// import { ref } from "vue";
+import { computed, ComputedRef } from "vue";
 const props = defineProps<{
   primary: string;
   secondary: string;
@@ -7,17 +7,19 @@ const props = defineProps<{
   goal: number;
 }>();
 
-// This did NOT make CSS reactive to props.
-// That's why we are using calc().
-// let percentage = ref(Math.round((props.prog * 100) / props.goal));
-// let degs = ref(Math.round(percentage.value * (18 / 5)) - 180);
-// let degsString = ref(`${degs.value}deg`);
+// Normalized progress and goal values.
+const normProg: ComputedRef<number> = computed(
+  (): number => Math.min(Math.max(props.prog, 0), props.goal)
+);
+const normGoal: ComputedRef<number> = computed(
+  (): number => Math.max(props.goal, 0)
+);
 </script>
 
 <template>
   <div class="progress">
     <div class="pie"></div>
-    <div class="desc">{{ prog }}/{{ goal }}</div>
+    <div class="desc">{{ normProg }}/{{ normGoal }}</div>
   </div>
 </template>
 
@@ -28,14 +30,14 @@ const props = defineProps<{
   --progress-width: 100px;
   --progress-stroke: 20px;
   /* These are props passed in from parent component. */
-  --primary-color: v-bind(props.primary);
-  --secondary-color: v-bind(props.secondary);
+  --primary-color: v-bind(primary);
+  --secondary-color: v-bind(secondary);
   /* These doesn't work. Even after adding `ref`, percentage and degsStrings still doesn't change with user input. */
   /* --p: v-bind(percentage);
   --v: v-bind(degsString); */
   /* Trying to calculate inside CSS using calc(). */
-  --prog: v-bind(props.prog);
-  --goal: v-bind(props.goal);
+  --goal: v-bind(normGoal);
+  --prog: v-bind(normProg);
   --p: calc(var(--prog) / var(--goal) * 100);
   --v: calc((var(--p) * (18 / 5) - 180) * 1deg);
 }
