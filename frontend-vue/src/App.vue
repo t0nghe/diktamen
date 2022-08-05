@@ -9,7 +9,7 @@ import { RouterLink, RouterView } from "vue-router";
       Sanity check: <span>{{ randomInteger }}</span>
     </div>
     <nav class="nav-links">
-      <RouterLink to="/dev/components">List of Components</RouterLink>
+      <RouterLink to="/">List of Components</RouterLink>
       <RouterLink to="/dev/graphql">Log In</RouterLink>
       <RouterLink to="/dev/graphql/signup">Sign Up</RouterLink>
       <RouterLink to="/dev/graphql/articles/seen">Seen Articles</RouterLink>
@@ -25,8 +25,6 @@ import { RouterLink, RouterView } from "vue-router";
       <RouterLink to="/dev/graphql/review/due">Review Due Cards</RouterLink>
     </nav>
   </header>
-
-  <hr />
 
   <RouterView />
 </template>

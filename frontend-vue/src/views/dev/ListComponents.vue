@@ -1,20 +1,69 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import ProgressCircle from "../../components/ArticleItem/ProgressCircle.vue";
+import { ref } from "vue";
+let pcPrimary = ref("#00bcd4");
+let pcSecondary = ref("#dcbc00");
+let pcProg = ref(1);
+let pcGoal = ref(10);
+</script>
 
 <template>
-  <div class="indigo">LIST OF COMPONENTS</div>
-  <div class="red-bg">HELLO.</div>
+  <h2>LIST OF COMPONENTS</h2>
+  <div id="components">
+    <div>
+      <h2>ProgressCircle</h2>
+      <!-- TODO WRITE input elements to set circle props. -->
+      Note: We still need to change the size.
+      <form>
+        <fieldset>
+          <legend>Progress Circle</legend>
+          <label for="pc_primary">Primary color:
+            <input
+              type="color"
+              id="pc_primary"
+              name="primary"
+              v-model="pcPrimary"
+            />
+          </label><br />
+          <label for="pc_secondary">Secondary color:
+            <input
+              type="color"
+              id="pc_secondary"
+              name="secondary"
+              v-model="pcSecondary"
+            />
+          </label><br />
+          <label for="pc_prog">Progress:
+            <input
+              type="number"
+              id="pc_prog"
+              name="prog"
+              v-model="pcProg"
+            />
+          </label><br />
+          <label for="pc_goal">Goal:
+            <input
+              type="number"
+              id="pc_goal"
+              name="goal"
+              v-model="pcGoal"
+            />
+          </label><br />
+        </fieldset>
+      </form>
+      <ProgressCircle
+        :prog="pcProg"
+        :goal="pcGoal"
+        :primary="pcPrimary"
+        :secondary="pcSecondary"
+      />
+    </div>
+  </div>
 </template>
 
 <style lang="scss">
-@import "@/assets/base.css";
-@import "@/assets/variables";
 
-.indigo {
-  color: white;
-  background-color: var(--vt-c-indigo);
-}
-
-.red-bg {
-  background-color: $red;
+#components {
+  display: flex;
 }
 </style>
