@@ -3,6 +3,7 @@ import { computed, ComputedRef } from "vue";
 const props = defineProps<{
   primary: string;
   secondary: string;
+  descBgColor: string;
   prog: number;
   goal: number;
 }>();
@@ -27,8 +28,8 @@ const normGoal: ComputedRef<number> = computed((): number =>
 .progress {
   position: relative;
   /* These are manually changed in CSS. */
-  --progress-width: 80px;
-  --progress-stroke: 13px;
+  --progress-width: 120px;
+  --progress-stroke: 20px;
   /* These are props passed in from parent component. */
   --primary-color: v-bind(primary);
   --secondary-color: v-bind(secondary);
@@ -38,6 +39,7 @@ const normGoal: ComputedRef<number> = computed((): number =>
   /* Trying to calculate inside CSS using calc(). */
   --goal: v-bind(normGoal);
   --prog: v-bind(normProg);
+  --desc-bg-color: v-bind(descBgColor);
   --p: calc(var(--prog) / var(--goal) * 100);
   --v: calc((var(--p) * (18 / 5) - 180) * 1deg);
 }
@@ -48,10 +50,10 @@ const normGoal: ComputedRef<number> = computed((): number =>
   height: calc(var(--progress-width) - var(--progress-stroke) * 2);
   top: var(--progress-stroke);
   left: var(--progress-stroke);
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: bold;
   color: var(--primary-color);
-  background-color: white;
+  background-color: var(--desc-bg-color);
   border-radius: 50%;
   display: flex;
   justify-content: center;

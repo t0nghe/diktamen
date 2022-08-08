@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { nextTick } from "vue";
 
 import { mount } from "@vue/test-utils";
 import ArticleItem from "../ArticleItem.vue";
@@ -42,14 +43,14 @@ describe("ArticleItem: in-progress article", () => {
     expect(wrapper.classes("article-item-complete")).toBe(false);
   });
 
-  it("clicking on an in-progress article, goToArticle event should emitted", () => {
-    wrapper.get("article-item__title").trigger("click");
-    expect(wrapper.emitted()).toHaveProperty("goToArticle");
-    expect(wrapper.emitted().goToArticle).toHaveLength(1);
-    expect(wrapper.emitted().goToArticle[0]).toEqual([testData.articleId]);
+  it("clicking on an in-progress article, go-to-article event should emitted", async () => {
+    const title = wrapper.find(".article-item__title");
+    title.trigger("click");
+    expect(wrapper.emitted()).toHaveProperty("click");
+    await nextTick();
+    expect(wrapper.emitted()).toHaveProperty("go-to-article");
+    expect(wrapper.emitted()["go-to-article"][0]).toEqual([testData.articleId]);
   });
-
-  wrapper.unmount();
 });
 
 describe("ArticleItem: new article", () => {
@@ -89,15 +90,14 @@ describe("ArticleItem: new article", () => {
     expect(wrapper.text()).toContain(`0/${testData.articleSentCount}`);
   });
 
-  it("clicking on an in-progress article, goToArticle event should emitted", () => {
-    // My understanding is the name of the custom event in our implementation would be 'goToArticle'. It's data would be article ID.
-    wrapper.get("article-item__title").trigger("click");
-    expect(wrapper.emitted()).toHaveProperty("goToArticle");
-    expect(wrapper.emitted().goToArticle).toHaveLength(1);
-    expect(wrapper.emitted().goToArticle[0]).toEqual([testData.articleId]);
+  it("clicking on a new article, go-to-article event should emitted", async () => {
+    const title = wrapper.find(".article-item__title");
+    title.trigger("click");
+    expect(wrapper.emitted()).toHaveProperty("click");
+    await nextTick();
+    expect(wrapper.emitted()).toHaveProperty("go-to-article");
+    expect(wrapper.emitted()["go-to-article"][0]).toEqual([testData.articleId]);
   });
-
-  wrapper.unmount();
 });
 
 describe("ArticleItem: complete", () => {
@@ -139,10 +139,9 @@ describe("ArticleItem: complete", () => {
     );
   });
 
-  it("clicking on a complete article, no event should be emitted", () => {
-    wrapper.get("article-item__title").trigger("click");
+  it("clicking on a complete article, no event should be emitted", async () => {
+    wrapper.get(".article-item__title").trigger("click");
+    await nextTick();
     expect(wrapper.emitted()).toBeNull;
   });
-
-  wrapper.unmount();
 });
