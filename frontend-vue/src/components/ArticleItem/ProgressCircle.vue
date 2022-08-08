@@ -3,16 +3,17 @@ import { computed, ComputedRef } from "vue";
 const props = defineProps<{
   primary: string;
   secondary: string;
+  descBgColor: string;
   prog: number;
   goal: number;
 }>();
 
 // Normalized progress and goal values.
-const normProg: ComputedRef<number> = computed(
-  (): number => Math.min(Math.max(props.prog, 0), props.goal)
+const normProg: ComputedRef<number> = computed((): number =>
+  Math.min(Math.max(props.prog, 0), props.goal)
 );
-const normGoal: ComputedRef<number> = computed(
-  (): number => Math.max(props.goal, 0)
+const normGoal: ComputedRef<number> = computed((): number =>
+  Math.max(props.goal, 0)
 );
 </script>
 
@@ -27,7 +28,7 @@ const normGoal: ComputedRef<number> = computed(
 .progress {
   position: relative;
   /* These are manually changed in CSS. */
-  --progress-width: 100px;
+  --progress-width: 120px;
   --progress-stroke: 20px;
   /* These are props passed in from parent component. */
   --primary-color: v-bind(primary);
@@ -38,6 +39,7 @@ const normGoal: ComputedRef<number> = computed(
   /* Trying to calculate inside CSS using calc(). */
   --goal: v-bind(normGoal);
   --prog: v-bind(normProg);
+  --desc-bg-color: v-bind(descBgColor);
   --p: calc(var(--prog) / var(--goal) * 100);
   --v: calc((var(--p) * (18 / 5) - 180) * 1deg);
 }
@@ -48,10 +50,10 @@ const normGoal: ComputedRef<number> = computed(
   height: calc(var(--progress-width) - var(--progress-stroke) * 2);
   top: var(--progress-stroke);
   left: var(--progress-stroke);
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: bold;
-  color: var(--secondary-color);
-  background-color: white;
+  color: var(--primary-color);
+  background-color: var(--desc-bg-color);
   border-radius: 50%;
   display: flex;
   justify-content: center;

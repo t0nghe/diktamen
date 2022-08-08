@@ -12,6 +12,7 @@ import { createApolloProvider } from "@vue/apollo-option";
 
 import App from "./App.vue";
 import router from "./router";
+import "@/assets/base.css";
 
 const app = createApp(App);
 
@@ -20,7 +21,7 @@ console.log("token: ", token);
 
 const authMiddleware = new ApolloLink((operation, forward) => {
   operation.setContext({
-    headers: { authorization: `bearer ${token}` },
+    headers: { authorization: `Bearer ${token}` },
   });
   return forward(operation);
 });

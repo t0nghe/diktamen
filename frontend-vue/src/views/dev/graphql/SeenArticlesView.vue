@@ -4,7 +4,7 @@
     <div v-if="$apollo.loading">loading...</div>
     <div v-else>
       <div v-for="item in listUserArticles" :key="item.id">
-        {{ item.articleTitle }}<br />
+        {{ item.articleTitle }}<br />{{ item.articleDescription }}
         {{ item.userFinishedIndex }} / {{ item.articleSentCount }}
       </div>
     </div>
@@ -20,7 +20,13 @@ export default {
   data() {
     return {
       listUserArticles: [
-        { articleId: 0, articleTitle: "", articleSentCount: 0, userId: 0 },
+        {
+          articleId: 0,
+          articleTitle: "",
+          articleSentCount: 0,
+          articleDescription: "",
+          userId: 0,
+        },
       ],
     };
   },
@@ -32,6 +38,7 @@ export default {
             articleId
             articleTitle
             articleSentCount
+            articleDescription
             userFinishedIndex
           }
         }
