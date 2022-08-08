@@ -166,6 +166,16 @@ func (r *queryResolver) RandomInteger(ctx context.Context) (*int, error) {
 	return &ret, nil
 }
 
+// GetUsername returns the username (string) and if the user is logged in (boolean). TODO implement this query.
+func (r *queryResolver) GetUsername(ctx context.Context) (*model.UserIdentity, error) {
+	userId := auth.FromContext(ctx, "user_id")
+	if userId == 0 {
+		return &model.UserIdentity{Username: "", LoggedIn: false}, nil
+	} else {
+		return &model.UserIdentity{Username: "", LoggedIn: true}, nil
+	}
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 

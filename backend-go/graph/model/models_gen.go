@@ -76,3 +76,8 @@ type UserCredentials struct {
 	Password string  `json:"password"`
 	Email    *string `json:"email"`
 }
+
+type UserIdentity struct {
+	Username string `json:"username"`
+	LoggedIn bool   `json:"loggedIn"`
+}
