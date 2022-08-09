@@ -77,6 +77,11 @@ type DueSent {
   sentWords: [TriedSentWord]!
 }
 
+type UserIdentity {
+  username: String!
+  loggedIn: Boolean!
+}
+
 type Mutation {
   userSignUp(input: UserCredentials!): Message!
   userLogIn(input: UserCredentials!): LoginToken!
@@ -94,4 +99,5 @@ type Query {
   examineIncorrectSents(articleId: Int): [IncorrectSeenSent]
   displayDueSents(daysAhead: Int): [DueSent]
   randomInteger: Int
+  getUsername: UserIdentity!
 }

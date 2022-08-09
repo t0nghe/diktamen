@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "test:unit": "vitest --coverage --run",
+    "test:ui": "vitest --ui",
     "test:update": "vitest --update --run",
     "lint": "eslint . --ext .vue,.js,.jsx,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "preview": "vite preview"
@@ -25,6 +26,7 @@
     "@types/jsdom": "^20.0.0",
     "@types/node": "^18.6.4",
     "@vitejs/plugin-vue": "^3.0.0",
+    "@vitest/ui": "^0.21.0",
     "@vue/eslint-config-prettier": "^7.0.0",
     "@vue/eslint-config-typescript": "^11.0.0",
     "@vue/test-utils": "^2.0.2",

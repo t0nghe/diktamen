@@ -78,6 +78,7 @@ type ComplexityRoot struct {
 		DisplayUnseenSents     func(childComplexity int, articleID *int) int
 		ExamineCorrectSents    func(childComplexity int, articleID *int) int
 		ExamineIncorrectSents  func(childComplexity int, articleID *int) int
+		GetUsername            func(childComplexity int) int
 		ListUserArticles       func(childComplexity int) int
 		ListUserUnseenArticles func(childComplexity int) int
 		RandomInteger          func(childComplexity int) int
@@ -124,6 +125,11 @@ type ComplexityRoot struct {
 		ArticleTitle       func(childComplexity int) int
 		UserFinishedIndex  func(childComplexity int) int
 	}
+
+	UserIdentity struct {
+		LoggedIn func(childComplexity int) int
+		Username func(childComplexity int) int
+	}
 }
 
 type MutationResolver interface {
@@ -140,6 +146,7 @@ type QueryResolver interface {
 	ExamineIncorrectSents(ctx context.Context, articleID *int) ([]*model.IncorrectSeenSent, error)
 	DisplayDueSents(ctx context.Context, daysAhead *int) ([]*model.DueSent, error)
 	RandomInteger(ctx context.Context) (*int, error)
+	GetUsername(ctx context.Context) (*model.UserIdentity, error)
 }
 
 type executableSchema struct {
@@ -322,6 +329,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.ExamineIncorrectSents(childComplexity, args["articleId"].(*int)), true
+
+	case "Query.getUsername":
+		if e.complexity.Query.GetUsername == nil {
+			break
+		}
+
+		return e.complexity.Query.GetUsername(childComplexity), true
 
 	case "Query.listUserArticles":
 		if e.complexity.Query.ListUserArticles == nil {
@@ -512,6 +526,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UserArticle.UserFinishedIndex(childComplexity), true
 
+	case "UserIdentity.loggedIn":
+		if e.complexity.UserIdentity.LoggedIn == nil {
+			break
+		}
+
+		return e.complexity.UserIdentity.LoggedIn(childComplexity), true
+
+	case "UserIdentity.username":
+		if e.complexity.UserIdentity.Username == nil {
+			break
+		}
+
+		return e.complexity.UserIdentity.Username(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -661,6 +689,11 @@ type DueSent {
   sentWords: [TriedSentWord]!
 }
 
+type UserIdentity {
+  username: String!
+  loggedIn: Boolean!
+}
+
 type Mutation {
   userSignUp(input: UserCredentials!): Message!
   userLogIn(input: UserCredentials!): LoginToken!
@@ -678,6 +711,7 @@ type Query {
   examineIncorrectSents(articleId: Int): [IncorrectSeenSent]
   displayDueSents(daysAhead: Int): [DueSent]
   randomInteger: Int
+  getUsername: UserIdentity!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -1947,6 +1981,56 @@ func (ec *executionContext) fieldContext_Query_randomInteger(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_getUsername(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getUsername(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetUsername(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserIdentity)
+	fc.Result = res
+	return ec.marshalNUserIdentity2ᚖbackendᚑgoᚋgraphᚋmodelᚐUserIdentity(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getUsername(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "username":
+				return ec.fieldContext_UserIdentity_username(ctx, field)
+			case "loggedIn":
+				return ec.fieldContext_UserIdentity_loggedIn(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserIdentity", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -3104,6 +3188,94 @@ func (ec *executionContext) fieldContext_UserArticle_userFinishedIndex(ctx conte
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserIdentity_username(ctx context.Context, field graphql.CollectedField, obj *model.UserIdentity) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserIdentity_username(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Username, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserIdentity_username(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserIdentity",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserIdentity_loggedIn(ctx context.Context, field graphql.CollectedField, obj *model.UserIdentity) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserIdentity_loggedIn(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LoggedIn, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserIdentity_loggedIn(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserIdentity",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5348,6 +5520,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "getUsername":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getUsername(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "__type":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -5621,6 +5816,41 @@ func (ec *executionContext) _UserArticle(ctx context.Context, sel ast.SelectionS
 
 			out.Values[i] = ec._UserArticle_userFinishedIndex(ctx, field, obj)
 
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var userIdentityImplementors = []string{"UserIdentity"}
+
+func (ec *executionContext) _UserIdentity(ctx context.Context, sel ast.SelectionSet, obj *model.UserIdentity) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userIdentityImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserIdentity")
+		case "username":
+
+			out.Values[i] = ec._UserIdentity_username(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "loggedIn":
+
+			out.Values[i] = ec._UserIdentity_loggedIn(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6147,6 +6377,20 @@ func (ec *executionContext) marshalNUserArticle2ᚖbackendᚑgoᚋgraphᚋmodel�
 func (ec *executionContext) unmarshalNUserCredentials2backendᚑgoᚋgraphᚋmodelᚐUserCredentials(ctx context.Context, v interface{}) (model.UserCredentials, error) {
 	res, err := ec.unmarshalInputUserCredentials(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUserIdentity2backendᚑgoᚋgraphᚋmodelᚐUserIdentity(ctx context.Context, sel ast.SelectionSet, v model.UserIdentity) graphql.Marshaler {
+	return ec._UserIdentity(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUserIdentity2ᚖbackendᚑgoᚋgraphᚋmodelᚐUserIdentity(ctx context.Context, sel ast.SelectionSet, v *model.UserIdentity) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UserIdentity(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
