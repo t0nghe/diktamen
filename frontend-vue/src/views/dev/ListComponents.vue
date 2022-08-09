@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ProgressCircle from "../../components/ArticleItem/ProgressCircle.vue";
 import ArticleItem from "../../components/ArticleItem/ArticleItem.vue";
+import NavSidebar from "../../components/NavSidebar/NavSidebar.vue";
 import { ref } from "vue";
 const pcPrimary = ref("#00bcd4");
 const pcSecondary = ref("#dcbc00");
@@ -100,7 +101,8 @@ const eventHandler = (data: number) => {
     :goal="10"
     :progress="0"
   />
-  <h2>...</h2>
+  <h2>NavSidebar</h2>
+  <NavSidebar :wide="true" />
 </template>
 
 <style lang="scss">

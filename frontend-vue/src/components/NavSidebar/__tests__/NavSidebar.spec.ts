@@ -1,70 +1,176 @@
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
-// import { nextTick } from "vue";
+import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
+import { nextTick } from "vue";
 
 import { mount } from "@vue/test-utils";
 import NavSidebar from "../NavSidebar.vue";
 
-describe("if there's a token, sidebar renders correctly", () => {
+describe("sidebar renders correctly when logged in", () => {
   beforeAll(() => {
     window.localStorage.setItem("token", "<tokenstring>");
   });
 
   it("sidebar renders correctly", () => {
     const wrapper = mount(NavSidebar);
-    expect(wrapper.text()).toContain("side bar initialized");
+    expect(wrapper.find("#sidebar-control-area").exists()).toBe(true);
+    expect(wrapper.find("#sidebar-display-area").exists()).toBe(true);
   });
 
-  it.todo("sidebar #sidebar-control-area is rendered");
+  it("in wide mode, labels are rendered for naviation and an icon is rendered for logging out", () => {
+    const wrapper = mount(NavSidebar, { props: { wide: true } });
+    expect(wrapper.find("#sidebar-nav-learn").text()).toContain("learn");
+    expect(wrapper.find(".svg-nav-learn").exists()).toBe(true);
+    expect(wrapper.find("#sidebar-nav-review").text()).toContain("review");
+    expect(wrapper.find(".svg-nav-review").exists()).toBe(true);
+    expect(wrapper.find("#sidebar-button-logout").exists()).toBe(true);
+    expect(wrapper.find(".svg-button-logout").exists()).toBe(true);
+  });
 
-  it.todo("sidebar #sidebar-display-area is rendered");
+  it("in narrow mode, 3 icons are rendered for naviation & 1 icon is rendered for logging out", () => {
+    const wrapper = mount(NavSidebar, { props: { wide: false } });
+    expect(wrapper.find("#sidebar-nav-learn").text()).not.toContain("learn");
+    expect(wrapper.find(".svg-nav-learn").exists()).toBe(true);
+    expect(wrapper.find("#sidebar-nav-review").text()).not.toContain("review");
+    expect(wrapper.find(".svg-nav-review").exists()).toBe(true);
+    expect(wrapper.find("#sidebar-button-logout").exists()).toBe(true);
+    expect(wrapper.find(".svg-button-logout").exists()).toBe(true);
+  });
 
-  it.todo(
-    "if #sidebar-display-area .sidebar-narrow, 3 svgs for nav and 1 svg for logging out are rendered"
-  );
+  it("clicking #sidebar-control-area will turn .sidebar-wide to .sidebar-narrow", async () => {
+    const wrapper = mount(NavSidebar, { props: { wide: true } });
+    wrapper.get("#sidebar-control-area").trigger("click");
+    await nextTick();
+    expect(wrapper.find(".sidebar-narrow").exists()).toBe(true);
+    expect(wrapper.find(".sidebar-wide").exists()).toBe(false);
+  });
 
-  it.todo(
-    "if #sidebar-display-area .sidebar-wide, 3 strings for nav & 1 svg for logging out are rendered"
-  );
+  it("clicking #sidebar-control-area will turn .sidebar-narrow to .sidebar-wide", async () => {
+    const wrapper = mount(NavSidebar, { props: { wide: false } });
+    wrapper.get("#sidebar-control-area").trigger("click");
+    await nextTick();
+    expect(wrapper.find(".sidebar-narrow").exists()).toBe(false);
+    expect(wrapper.find(".sidebar-wide").exists()).toBe(true);
+  });
 
-  it.todo("clicking #sidebar-nav-list, router goes to /articles/");
+  // it("clicking learn on nav sidebar, router.push is called with /articles", async () => {
+  //   const mockRouter = { push: vi.fn() };
+  //   const wrapper = mount(NavSidebar, {
+  //     props: { wide: false },
+  //     global: {
+  //       mocks: {
+  //         $router: mockRouter,
+  //       },
+  //     },
+  //   });
 
-  it.todo("clicking #sidebar-nav-learn, router goes to /learn/");
+  //   wrapper.get("#sidebar-nav-learn").trigger("click");
+  //   await nextTick();
+  //   expect(mockRouter.push).toHaveBeenCalledTimes(1);
+  //   expect(mockRouter.push).toHaveBeenCalledWith("/articles");
+  // });
 
-  it.todo("clicking #sidebar-nav-review, router goes to /review/");
+  // it("clicking review on nav sidebar, router.push is called with /review", async () => {
+  //   const mockRouter = { push: vi.fn() };
+  //   const wrapper = mount(NavSidebar, {
+  //     props: { wide: false },
+  //     global: {
+  //       mocks: {
+  //         $router: mockRouter,
+  //       },
+  //     },
+  //   });
 
-  it.todo(
-    "clicking #sidebar-button-logout, router goes to / and token is cleared"
-  );
+  //   wrapper.get("#sidebar-nav-review").trigger("click");
+  //   await nextTick();
+  //   expect(mockRouter.push).toHaveBeenCalledTimes(1);
+  //   expect(mockRouter.push).toHaveBeenCalledWith("/review");
+  // });
 
-  it.todo(
-    "clicking #sidebar-control-area will toggle .sidebar-wide vs .sidebar-narrow"
-  );
+  // how to test there's no token
+  it("clicking #sidebar-button-logout, router goes to / and token is cleared", async () => {
+    // const mockRouter = { push: vi.fn() };
+    const wrapper = mount(NavSidebar, {
+      props: { wide: false },
+      // global: {
+      //   mocks: {
+      //     $router: mockRouter,
+      //   },
+      // },
+    });
+    wrapper.get("#sidebar-button-logout").trigger("click");
+    await nextTick();
+    // expect(mockRouter.push).toHaveBeenCalledTimes(1);
+    // expect(mockRouter.push).toHaveBeenCalledWith("/");
+    const token = window.localStorage.getItem("token");
+    expect(token).toBe(null);
+  });
 
-  afterAll(()=> {
+  afterAll(() => {
     window.localStorage.removeItem("token");
   });
 });
 
-describe("if there's not a token, sidebar renders correctly when not logged in", () => {
+describe("sidebar renders correctly when not logged in", () => {
   beforeAll(() => {
     window.localStorage.removeItem("token");
   });
 
-  it.todo("#sidebar-control-area is rendered");
+  it("sidebar renders correctly in wide mode", () => {
+    const wrapper = mount(NavSidebar, { props: { wide: true } });
+    expect(wrapper.find("#sidebar-control-area").exists()).toBe(true);
+    expect(wrapper.find("#sidebar-display-area").exists()).toBe(true);
 
-  it.todo("#sidebar-display-area is rendered");
+    expect(wrapper.find("#sidebar-nav-learn").exists()).toBe(false);
+    expect(wrapper.find("#sidebar-nav-review").exists()).toBe(false);
+    expect(wrapper.find("#sidebar-button-logout").exists()).toBe(false);
 
-  it.todo(
-    "when #sidebar-control-area is .sidebar-narrow, 1 svg icon for logging in is rendered"
-  );
+    expect(wrapper.find("#sidebar-button-login").exists()).toBe(true);
+    expect(wrapper.find("#sidebar-button-login").text()).toContain("log in");
+  });
 
-  it.todo(
-    "when #sidebar-control-area is .sidebar-wide, 1 svg and a string is rendered"
-  );
+  it("sidebar renders correctly in narrow mode", () => {
+    const wrapper = mount(NavSidebar, { props: { wide: false } });
+    expect(wrapper.find("#sidebar-control-area").exists()).toBe(true);
+    expect(wrapper.find("#sidebar-display-area").exists()).toBe(true);
 
-  it.todo("clicking #sidebar-button-login router goes to /login");
+    expect(wrapper.find("#sidebar-nav-learn").exists()).toBe(false);
+    expect(wrapper.find("#sidebar-nav-review").exists()).toBe(false);
+    expect(wrapper.find("#sidebar-button-logout").exists()).toBe(false);
 
-  it.todo(
-    "clicking #sidebar-control-area will toggle .sidebar-wide vs .sidebar-narrow"
-  );
+    expect(wrapper.find("#sidebar-button-login").exists()).toBe(true);
+    expect(wrapper.find("#sidebar-button-login").text()).not.toContain(
+      "log in"
+    );
+    expect(wrapper.find(".svg-button-login").exists()).toBe(true);
+  });
+
+  // it("clicking #sidebar-button-login router goes to /login", async () => {
+  //   const mockRouter = { push: vi.fn() };
+  //   const wrapper = mount(NavSidebar, {
+  //     props: { wide: false },
+  //     global: {
+  //       mocks: { $router: mockRouter },
+  //     },
+  //   });
+  //   wrapper.find("#sidebar-button-login").trigger("click");
+  //   await nextTick();
+  //   expect(mockRouter.push).toHaveBeenCalledTimes(1);
+  //   expect(mockRouter.push).toHaveBeenCalledWith("/login");
+  // });
+  
+  // it("clicking #sidebar-button-login router goes to /login", async () => {
+  //   const mockRouterPush = vi.fn();
+  //   vi.mock("vue-router", () => ({
+  //     useRouter: () => ({
+  //       push: mockRouterPush,
+  //     }),
+  //   }));
+
+  //   const wrapper = mount(NavSidebar, {
+  //     props: { wide: false },
+  //   });
+  //   wrapper.find("#sidebar-button-login").trigger("click");
+  //   await nextTick();
+  //   expect(mockRouterPush).toHaveBeenCalledTimes(1);
+  //   expect(mockRouterPush).toHaveBeenCalledWith("/login");
+  // });
 });
