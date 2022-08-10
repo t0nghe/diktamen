@@ -2,6 +2,7 @@
 import ProgressCircle from "../../components/ArticleItem/ProgressCircle.vue";
 import ArticleItem from "../../components/ArticleItem/ArticleItem.vue";
 import NavSidebar from "../../components/NavSidebar/NavSidebar.vue";
+import TopBar from "../../components/TopBar/TopBar.vue";
 import { ref } from "vue";
 const pcPrimary = ref("#00bcd4");
 const pcSecondary = ref("#dcbc00");
@@ -15,6 +16,8 @@ const articleItemData = {
     "När han nu väl tar plats, den traditionelle mannen, väcker han både kvinnors åtrå och mäns önskan att vara som han.",
   userFinishedIndex: 3,
 };
+const topBarDone = ref(1);
+const topBarToGo = ref(10);
 
 const eventHandler = (data: number) => {
   alert("clicked");
@@ -103,6 +106,32 @@ const eventHandler = (data: number) => {
   />
   <h2>NavSidebar</h2>
   <NavSidebar :wide="true" />
+  <h2>TopBar</h2>
+  <h3>TopBar - waitlist</h3>
+  <TopBar state="waitlist" ahref="https://dope.com/" />
+  <h3>TopBar - articles</h3>
+  <TopBar state="articles" />
+  <h3>TopBar - learn</h3>
+  <TopBar state="learn" title="Nu kör vi!" />
+  <h3>TopBar - summary</h3>
+  <TopBar state="summary" />
+  <h2>Dear TopBar review, aren't you a little pain dans le cul?</h2>
+  <form>
+    <fieldset>
+      <legend>customize your progress, my friend</legend>
+      <label for="topBarDone"
+        >You've reviewed this many cards:
+        <input type="number" v-model="topBarDone"
+      /></label>
+      <br />
+      <label for="topBarToGo"
+        >You need to review this many cards:
+        <input type="number" v-model="topBarToGo"
+      /></label>
+    </fieldset>
+  </form>
+  <br /><br /><br />
+  <TopBar state="review" :revcount="topBarDone" :duecount="topBarToGo" />
 </template>
 
 <style lang="scss">

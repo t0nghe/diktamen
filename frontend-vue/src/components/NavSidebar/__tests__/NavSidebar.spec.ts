@@ -86,20 +86,12 @@ describe("sidebar renders correctly when logged in", () => {
   // });
 
   // how to test there's no token
-  it("clicking #sidebar-button-logout, router goes to / and token is cleared", async () => {
-    // const mockRouter = { push: vi.fn() };
+  it("clicking #sidebar-button-logout, token is cleared", async () => {
     const wrapper = mount(NavSidebar, {
       props: { wide: false },
-      // global: {
-      //   mocks: {
-      //     $router: mockRouter,
-      //   },
-      // },
     });
     wrapper.get("#sidebar-button-logout").trigger("click");
     await nextTick();
-    // expect(mockRouter.push).toHaveBeenCalledTimes(1);
-    // expect(mockRouter.push).toHaveBeenCalledWith("/");
     const token = window.localStorage.getItem("token");
     expect(token).toBe(null);
   });
@@ -156,7 +148,7 @@ describe("sidebar renders correctly when not logged in", () => {
   //   expect(mockRouter.push).toHaveBeenCalledTimes(1);
   //   expect(mockRouter.push).toHaveBeenCalledWith("/login");
   // });
-  
+
   // it("clicking #sidebar-button-login router goes to /login", async () => {
   //   const mockRouterPush = vi.fn();
   //   vi.mock("vue-router", () => ({
