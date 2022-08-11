@@ -11,7 +11,9 @@ import SentenceTried from "../SentenceTried.vue";
 
 describe("correct seen sents displayed correctly", () => {
   const correctSeenSent = CorrSents[0];
-  const wrapper = mount(SentenceTried, { props: { ...correctSeenSent } });
+  const wrapper = mount(SentenceTried, {
+    props: { ...correctSeenSent, isCorrect: true },
+  });
 
   it("style of tried sentences", () => {
     // This classname to distringuish from sentences shown on summary page.
@@ -25,7 +27,7 @@ describe("correct seen sents displayed correctly", () => {
   });
 
   it("text: styling and content correct", () => {
-    const tryTextSpan = wrapper.find(".sent-text");
+    const tryTextSpan = wrapper.find(".learn-sent-text");
     expect(tryTextSpan).toBeDefined();
     expect(tryTextSpan.text()).toEqual(correctSeenSent.tryText);
   });
@@ -33,7 +35,9 @@ describe("correct seen sents displayed correctly", () => {
 
 describe("incorrect seen sents displayed correctly", () => {
   const incorrectSeenSent = IncorrSents[0];
-  const wrapper = mount(SentenceTried, { props: { ...incorrectSeenSent } });
+  const wrapper = mount(SentenceTried, {
+    props: { ...incorrectSeenSent, isCorrect: false },
+  });
 
   it("indexInArticle: styling and content correct", () => {
     const iiaSpanIncorr = wrapper.find(".learn-sent-index-incorrect");

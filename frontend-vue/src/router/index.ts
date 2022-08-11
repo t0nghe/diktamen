@@ -9,12 +9,18 @@ import ExamineCorrectView from "../views/dev/graphql/ExamineCorrectView.vue";
 import ExamineIncorrectView from "../views/dev/graphql/ExamineIncorrectView.vue";
 import ReviewDueView from "../views/dev/graphql/ReviewDueView.vue";
 import ListComponents from "../views/dev/ListComponents.vue";
+import ListSentences from "../views/dev/ListSentences.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: "/",
+      name: "ListSentences",
+      component: ListSentences,
+    },
+    {
+      path: "/list-components",
       name: "ListComponents",
       component: ListComponents,
     },
