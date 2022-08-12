@@ -8,8 +8,6 @@ const props = defineProps<{
   tryText?: string;
   sentWords?: sentWord[];
 }>();
-
-console.log(props);
 </script>
 
 <template>
@@ -32,9 +30,11 @@ console.log(props);
         v-for="sentword in props.sentWords"
         :key="sentword['indexInSent']"
       >
+        <!-- We can't use lastInputScore for this condition because that score comes from the backend. And we might not have submitted the user input there yet. -->
         <template
           v-if="
-            (sentword.isCloze && sentword.lastInputScore > 0.998) ||
+            (sentword.isCloze &&
+              sentword.lastInputText === sentword.wordform) ||
             !sentword.isCloze
           "
           >{{ sentword.wordform }}</template
@@ -61,6 +61,7 @@ console.log(props);
   flex-direction: row;
   align-items: flex-start;
   color: $blue-primary;
+  margin: 8px;
 }
 
 .learn-sent-index-correct {
@@ -98,7 +99,7 @@ console.log(props);
   .word-error {
     color: $red-primary;
     text-decoration: line-through;
-    background-color: $yellow-gold;
+    background-color: $yellow-beige;
     font-style: italic;
     box-shadow: 1px 1px $red-primary;
   }

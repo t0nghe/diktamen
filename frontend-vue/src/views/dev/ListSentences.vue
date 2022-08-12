@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import SentenceTried from "../../components/Sentence/SentenceTried.vue";
 import SentenceNew from "../../components/Sentence/SentenceNew.vue";
+import SentenceTrying from "../../components/Sentence/SentenceTrying.vue";
 
 const correctExample = {
   sentId: 17,
@@ -223,6 +224,118 @@ const incorrectExample = {
     },
   ],
 };
+
+const unseenSentExample = {
+  sentId: 18,
+  indexInArticle: 4,
+  mediaUri: "https://d1zg52ope8o24c.cloudfront.net/zelenskyj/zelenskyj_04.mp3",
+  sentWords: [
+    {
+      length: 1,
+      isCloze: true,
+      wordform: "I",
+      indexInSent: 1,
+    },
+    {
+      length: 6,
+      isCloze: false,
+      wordform: "åratal",
+      indexInSent: 2,
+    },
+    {
+      length: 3,
+      isCloze: true,
+      wordform: "har",
+      indexInSent: 3,
+    },
+    {
+      length: 3,
+      isCloze: false,
+      wordform: "ett",
+      indexInSent: 4,
+    },
+    {
+      length: 11,
+      isCloze: true,
+      wordform: "oförsonligt",
+      indexInSent: 5,
+    },
+    {
+      length: 10,
+      isCloze: false,
+      wordform: "kulturkrig",
+      indexInSent: 6,
+    },
+    {
+      length: 5,
+      isCloze: true,
+      wordform: "rasat",
+      indexInSent: 7,
+    },
+    {
+      length: 1,
+      isCloze: false,
+      wordform: ",",
+      indexInSent: 8,
+    },
+    {
+      length: 3,
+      isCloze: true,
+      wordform: "med",
+      indexInSent: 9,
+    },
+    {
+      length: 5,
+      isCloze: false,
+      wordform: "offer",
+      indexInSent: 10,
+    },
+    {
+      length: 4,
+      isCloze: true,
+      wordform: "till",
+      indexInSent: 11,
+    },
+    {
+      length: 4,
+      isCloze: false,
+      wordform: "både",
+      indexInSent: 12,
+    },
+    {
+      length: 5,
+      isCloze: true,
+      wordform: "höger",
+      indexInSent: 13,
+    },
+    {
+      length: 3,
+      isCloze: false,
+      wordform: "och",
+      indexInSent: 14,
+    },
+    {
+      length: 7,
+      isCloze: true,
+      wordform: "vänster",
+      indexInSent: 15,
+    },
+    {
+      length: 1,
+      isCloze: false,
+      wordform: ",",
+      indexInSent: 16,
+    },
+  ],
+};
+
+const shouldPlay = () => {
+  console.log("should play sound");
+};
+
+const shouldSubmitSent = (payload) => {
+  console.log(payload);
+};
 </script>
 
 <template>
@@ -242,6 +355,27 @@ const incorrectExample = {
     :indexInArticle="incorrectExample.indexInArticle"
     :sentWords="incorrectExample.sentWords"
   />
+  <h2>Sentence New - that awaits you to listen!</h2>
+  <SentenceNew
+    :sent-id="unseenSentExample.sentId"
+    :index-in-article="unseenSentExample.indexInArticle"
+    :sent-words="unseenSentExample.sentWords"
+  />
+  <h2>Sentence Trying - enjoy it!</h2>
+  <div>
+    &nbsp;&nbsp;
+    <span v-for="w in unseenSentExample.sentWords" 
+      >{{ w.wordform }} &nbsp;</span
+    >
+  </div>
+  <SentenceTrying
+    :sent-id="unseenSentExample.sentId"
+    :index-in-article="unseenSentExample.indexInArticle"
+    :sent-words="unseenSentExample.sentWords"
+    @play-sound="shouldPlay"
+    @submit-sent="shouldSubmitSent"
+  />
+  <h2>...</h2>
 </template>
 
 <style></style>
