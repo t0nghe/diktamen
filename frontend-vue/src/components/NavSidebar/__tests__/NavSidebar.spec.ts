@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { nextTick } from "vue";
 
 import { mount } from "@vue/test-utils";
@@ -51,40 +51,6 @@ describe("sidebar renders correctly when logged in", () => {
     expect(wrapper.find(".sidebar-wide").exists()).toBe(true);
   });
 
-  // it("clicking learn on nav sidebar, router.push is called with /articles", async () => {
-  //   const mockRouter = { push: vi.fn() };
-  //   const wrapper = mount(NavSidebar, {
-  //     props: { wide: false },
-  //     global: {
-  //       mocks: {
-  //         $router: mockRouter,
-  //       },
-  //     },
-  //   });
-
-  //   wrapper.get("#sidebar-nav-learn").trigger("click");
-  //   await nextTick();
-  //   expect(mockRouter.push).toHaveBeenCalledTimes(1);
-  //   expect(mockRouter.push).toHaveBeenCalledWith("/articles");
-  // });
-
-  // it("clicking review on nav sidebar, router.push is called with /review", async () => {
-  //   const mockRouter = { push: vi.fn() };
-  //   const wrapper = mount(NavSidebar, {
-  //     props: { wide: false },
-  //     global: {
-  //       mocks: {
-  //         $router: mockRouter,
-  //       },
-  //     },
-  //   });
-
-  //   wrapper.get("#sidebar-nav-review").trigger("click");
-  //   await nextTick();
-  //   expect(mockRouter.push).toHaveBeenCalledTimes(1);
-  //   expect(mockRouter.push).toHaveBeenCalledWith("/review");
-  // });
-
   // how to test there's no token
   it("clicking #sidebar-button-logout, token is cleared", async () => {
     const wrapper = mount(NavSidebar, {
@@ -134,35 +100,4 @@ describe("sidebar renders correctly when not logged in", () => {
     );
     expect(wrapper.find(".svg-button-login").exists()).toBe(true);
   });
-
-  // it("clicking #sidebar-button-login router goes to /login", async () => {
-  //   const mockRouter = { push: vi.fn() };
-  //   const wrapper = mount(NavSidebar, {
-  //     props: { wide: false },
-  //     global: {
-  //       mocks: { $router: mockRouter },
-  //     },
-  //   });
-  //   wrapper.find("#sidebar-button-login").trigger("click");
-  //   await nextTick();
-  //   expect(mockRouter.push).toHaveBeenCalledTimes(1);
-  //   expect(mockRouter.push).toHaveBeenCalledWith("/login");
-  // });
-
-  // it("clicking #sidebar-button-login router goes to /login", async () => {
-  //   const mockRouterPush = vi.fn();
-  //   vi.mock("vue-router", () => ({
-  //     useRouter: () => ({
-  //       push: mockRouterPush,
-  //     }),
-  //   }));
-
-  //   const wrapper = mount(NavSidebar, {
-  //     props: { wide: false },
-  //   });
-  //   wrapper.find("#sidebar-button-login").trigger("click");
-  //   await nextTick();
-  //   expect(mockRouterPush).toHaveBeenCalledTimes(1);
-  //   expect(mockRouterPush).toHaveBeenCalledWith("/login");
-  // });
 });

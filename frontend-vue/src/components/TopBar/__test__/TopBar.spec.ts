@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { mount } from "@vue/test-utils";
+import { nextTick } from "vue";
 import TopBar from "../TopBar.vue";
 
 describe("topbar renders correctly", () => {
@@ -50,5 +51,17 @@ describe("topbar renders correctly", () => {
     expect(wrapper.text()).toContain("review");
     expect(wrapper.text()).toContain("0/10");
     expect(wrapper.classes()).toContain("top-bar-review");
+  });
+
+  it("reactivity of props", async () => {
+    const wrapper = mount(TopBar, {
+      props: { state: "review", revcount: 3, duecount: 10 },
+    });
+    expect(wrapper.text()).toContain("3/10");
+
+    await wrapper.setProps({ duecount: 12 });
+    await nextTick();
+
+    expect(wrapper.text()).toContain("3/12");
   });
 });

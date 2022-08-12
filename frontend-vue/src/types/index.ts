@@ -4,3 +4,24 @@ export type seenArticleType = {
   articleSentCount: number;
   userFinishedIndex: number;
 };
+
+export type sentWord = {
+  length: number;
+  isCloze: boolean;
+  wordform: string;
+  indexInSent: number;
+  lastInputText?: string;
+  lastInputScore?: number;
+};
+
+export type userTrySent = {
+  sentId: number;
+  userInputWords: {
+    indexInSent: number;
+    inputText: string;
+  }[];
+};
+
+export type inputValuesType = { [key: string]: string };
+
+export type inputFieldsType = { [key: string]: HTMLInputElement };

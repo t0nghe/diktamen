@@ -9,7 +9,8 @@ import { RouterLink, RouterView } from "vue-router";
       Sanity check: <span>{{ randomInteger }}</span>
     </div>
     <nav class="nav-links">
-      <RouterLink to="/">List of Components</RouterLink>
+      <RouterLink to="/">Sentence Components</RouterLink>
+      <RouterLink to="/list-components">List of components</RouterLink>
       <RouterLink to="/dev/graphql">Log In</RouterLink>
       <RouterLink to="/dev/graphql/signup">Sign Up</RouterLink>
       <RouterLink to="/dev/graphql/articles/seen">Seen Articles</RouterLink>
@@ -56,11 +57,11 @@ export default {
 <style lang="scss">
 .nav-links {
   display: flex;
-  justify-content: space-around;
+  flex-wrap: wrap;
 
   a {
-    margin: 0.5rem;
-    padding: 0.5rem;
+    margin: 0.2rem;
+    padding: 0.2rem;
     border: 1px solid #ccc;
     border-radius: 0.5rem;
   }
