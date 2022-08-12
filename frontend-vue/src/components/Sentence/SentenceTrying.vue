@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineEmits } from "vue";
+import { ref, watch, defineEmits, computed } from "vue";
 import {
   sentWord,
   userTrySent,
@@ -11,7 +11,14 @@ const props = defineProps<{
   sentId: number;
   indexInArticle: number;
   sentWords: sentWord[];
+  parentArrowClick: number;
 }>();
+
+const parentArrowClickRef = computed(() => props.parentArrowClick);
+// You can't watch a single prop from the parent. I had to use a computed ref.
+watch(parentArrowClickRef, () => {
+  trySubmitSent();
+});
 
 const emit = defineEmits<{
   (e: "submit-sent", payload: userTrySent): void;
@@ -40,8 +47,7 @@ const focusNextInput = (idxSent: string) => {
 };
 
 const readyToSubmit = (): boolean => {
-  console.log("inside ready to submit function");
-  // BUG: The following line is a problem. It seems:
+  // BUG NOTE (FIXED): The following line is a problem. It seems:
   // Each input element is bound to a value in this object.
   // and before interaction, the value is NOT appended to this object.
   // In this object, only the keys of fields that HAVE a value are present.
@@ -191,12 +197,11 @@ const onDownHandler = (ev) => {
   }
 
   .word-user-input-missing {
-    border: 4px solid $yellow-gold;
+    border-bottom: 4px solid $yellow-gold;
   }
 
   .word-user-input-wrong {
-    border: 2px solid $red-primary;
-    background-color: $red-secondary;
+    border-bottom: 4px solid $red-secondary;
   }
 }
 </style>

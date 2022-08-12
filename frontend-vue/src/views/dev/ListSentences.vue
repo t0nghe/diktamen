@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import SentenceTried from "../../components/Sentence/SentenceTried.vue";
 import SentenceNew from "../../components/Sentence/SentenceNew.vue";
 import SentenceTrying from "../../components/Sentence/SentenceTrying.vue";
+import ArrowYellow from "../../components/Interaction/ArrowYellow.vue";
+import PlayPause from "@/components/Interaction/PlayPause.vue";
 
 const correctExample = {
   sentId: 17,
@@ -330,12 +333,15 @@ const unseenSentExample = {
 };
 
 const shouldPlay = () => {
-  console.log("should play sound");
+  parentClickPlay.value++;
 };
 
 const shouldSubmitSent = (payload) => {
   console.log(payload);
 };
+
+const counterArrowClick = ref<number>(0);
+const parentClickPlay = ref<number>(0);
 </script>
 
 <template>
@@ -362,20 +368,38 @@ const shouldSubmitSent = (payload) => {
     :sent-words="unseenSentExample.sentWords"
   />
   <h2>Sentence Trying - enjoy it!</h2>
+  TODO: IMPLEMENT A REAL ARROW.
+  <!-- <button @click="counterArrowClick++">⬇️ ⬇️ ⬇️</button> -->
+  <div>
+    <ArrowYellow @click-down-arrow="counterArrowClick++" />
+  </div>
   <div>
     &nbsp;&nbsp;
-    <span v-for="w in unseenSentExample.sentWords" 
+    <span v-for="w in unseenSentExample.sentWords" :key="w.indexInSent"
       >{{ w.wordform }} &nbsp;</span
     >
   </div>
+  <!-- NOTE:  -->
   <SentenceTrying
     :sent-id="unseenSentExample.sentId"
     :index-in-article="unseenSentExample.indexInArticle"
     :sent-words="unseenSentExample.sentWords"
     @play-sound="shouldPlay"
     @submit-sent="shouldSubmitSent"
+    :parent-arrow-click="counterArrowClick"
+    style="z-index: 10"
   />
   <h2>...</h2>
+  <PlayPause
+    media-url="https://d1zg52ope8o24c.cloudfront.net/meningsfullt/meningsfullt_10.mp3"
+    :parent-click-play="parentClickPlay"
+  />
 </template>
 
-<style></style>
+<style lang="scss">
+/* .arrow-div {
+  position: fixed;
+  top: 85vh; // use a calc trick to center it
+  left: 45vw;
+} */
+</style>
