@@ -10,6 +10,7 @@ import ExamineIncorrectView from "../views/dev/graphql/ExamineIncorrectView.vue"
 import ReviewDueView from "../views/dev/graphql/ReviewDueView.vue";
 import ListComponents from "../views/dev/ListComponents.vue";
 import ListSentences from "../views/dev/ListSentences.vue";
+import SummaryView from "../views/SummaryView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,6 +19,11 @@ const router = createRouter({
       path: "/",
       name: "ListSentences",
       component: ListSentences,
+    },
+    {
+      path: "/summary",
+      name: "SummaryView",
+      component: SummaryView,
     },
     {
       path: "/list-components",

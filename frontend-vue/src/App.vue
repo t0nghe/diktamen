@@ -10,6 +10,7 @@ import { RouterLink, RouterView } from "vue-router";
     </div>
     <nav class="nav-links">
       <RouterLink to="/">Sentence Components</RouterLink>
+      <RouterLink to="/summary">Summary View</RouterLink>
       <RouterLink to="/list-components">List of components</RouterLink>
       <RouterLink to="/dev/graphql">Log In</RouterLink>
       <RouterLink to="/dev/graphql/signup">Sign Up</RouterLink>
