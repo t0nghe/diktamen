@@ -97,6 +97,7 @@ type Query {
   examineCorrectSents(articleId: Int): [SeenSent]
   # these two are quite similar too
   examineIncorrectSents(articleId: Int): [IncorrectSeenSent]
+  getArticleScore(articleId: Int):
   displayDueSents(daysAhead: Int): [DueSent]
   randomInteger: Int
   getUsername: UserIdentity!

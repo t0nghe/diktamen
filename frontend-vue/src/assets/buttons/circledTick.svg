@@ -1,0 +1,18 @@
+<svg width="218.000000" height="218.000000" viewBox="0 0 218 218" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<g clip-path="url(#clip5_87)">
+		<rect width="218.000000" height="218.000000"/>
+		<circle cx="109.000000" cy="109.000000" r="107.500000" stroke="#004B87" stroke-opacity="0.5" stroke-width="3.000000"/>
+		<circle cx="109.000000" cy="109.000000" r="99.000000" stroke="#004B87" stroke-opacity="0.75" stroke-width="5.000000"/>
+		<circle cx="109.000000" cy="109.000000" r="88.500000" stroke="#004B87" stroke-opacity="0.75" stroke-width="6.000000"/>
+		<path d="M48.1928 116.799L88.8216 157.488L99.436 146.889L53.5078 100.893L42.8934 111.492L48.1928 116.799Z" fill-rule="evenodd" fill="#FFCD00"/>
+		<path d="M154.907 71.1967L78.8934 147.211L89.5 157.817L170.817 76.5L160.211 65.8934L154.907 71.1967Z" fill-rule="evenodd" fill="#FFCD00"/>
+	</g>
+	<defs>
+		<clipPath id="clip5_87">
+			<rect width="218.000000" height="218.000000" fill="white"/>
+		</clipPath>
+	</defs>
+</svg>

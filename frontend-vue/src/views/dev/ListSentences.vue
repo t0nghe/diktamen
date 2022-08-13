@@ -350,6 +350,15 @@ const parentClickPlay = ref<number>(0);
   <h2>Sentence Tried (correct)</h2>
   <SentenceTried
     :isCorrect="true"
+    :is-summary="false"
+    :sentId="correctExample.sentId"
+    :indexInArticle="correctExample.indexInArticle"
+    :tryText="correctExample.tryText"
+  />
+  <h2>Sentence Tried (correct, in summary)</h2>
+  <SentenceTried
+    :isCorrect="true"
+    :is-summary="true"
     :sentId="correctExample.sentId"
     :indexInArticle="correctExample.indexInArticle"
     :tryText="correctExample.tryText"
@@ -357,6 +366,7 @@ const parentClickPlay = ref<number>(0);
   <h2>Sentence Tried (incorrect)</h2>
   <SentenceTried
     :isCorrect="false"
+    :is-summary="false"
     :sentId="incorrectExample.sentId"
     :indexInArticle="incorrectExample.indexInArticle"
     :sentWords="incorrectExample.sentWords"
