@@ -120,6 +120,9 @@ const logout = () => {
   align-items: center;
   width: auto;
   height: calc(100vh - $topbar-height);
+  position: fixed;
+  top: $topbar-height;
+  left: 0;
 
   #sidebar-control-area {
     width: $nav-sidebar-control-width;

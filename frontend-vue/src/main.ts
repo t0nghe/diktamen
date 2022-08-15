@@ -1,48 +1,60 @@
-import { createApp } from "vue";
+import { createApp, h } from "vue";
 import { createPinia } from "pinia";
 
 import {
   ApolloClient,
   createHttpLink,
   InMemoryCache,
-  ApolloLink,
-  concat,
 } from "@apollo/client/core";
-import { createApolloProvider } from "@vue/apollo-option";
+import { provideApolloClient } from "@vue/apollo-composable";
 
 import App from "./App.vue";
 import router from "./router";
 import "@/assets/base.css";
 
-const app = createApp(App);
+const getHeaders = () => {
+  const headers: { Authorization?: string; "Content-Type"?: string } = {};
+  const token = localStorage.getItem("token") || "";
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  headers["Content-Type"] = "application/json";
 
-const token = localStorage.getItem("token") || "";
-console.log("token: ", token);
-
-const authMiddleware = new ApolloLink((operation, forward) => {
-  operation.setContext({
-    headers: { authorization: `Bearer ${token}` },
-  });
-  return forward(operation);
-});
+  console.log(headers);
+  return headers;
+};
 
 const httpLink = createHttpLink({
   uri: import.meta.env.VITE_DEV_GRAPHQL_SERVER,
+  fetch: (uri: RequestInfo, options: RequestInit) => {
+    options.headers = getHeaders();
+    return fetch(uri, options);
+  },
 });
 
 const cache = new InMemoryCache();
 
 const apolloClient = new ApolloClient({
-  link: concat(authMiddleware, httpLink),
+  link: httpLink,
   cache,
+  defaultOptions: {
+    query: {
+      errorPolicy: "all",
+    },
+    mutate: {
+      errorPolicy: "all",
+    },
+  },
 });
 
-const apolloProvider = createApolloProvider({
-  defaultClient: apolloClient,
+const app = createApp({
+  setup() {
+    provideApolloClient(apolloClient);
+  },
+  render: () => h(App),
 });
 
 app.use(createPinia());
 app.use(router);
-app.use(apolloProvider);
 
 app.mount("#app");

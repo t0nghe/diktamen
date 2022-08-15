@@ -4,7 +4,7 @@ const props = defineProps<{ score: number }>();
 
 <template>
   <div class="summary-score-circle">
-    {{ props.score }}
+    {{ Math.floor(props.score * 100) }}
   </div>
 </template>
 
@@ -22,14 +22,14 @@ const props = defineProps<{ score: number }>();
   background: transparent;
   z-index: -2;
 
-  border: 32px solid $blue-secondary;
+  border: 32px solid $azure-primary;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
 
   font-size: 20rem;
-  color: $blue-secondary;
+  color: $azure-primary;
   font-weight: bold;
 }
 </style>

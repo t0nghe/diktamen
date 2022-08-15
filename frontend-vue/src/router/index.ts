@@ -19,11 +19,13 @@ const router = createRouter({
       path: "/",
       name: "ListSentences",
       component: ListSentences,
+      meta: { transition: "slide-left" },
     },
     {
-      path: "/summary",
+      path: "/articles/:id/summary",
       name: "SummaryView",
       component: SummaryView,
+      meta: { transition: "slide-left" },
     },
     {
       path: "/list-components",
