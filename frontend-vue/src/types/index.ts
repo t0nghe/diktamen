@@ -32,3 +32,11 @@ export type examineSent = {
   tryText?: string;
   sentWords?: sentWord[];
 };
+
+export type userArticleType = {
+  articleId: number;
+  articleTitle: string;
+  articleSentCount: number;
+  articleDescription: string;
+  userFinishedIndex: number;
+};
