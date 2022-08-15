@@ -11,6 +11,8 @@ import ReviewDueView from "../views/dev/graphql/ReviewDueView.vue";
 import ListComponents from "../views/dev/ListComponents.vue";
 import ListSentences from "../views/dev/ListSentences.vue";
 import SummaryView from "../views/SummaryView.vue";
+import ArticlesView from "../views/ArticlesView.vue";
+import LearnView from "../views/LearnView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,6 +22,19 @@ const router = createRouter({
       name: "ListSentences",
       component: ListSentences,
       meta: { transition: "slide-left" },
+    },
+    {
+      path: "/articles",
+      name: "ArticlesView",
+      component: ArticlesView,
+      meta: { transition: "slide-left" },
+    },
+    {
+      path: "/articles/:id/learn",
+      name: "LearnView",
+      component: LearnView,
+      meta: { transition: "slide-left" },
+      props: true,
     },
     {
       path: "/articles/:id/summary",

@@ -26,3 +26,27 @@ export const corrSents = gql`
     }
   }
 `;
+
+export const seenArticles = gql`
+  query listUserArticles {
+    listUserArticles {
+      articleId
+      articleTitle
+      articleSentCount
+      articleDescription
+      userFinishedIndex
+    }
+  }
+`;
+
+export const unseenArticles = gql`
+  query unseenArticles {
+    listUserUnseenArticles {
+      articleId
+      articleTitle
+      articleSentCount
+      articleDescription
+      userFinishedIndex
+    }
+  }
+`;
