@@ -401,7 +401,7 @@ const parentClickPlay = ref<number>(0);
   />
   <h2>...</h2>
   <PlayPause
-    media-url="https://d1zg52ope8o24c.cloudfront.net/meningsfullt/meningsfullt_10.mp3"
+    media-url="https://d1zg52ope8o24c.cloudfront.net/zelenskyj/zelenskyj_04.mp3"
     :parent-click-play="parentClickPlay"
   />
 </template>

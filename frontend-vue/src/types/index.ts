@@ -25,3 +25,10 @@ export type userTrySent = {
 export type inputValuesType = { [key: string]: string };
 
 export type inputFieldsType = { [key: string]: HTMLInputElement };
+
+export type examineSent = {
+  sentId: number;
+  indexInArticle: number;
+  tryText?: string;
+  sentWords?: sentWord[];
+};

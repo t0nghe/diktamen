@@ -116,6 +116,10 @@ switch (props.state) {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 5;
 
   .top-bar-heading {
     font-size: 1.5rem;
