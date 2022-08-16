@@ -37,19 +37,22 @@ func (r *mutationResolver) UserLogIn(ctx context.Context, input model.UserCreden
 }
 
 // TrySent takes user input, parses and scores user input.
-func (r *mutationResolver) TrySent(ctx context.Context, input *model.TrySentInput) (*model.TrySentScore, error) {
+func (r *mutationResolver) TrySent(ctx context.Context, input *model.TrySentInput) (*model.SeenSent, error) {
 	userId := auth.FromContext(ctx, "user_id")
 	if userId == 0 {
 		return nil, fmt.Errorf("please log in")
 	}
 
-	score, err := queries.TrySentence(userId, input.SentID, input.UserInputJSON)
+	indexInArticle, tryText, err := queries.TrySentence(userId, input.SentID, input.UserInputJSON)
 	if err != nil {
 		return nil, err
 	}
-	success := true
 
-	return &model.TrySentScore{Success: &success, Score: &score}, nil
+	return &model.SeenSent{
+		SentID:         &input.SentID,
+		IndexInArticle: &indexInArticle,
+		TryText:        tryText,
+	}, nil
 }
 
 // ListUserArticles resolver returns all articles with the progress of the user.
@@ -85,6 +88,21 @@ func (r *queryResolver) ListUserUnseenArticles(ctx context.Context) ([]*model.Us
 	}
 
 	return ret, nil
+}
+
+// GetUserArticle is the resolver for the getUserArticle field.
+func (r *queryResolver) GetUserArticle(ctx context.Context, articleID *int) (*model.UserArticle, error) {
+	userId := auth.FromContext(ctx, "user_id")
+	if userId == 0 {
+		return nil, fmt.Errorf("please log in")
+	}
+
+	ret, err := queries.GetSingleArticle(userId, *articleID)
+	if err != nil {
+		return nil, err
+	}
+
+	return ret, err
 }
 
 // DisplayUnseenSents queries for sentences the user has not seen in an article.
@@ -145,6 +163,11 @@ func (r *queryResolver) ExamineIncorrectSents(ctx context.Context, articleID *in
 		return nil, err
 	}
 	return result, nil
+}
+
+// GetArticleScore is the resolver for the getArticleScore field.
+func (r *queryResolver) GetArticleScore(ctx context.Context, articleID *int) (float64, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 // DisplayDueSents is the resolver for the displayDueSents field.

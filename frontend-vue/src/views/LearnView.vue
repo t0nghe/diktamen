@@ -1,8 +1,188 @@
 <script setup lang="ts">
+import { useRoute } from "vue-router";
+import { computed, ref } from "vue";
+import {
+  unseenSents,
+  seenSents,
+  singleArticle,
+  mutationTrySent,
+} from "../queries";
+import { useQuery, useMutation } from "@vue/apollo-composable";
+import { seenArticleType } from "../types";
+import SentenceTried from "../components/Sentence/SentenceTried.vue";
+import SentenceNew from "../components/Sentence/SentenceNew.vue";
+import SentenceTrying from "../components/Sentence/SentenceTrying.vue";
+import ArrowYellow from "../components/Interaction/ArrowYellow.vue";
+import PlayPause from "@/components/Interaction/PlayPause.vue";
+import LoadingEllipsis from "@/components/Interaction/LoadingEllipsis.vue";
+
+const route = useRoute();
+const articleId = computed<string>(() => {
+  if (typeof route.params.id === "string") {
+    return route.params.id;
+  } else {
+    return "0";
+  }
+});
+
+const {
+  result: unseenResult,
+  loading: unseenLoading,
+  // error: unseenError,
+} = useQuery(unseenSents, {
+  articleId: articleId.value,
+});
+
+const {
+  result: seenResult,
+  loading: seenLoading,
+  // error: seenError,
+} = useQuery(seenSents, {
+  articleId: articleId.value,
+});
+
+const {
+  result: articleResult,
+  loading: articleLoading,
+  // error: articleError,
+} = useQuery(singleArticle, {
+  articleId: articleId.value,
+});
+
+const { mutate: submitTrySent } = useMutation(mutationTrySent);
+
+const arrowClickCounter = ref(0);
+const arrowClickHandler = () => {
+  arrowClickCounter.value++;
+};
+
+const spacebarPressCount = ref(0);
+const spacebarPressHandler = () => {
+  spacebarPressCount.value++;
+};
+
+const thisArticle = computed(() => {
+  if (articleResult.value && articleResult.value.getUserArticle) {
+    return articleResult.value.getUserArticle;
+  } else {
+    return null; // THIS MIGHT BE PROBLEMATIC.
+  }
+});
+
+const learningIndex = computed(() => {
+  if (thisArticle.value && thisArticle.value.userFinishedIndex) {
+    return thisArticle.value.userFinishedIndex + 1;
+  } else {
+    return 1;
+  }
+});
+
+const activeSentence = computed(() => {
+  if (
+    unseenResult &&
+    unseenResult.value &&
+    unseenResult.value.displayUnseenSents
+  ) {
+    return unseenResult.value.displayUnseenSents.find(
+      (item) => item.indexInArticle === learningIndex.value
+    );
+  } else {
+    return "";
+  }
+});
+
+const submitSentHandler = (payload: {
+  sentId: number;
+  userInputWords: { indexInSent: number; inputText: string }[];
+}) => {
+  console.log(payload);
+  const { sentId, userInputWords } = payload;
+  const tryTextArray = [];
+  const sentWords = activeSentence.value.sentWords;
+  const wordCount = sentWords.length;
+
+  for (let k = 1; k <= wordCount; k++) {
+    const userInputWordAtK = userInputWords.find(
+      (item) => item.indexInSent === k
+    );
+    console.log(userInputWordAtK);
+    if (userInputWordAtK) {
+      tryTextArray.push(userInputWordAtK.inputText);
+      console.log(tryTextArray);
+    } else {
+      tryTextArray.push(
+        sentWords.find((word) => word.indexInSent === k).wordform || ""
+      );
+    }
+  }
+
+  submitTrySent(
+    {
+      sentId: sentId,
+      userInputJson: JSON.stringify(tryTextArray),
+    },
+    {
+      update: (cache) => {
+        console.log("this is what the cache looks like: ", cache);
+      },
+    }
+  );
+};
 </script>
 
 <template>
-    HELLO! NAVIGATION IS WORKING! 
+  <!-- TODO: Where should we put this loading indicator though? -->
+  <div
+    v-if="articleLoading || unseenLoading || seenLoading"
+    style="text-align: center"
+  >
+    <LoadingEllipsis />
+  </div>
+  <h2 v-if="thisArticle && thisArticle.articleTitle">
+    {{ thisArticle.articleTitle }}
+  </h2>
+
+  <template v-if="seenResult && seenResult.displaySeenSents">
+    <div v-for="sent in seenResult.displaySeenSents" :key="sent.sentId">
+      <template v-if="sent.indexInArticle <= thisArticle.userFinishedIndex">
+        <SentenceTried
+          :is-correct="true"
+          :is-summary="false"
+          :sent-id="sent.sentId"
+          :index-in-article="sent.indexInArticle"
+          :try-text="sent.tryText"
+        />
+      </template>
+    </div>
+  </template>
+
+  <sentence-trying
+    @play-sound="spacebarPressHandler"
+    @submit-sent="submitSentHandler"
+    :sent-id="activeSentence.sentId"
+    :index-in-article="activeSentence.indexInArticle"
+    :sent-words="activeSentence.sentWords"
+    :parent-arrow-click="arrowClickCounter"
+  />
+
+  <template v-if="unseenResult && unseenResult.displayUnseenSents">
+    <div v-for="sent in unseenResult.displayUnseenSents" :key="sent.sentId">
+      <template v-if="sent.indexInArticle > learningIndex">
+        <SentenceNew
+          :sent-id="sent.sentId"
+          :index-in-article="sent.indexInArticle"
+          :sent-words="sent.sentWords"
+        />
+      </template>
+    </div>
+  </template>
+
+  <template v-if="activeSentence && activeSentence.mediaUri"
+    ><play-pause
+      :media-url="activeSentence.mediaUri"
+      :parent-click-play="spacebarPressCount"
+  /></template>
+  <arrow-yellow @click-down-arrow="arrowClickHandler" />
 </template>
 
 <style lang="scss"></style>

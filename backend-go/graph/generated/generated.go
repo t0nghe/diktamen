@@ -78,6 +78,8 @@ type ComplexityRoot struct {
 		DisplayUnseenSents     func(childComplexity int, articleID *int) int
 		ExamineCorrectSents    func(childComplexity int, articleID *int) int
 		ExamineIncorrectSents  func(childComplexity int, articleID *int) int
+		GetArticleScore        func(childComplexity int, articleID *int) int
+		GetUserArticle         func(childComplexity int, articleID *int) int
 		GetUsername            func(childComplexity int) int
 		ListUserArticles       func(childComplexity int) int
 		ListUserUnseenArticles func(childComplexity int) int
@@ -135,15 +137,17 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	UserSignUp(ctx context.Context, input model.UserCredentials) (*model.Message, error)
 	UserLogIn(ctx context.Context, input model.UserCredentials) (*model.LoginToken, error)
-	TrySent(ctx context.Context, input *model.TrySentInput) (*model.TrySentScore, error)
+	TrySent(ctx context.Context, input *model.TrySentInput) (*model.SeenSent, error)
 }
 type QueryResolver interface {
 	ListUserArticles(ctx context.Context) ([]*model.UserArticle, error)
 	ListUserUnseenArticles(ctx context.Context) ([]*model.UserArticle, error)
+	GetUserArticle(ctx context.Context, articleID *int) (*model.UserArticle, error)
 	DisplayUnseenSents(ctx context.Context, articleID *int) ([]*model.UnseenSent, error)
 	DisplaySeenSents(ctx context.Context, articleID *int) ([]*model.SeenSent, error)
 	ExamineCorrectSents(ctx context.Context, articleID *int) ([]*model.SeenSent, error)
 	ExamineIncorrectSents(ctx context.Context, articleID *int) ([]*model.IncorrectSeenSent, error)
+	GetArticleScore(ctx context.Context, articleID *int) (float64, error)
 	DisplayDueSents(ctx context.Context, daysAhead *int) ([]*model.DueSent, error)
 	RandomInteger(ctx context.Context) (*int, error)
 	GetUsername(ctx context.Context) (*model.UserIdentity, error)
@@ -329,6 +333,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.ExamineIncorrectSents(childComplexity, args["articleId"].(*int)), true
+
+	case "Query.getArticleScore":
+		if e.complexity.Query.GetArticleScore == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getArticleScore_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetArticleScore(childComplexity, args["articleId"].(*int)), true
+
+	case "Query.getUserArticle":
+		if e.complexity.Query.GetUserArticle == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getUserArticle_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetUserArticle(childComplexity, args["articleId"].(*int)), true
 
 	case "Query.getUsername":
 		if e.complexity.Query.GetUsername == nil {
@@ -697,18 +725,20 @@ type UserIdentity {
 type Mutation {
   userSignUp(input: UserCredentials!): Message!
   userLogIn(input: UserCredentials!): LoginToken!
-  trySent(input: TrySentInput): TrySentScore!
+  trySent(input: TrySentInput): SeenSent!
 }
 
 type Query {
   listUserArticles: [UserArticle!]!
   listUserUnseenArticles: [UserArticle!]!
+  getUserArticle(articleId: Int): UserArticle!
   displayUnseenSents(articleId: Int): [UnseenSent]
   # the two following queries are almost identical
   displaySeenSents(articleId: Int): [SeenSent]
   examineCorrectSents(articleId: Int): [SeenSent]
   # these two are quite similar too
   examineIncorrectSents(articleId: Int): [IncorrectSeenSent]
+  getArticleScore(articleId: Int): Float!
   displayDueSents(daysAhead: Int): [DueSent]
   randomInteger: Int
   getUsername: UserIdentity!
@@ -841,6 +871,36 @@ func (ec *executionContext) field_Query_examineCorrectSents_args(ctx context.Con
 }
 
 func (ec *executionContext) field_Query_examineIncorrectSents_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int
+	if tmp, ok := rawArgs["articleId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("articleId"))
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["articleId"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getArticleScore_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int
+	if tmp, ok := rawArgs["articleId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("articleId"))
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["articleId"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getUserArticle_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *int
@@ -1491,9 +1551,9 @@ func (ec *executionContext) _Mutation_trySent(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.TrySentScore)
+	res := resTmp.(*model.SeenSent)
 	fc.Result = res
-	return ec.marshalNTrySentScore2ᚖbackendᚑgoᚋgraphᚋmodelᚐTrySentScore(ctx, field.Selections, res)
+	return ec.marshalNSeenSent2ᚖbackendᚑgoᚋgraphᚋmodelᚐSeenSent(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_trySent(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1504,12 +1564,14 @@ func (ec *executionContext) fieldContext_Mutation_trySent(ctx context.Context, f
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "success":
-				return ec.fieldContext_TrySentScore_success(ctx, field)
-			case "score":
-				return ec.fieldContext_TrySentScore_score(ctx, field)
+			case "sentId":
+				return ec.fieldContext_SeenSent_sentId(ctx, field)
+			case "indexInArticle":
+				return ec.fieldContext_SeenSent_indexInArticle(ctx, field)
+			case "tryText":
+				return ec.fieldContext_SeenSent_tryText(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type TrySentScore", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type SeenSent", field.Name)
 		},
 	}
 	defer func() {
@@ -1634,6 +1696,73 @@ func (ec *executionContext) fieldContext_Query_listUserUnseenArticles(ctx contex
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserArticle", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getUserArticle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getUserArticle(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetUserArticle(rctx, fc.Args["articleId"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserArticle)
+	fc.Result = res
+	return ec.marshalNUserArticle2ᚖbackendᚑgoᚋgraphᚋmodelᚐUserArticle(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getUserArticle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "articleId":
+				return ec.fieldContext_UserArticle_articleId(ctx, field)
+			case "articleTitle":
+				return ec.fieldContext_UserArticle_articleTitle(ctx, field)
+			case "articleSentCount":
+				return ec.fieldContext_UserArticle_articleSentCount(ctx, field)
+			case "articleDescription":
+				return ec.fieldContext_UserArticle_articleDescription(ctx, field)
+			case "userFinishedIndex":
+				return ec.fieldContext_UserArticle_userFinishedIndex(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserArticle", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getUserArticle_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -1874,6 +2003,61 @@ func (ec *executionContext) fieldContext_Query_examineIncorrectSents(ctx context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_examineIncorrectSents_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getArticleScore(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getArticleScore(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetArticleScore(rctx, fc.Args["articleId"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getArticleScore(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getArticleScore_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -5400,6 +5584,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "getUserArticle":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getUserArticle(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "displayUnseenSents":
 			field := field
 
@@ -5470,6 +5677,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_examineIncorrectSents(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "getArticleScore":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getArticleScore(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			}
 
@@ -6253,6 +6483,20 @@ func (ec *executionContext) marshalNMessage2ᚖbackendᚑgoᚋgraphᚋmodelᚐMe
 	return ec._Message(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNSeenSent2backendᚑgoᚋgraphᚋmodelᚐSeenSent(ctx context.Context, sel ast.SelectionSet, v model.SeenSent) graphql.Marshaler {
+	return ec._SeenSent(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSeenSent2ᚖbackendᚑgoᚋgraphᚋmodelᚐSeenSent(ctx context.Context, sel ast.SelectionSet, v *model.SeenSent) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._SeenSent(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -6306,18 +6550,8 @@ func (ec *executionContext) marshalNTriedSentWord2ᚕᚖbackendᚑgoᚋgraphᚋm
 	return ret
 }
 
-func (ec *executionContext) marshalNTrySentScore2backendᚑgoᚋgraphᚋmodelᚐTrySentScore(ctx context.Context, sel ast.SelectionSet, v model.TrySentScore) graphql.Marshaler {
-	return ec._TrySentScore(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNTrySentScore2ᚖbackendᚑgoᚋgraphᚋmodelᚐTrySentScore(ctx context.Context, sel ast.SelectionSet, v *model.TrySentScore) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._TrySentScore(ctx, sel, v)
+func (ec *executionContext) marshalNUserArticle2backendᚑgoᚋgraphᚋmodelᚐUserArticle(ctx context.Context, sel ast.SelectionSet, v model.UserArticle) graphql.Marshaler {
+	return ec._UserArticle(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNUserArticle2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐUserArticleᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.UserArticle) graphql.Marshaler {

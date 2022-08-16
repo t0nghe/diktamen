@@ -15,6 +15,19 @@ type articleRow struct {
 	ufi   int    // user finished index
 }
 
+func GetSingleArticle(userId int, articleId int) (*model.UserArticle, error) {
+	stmt, err := dbconn.Db.Prepare("SELECT a.id, a.title, a.sent_count, a.description, ua.finished_sent_index FROM article a LEFT JOIN user_article ua ON a.id = ua.article_id WHERE ua.user_id=? AND a.id=?;")
+
+	if err != nil {
+		return nil, err
+	}
+
+	var row articleRow
+	err = stmt.QueryRow(userId, articleId).Scan(&row.aid, &row.attl, &row.asc, &row.adesc, &row.ufi)
+
+	return &model.UserArticle{ArticleID: &row.aid, ArticleTitle: row.attl, ArticleSentCount: row.asc, ArticleDescription: &row.adesc, UserFinishedIndex: &row.ufi}, nil
+}
+
 func GetUserArticlesList(userId int) ([]*model.UserArticle, error) {
 	stmt, err := dbconn.Db.Prepare("SELECT a.id, a.title, a.sent_count, a.description, ua.finished_sent_index FROM article a LEFT JOIN user_article ua ON a.id = ua.article_id WHERE ua.user_id = ?;")
 	if err != nil {
