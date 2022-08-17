@@ -50,3 +50,51 @@ export const unseenArticles = gql`
     }
   }
 `;
+
+export const unseenSents = gql`
+  query displayUnseenSents($articleId: Int!) {
+    displayUnseenSents(articleId: $articleId) {
+      sentId
+      indexInArticle
+      mediaUri
+      sentWords {
+        length
+        isCloze
+        wordform
+        indexInSent
+      }
+    }
+  }
+`;
+
+export const seenSents = gql`
+  query displaySeenSents($articleId: Int!) {
+    displaySeenSents(articleId: $articleId) {
+      sentId
+      indexInArticle
+      tryText
+    }
+  }
+`;
+
+export const mutationTrySent = gql`
+  mutation trySent($sentId: Int!, $userInputJson: String!) {
+    trySent(input: { sentId: $sentId, userInputJson: $userInputJson }) {
+      sentId
+      indexInArticle
+      tryText
+    }
+  }
+`;
+
+export const singleArticle = gql`
+  query getUserArticle($articleId: Int!) {
+    getUserArticle(articleId: $articleId) {
+      articleId
+      articleTitle
+      articleDescription
+      articleSentCount
+      userFinishedIndex
+    }
+  }
+`;

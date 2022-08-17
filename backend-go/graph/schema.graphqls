@@ -85,19 +85,19 @@ type UserIdentity {
 type Mutation {
   userSignUp(input: UserCredentials!): Message!
   userLogIn(input: UserCredentials!): LoginToken!
-  trySent(input: TrySentInput): TrySentScore!
+  trySent(input: TrySentInput): SeenSent!
 }
 
 type Query {
   listUserArticles: [UserArticle!]!
   listUserUnseenArticles: [UserArticle!]!
+  getUserArticle(articleId: Int): UserArticle!
   displayUnseenSents(articleId: Int): [UnseenSent]
   # the two following queries are almost identical
   displaySeenSents(articleId: Int): [SeenSent]
   examineCorrectSents(articleId: Int): [SeenSent]
   # these two are quite similar too
   examineIncorrectSents(articleId: Int): [IncorrectSeenSent]
-  getArticleScore(articleId: Int):
   displayDueSents(daysAhead: Int): [DueSent]
   randomInteger: Int
   getUsername: UserIdentity!

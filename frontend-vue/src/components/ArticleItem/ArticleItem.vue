@@ -60,7 +60,7 @@ const progStyling: ComputedRef<{
 const emit = defineEmits(["go-to-article"]);
 const clickHandler = () => {
   if (status.value !== "complete") {
-    emit("go-to-article", { id: props.id, title: props.title });
+    emit("go-to-article", props.id);
   }
 };
 </script>

@@ -15,10 +15,12 @@ const props = defineProps<{
 }>();
 
 const parentArrowClickRef = computed(() => props.parentArrowClick);
-// You can't watch a single prop from the parent. I had to use a computed ref.
+// Can't watch a single prop from the parent. Need to use a computed ref here.
 watch(parentArrowClickRef, () => {
   trySubmitSent();
 });
+
+const isComplete = ref<boolean>(false);
 
 const emit = defineEmits<{
   (e: "submit-sent", payload: userTrySent): void;
@@ -27,6 +29,12 @@ const emit = defineEmits<{
 
 const inputFields = ref<inputFieldsType>({});
 const inputValues = ref<inputValuesType>({});
+
+const newSentIdRef = computed(() => props.sentId);
+watch(newSentIdRef, () => {
+  inputValues.value = {};
+  isComplete.value = false;
+});
 
 const focusPrevInput = (idxSent: string) => {
   const keys = Object.keys(inputFields.value);
@@ -43,6 +51,10 @@ const focusNextInput = (idxSent: string) => {
   if (nextIdxSent) {
     const nextField = inputFields.value[nextIdxSent];
     nextField.focus();
+  } else {
+    // if this input box is the last available,
+    // this sentence seems to be finished.
+    trySubmitSent();
   }
 };
 
@@ -62,6 +74,7 @@ const readyToSubmit = (): boolean => {
       return false;
     }
   }
+  isComplete.value = true;
   return true;
 };
 
@@ -112,7 +125,11 @@ const onInputHandler = (ev) => {
   }
 
   // check if the input length is as long as data-length, if so focus next.
-  if (inputContent.length >= canonWordLength) {
+  if (
+    inputContent.length >= canonWordLength &&
+    !inputContent.includes("˚") &&
+    !inputContent.includes("¨")
+  ) {
     focusNextInput(idxSent);
   }
 
@@ -155,8 +172,16 @@ const onDownHandler = (ev) => {
           @keyup.down="onDownHandler"
           @input="onInputHandler"
           :style="{ width: `${word.length * 1.3}rem` }"
+          autocomplete="off"
         />
       </template>
+    </span>
+    <span v-if="isComplete" class="small-finish-tick">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <path
+          d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM371.8 211.8C382.7 200.9 382.7 183.1 371.8 172.2C360.9 161.3 343.1 161.3 332.2 172.2L224 280.4L179.8 236.2C168.9 225.3 151.1 225.3 140.2 236.2C129.3 247.1 129.3 264.9 140.2 275.8L204.2 339.8C215.1 350.7 232.9 350.7 243.8 339.8L371.8 211.8z"
+        />
+      </svg>
     </span>
   </div>
 </template>
@@ -202,6 +227,18 @@ const onDownHandler = (ev) => {
 
   .word-user-input-wrong {
     border-bottom: 4px solid $red-secondary;
+  }
+
+  .small-finish-tick {
+    margin-left: 10px;
+    margin-right: 10px;
+    svg {
+      width: 18px;
+      height: 18px;
+      path {
+        fill: $yellow-beige;
+      }
+    }
   }
 }
 </style>

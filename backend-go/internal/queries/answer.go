@@ -28,26 +28,25 @@ type userDictationWordRecord struct {
 	userInputWordform string
 }
 
-func BumpUpFinishedIndex(userId int, sentId int) error {
-	fmt.Println("BumpUpFinishedIndex")
+func BumpUpFinishedIndex(userId int, sentId int) (int, error) {
 	// get article_id; index_in_article
 	stmt, err := dbconn.Db.Prepare("SELECT article_id, index_in_article FROM sent WHERE id=?;")
 	if err != nil {
-		return err
+		return -1, err
 	}
 	defer stmt.Close()
 
 	var articleId, indexInArticle int // article_id; index_in_article
 	err = stmt.QueryRow(sentId).Scan(&articleId, &indexInArticle)
 	if err != nil {
-		return err // This error includes the case where sent.id doesn't exist.
+		return -1, err // This error includes the case where sent.id doesn't exist.
 	}
 
 	// ALAS... MySQL doens't support IF NOT EXISTS () ... ELSE...
 
 	stmtExists, err := dbconn.Db.Prepare("SELECT IF (EXISTS (SELECT id FROM user_article WHERE user_id=? AND article_id = ?), 1, 0);")
 	if err != nil {
-		return err
+		return -1, err
 	}
 	defer stmtExists.Close()
 	var exists int
@@ -56,12 +55,12 @@ func BumpUpFinishedIndex(userId int, sentId int) error {
 	if exists == 1 {
 		stmtBumpUp, err := dbconn.Db.Prepare("UPDATE user_article SET finished_sent_index=? WHERE finished_sent_index<? AND user_id=? AND article_id=?;")
 		if err != nil {
-			return err
+			return -1, err
 		}
 		defer stmtBumpUp.Close()
 		result, err := stmtBumpUp.Exec(indexInArticle, indexInArticle, userId, articleId)
 		if err != nil {
-			return err
+			return -1, err
 		}
 		rc, _ := result.RowsAffected() // rows count
 		fmt.Println(rc)
@@ -70,13 +69,13 @@ func BumpUpFinishedIndex(userId int, sentId int) error {
 		defer stmtInsert.Close()
 		resultInsert, err := stmtInsert.Exec(articleId, indexInArticle, userId)
 		if err != nil {
-			return err
+			return -1, err
 		}
 		rcInsert, _ := resultInsert.RowsAffected()
 		fmt.Println(rcInsert)
 	}
 
-	return nil
+	return indexInArticle, nil
 }
 
 // GetThisTryCount returns n, where n indicates the n-th time this is that a user tries a sentence. n is 1-based. If there is an error, 0 is returned.
@@ -165,7 +164,7 @@ func InsertUserDictationWord(input userDictationWordRecord) (int64, error) {
 	return id, nil
 }
 
-func TrySentence(userId int, sentId int, userInput string) (float64, error) {
+func TrySentence(userId int, sentId int, userInput string) (int, string, error) {
 	/*
 		STEPS
 		1. SELECT article_id, index_in_article FROM sent WHERE sent_id;
@@ -196,15 +195,15 @@ func TrySentence(userId int, sentId int, userInput string) (float64, error) {
 	*/
 
 	/* STEP 1 - BUMP UP finished_sent_index */
-	err := BumpUpFinishedIndex(userId, sentId)
+	indexInArticle, err := BumpUpFinishedIndex(userId, sentId)
 	if err != nil {
-		return 0, err
+		return -1, "", err
 	}
 
 	/* STEP 2 - GET TRY COUNT */
 	thisTryCount, err := GetThisTryCount(userId, sentId)
 	if err != nil {
-		return 0, err
+		return -1, "", err
 	}
 	fmt.Println(thisTryCount) // To prevent errors.
 
@@ -213,13 +212,13 @@ func TrySentence(userId int, sentId int, userInput string) (float64, error) {
 	indexesInSent, wordforms, areClozes, _, err := GetWordforms(sentId)
 
 	if err != nil {
-		return 0, err
+		return -1, "", err
 	}
 
 	var userInputWords []string
 	err = json.Unmarshal([]byte(userInput), &userInputWords)
 	if err != nil {
-		return 0, err
+		return -1, "", err
 	}
 	tryText := strings.Join(userInputWords, " ") // STEP 4 - try_text
 
@@ -263,7 +262,7 @@ func TrySentence(userId int, sentId int, userInput string) (float64, error) {
 
 	userDictationId, err := InsertUserDictation(userDictationToInsert)
 	if err != nil {
-		return 0, err
+		return -1, "", err
 	}
 
 	/* STEP 9 - INSERT RECORDS TO user_dication_word */
@@ -279,11 +278,11 @@ func TrySentence(userId int, sentId int, userInput string) (float64, error) {
 
 			_, err := InsertUserDictationWord(udw)
 			if err != nil {
-				return 0.1, err
+				return -1, "", err
 			}
 		}
 	}
 
 	/* STEP 10 - RETURN tryScore */
-	return tryScore, nil
+	return indexInArticle, tryText, nil
 }

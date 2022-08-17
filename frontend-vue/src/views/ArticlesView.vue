@@ -6,7 +6,7 @@ import { userArticleType } from "../types";
 import { seenArticles, unseenArticles } from "../queries";
 import { useRouter } from "vue-router";
 
-const router = useRouter()
+const router = useRouter();
 
 const {
   result: resultSeen,
@@ -33,18 +33,16 @@ const unfinishedArticles = computed<userArticleType[]>(() => {
 const finishedArticles = computed<userArticleType[]>(() => {
   if (resultSeen.value && resultSeen.value.listUserArticles) {
     return resultSeen.value.listUserArticles.filter(
-      (item: userArticleType) => item.userFinishedIndex === item.articleSentCount
+      (item: userArticleType) =>
+        item.userFinishedIndex === item.articleSentCount
     );
   } else {
     return [];
   }
 });
 
-const navHandler = (data: { id: number; title: string }) => {
-  router.push({
-    name: "LearnView",
-    params: { id: data.id, title: data.title },
-  });
+const navHandler = (data: number) => {
+  router.push(`/articles/${data}/learn`);
 };
 </script>
 

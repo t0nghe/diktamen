@@ -13,6 +13,7 @@ import ListSentences from "../views/dev/ListSentences.vue";
 import SummaryView from "../views/SummaryView.vue";
 import ArticlesView from "../views/ArticlesView.vue";
 import LearnView from "../views/LearnView.vue";
+import LoadingEllipsis from "../components/Interaction/LoadingEllipsis.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,7 +35,6 @@ const router = createRouter({
       name: "LearnView",
       component: LearnView,
       meta: { transition: "slide-left" },
-      props: true,
     },
     {
       path: "/articles/:id/summary",
@@ -91,6 +91,11 @@ const router = createRouter({
       path: "/dev/graphql/review/due",
       name: "ReviewDue",
       component: ReviewDueView,
+    },
+    {
+      path: "/dev/loading-dots",
+      name: "LoadingEllipsis",
+      component: LoadingEllipsis,
     },
   ],
 });
