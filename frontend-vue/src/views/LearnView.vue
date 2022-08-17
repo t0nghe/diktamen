@@ -14,7 +14,9 @@ import SentenceNew from "../components/Sentence/SentenceNew.vue";
 import SentenceTrying from "../components/Sentence/SentenceTrying.vue";
 import ArrowYellow from "../components/Interaction/ArrowYellow.vue";
 import PlayPause from "@/components/Interaction/PlayPause.vue";
+import CompleteCircle from "@/components/Interaction/CompleteCircle.vue";
 import LoadingEllipsis from "@/components/Interaction/LoadingEllipsis.vue";
+import TextNavButton from "@/components/Interaction/TextNavButton.vue";
 
 const route = useRoute();
 const articleId = computed<string>(() => {
@@ -49,7 +51,9 @@ const {
   articleId: articleId.value,
 });
 
-const { mutate: submitTrySent } = useMutation(mutationTrySent);
+const { mutate: trySent } = useMutation(mutationTrySent, {
+  refetchQueries: ["displaySeenSents", "displayUnseenSents", "getUserArticle"],
+});
 
 const arrowClickCounter = ref(0);
 const arrowClickHandler = () => {
@@ -87,7 +91,7 @@ const activeSentence = computed(() => {
       (item) => item.indexInArticle === learningIndex.value
     );
   } else {
-    return "";
+    return null;
   }
 });
 
@@ -116,28 +120,15 @@ const submitSentHandler = (payload: {
     }
   }
 
-  submitTrySent(
-    {
-      sentId: sentId,
-      userInputJson: JSON.stringify(tryTextArray),
-    },
-    {
-      update: (cache) => {
-        console.log("this is what the cache looks like: ", cache);
-      },
-    }
-  );
+  trySent({
+    sentId: sentId,
+    userInputJson: JSON.stringify(tryTextArray),
+  });
 };
 </script>
 
 <template>
   <!-- TODO: Where should we put this loading indicator though? -->
-  <div
-    v-if="articleLoading || unseenLoading || seenLoading"
-    style="text-align: center"
-  >
-    <LoadingEllipsis />
-  </div>
   <h2 v-if="thisArticle && thisArticle.articleTitle">
     {{ thisArticle.articleTitle }}
   </h2>
@@ -145,7 +136,7 @@ const submitSentHandler = (payload: {
   <template v-if="seenResult && seenResult.displaySeenSents">
     <div v-for="sent in seenResult.displaySeenSents" :key="sent.sentId">
       <template v-if="sent.indexInArticle <= thisArticle.userFinishedIndex">
-        <SentenceTried
+        <sentence-tried
           :is-correct="true"
           :is-summary="false"
           :sent-id="sent.sentId"
@@ -156,19 +147,32 @@ const submitSentHandler = (payload: {
     </div>
   </template>
 
-  <sentence-trying
-    @play-sound="spacebarPressHandler"
-    @submit-sent="submitSentHandler"
-    :sent-id="activeSentence.sentId"
-    :index-in-article="activeSentence.indexInArticle"
-    :sent-words="activeSentence.sentWords"
-    :parent-arrow-click="arrowClickCounter"
-  />
+  <div
+    v-if="articleLoading || unseenLoading || seenLoading"
+    style="text-align: center"
+  >
+    <loading-ellipsis />
+  </div>
+  <template
+    v-if="
+      activeSentence &&
+      thisArticle.userFinishedIndex < thisArticle.articleSentCount
+    "
+  >
+    <sentence-trying
+      @play-sound="spacebarPressHandler"
+      @submit-sent="submitSentHandler"
+      :sent-id="activeSentence.sentId"
+      :index-in-article="activeSentence.indexInArticle"
+      :sent-words="activeSentence.sentWords"
+      :parent-arrow-click="arrowClickCounter"
+    />
+  </template>
 
   <template v-if="unseenResult && unseenResult.displayUnseenSents">
     <div v-for="sent in unseenResult.displayUnseenSents" :key="sent.sentId">
       <template v-if="sent.indexInArticle > learningIndex">
-        <SentenceNew
+        <sentence-new
           :sent-id="sent.sentId"
           :index-in-article="sent.indexInArticle"
           :sent-words="sent.sentWords"
@@ -177,12 +181,31 @@ const submitSentHandler = (payload: {
     </div>
   </template>
 
-  <template v-if="activeSentence && activeSentence.mediaUri"
+  <template
+    v-if="
+      activeSentence &&
+      activeSentence.mediaUri &&
+      thisArticle.userFinishedIndex < thisArticle.articleSentCount
+    "
     ><play-pause
       :media-url="activeSentence.mediaUri"
       :parent-click-play="spacebarPressCount"
-  /></template>
-  <arrow-yellow @click-down-arrow="arrowClickHandler" />
+    />
+  </template>
+
+  <arrow-yellow
+    v-if="thisArticle.userFinishedIndex < thisArticle.articleSentCount"
+    @click-down-arrow="arrowClickHandler"
+  />
+
+  <template
+    v-if="thisArticle.userFinishedIndex >= thisArticle.articleSentCount"
+  >
+    <complete-circle />
+    <text-nav-button :href="`/articles/${articleId}/summary`"
+      >summary</text-nav-button
+    >
+  </template>
 </template>
 
 <style lang="scss"></style>

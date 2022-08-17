@@ -5,6 +5,7 @@ import { useQuery } from "@vue/apollo-composable";
 import TextNavButton from "../components/Interaction/TextNavButton.vue";
 import ScoreCircle from "../components/Interaction/ScoreCircle.vue";
 import SentenceTried from "../components/Sentence/SentenceTried.vue";
+import LoadingEllipsis from "@/components/Interaction/LoadingEllipsis.vue";
 import { corrSents, incorrSents } from "../queries";
 import { examineSent } from "@/types";
 
@@ -16,37 +17,42 @@ const articleId = computed(() => {
 const score = ref(0);
 
 const {
-  result: result1,
-  loading: loading1,
-  error: error1,
+  result: resultCorrect,
+  loading: loadingCorrect,
+  // error: error1,
 } = useQuery(corrSents, {
   articleId: articleId.value,
 });
 
 const {
-  result: result2,
-  loading: loading2,
-  error: error2,
+  result: resultIncorrect,
+  loading: loadingIncorrect,
+  // error: error2,
 } = useQuery(incorrSents, {
   articleId: articleId.value,
 });
 
 const allSents = ref<examineSent[]>([]);
 
-watch(result1, () => {
-  if (result1.value) {
-    allSents.value = allSents.value.concat(result1.value.examineCorrectSents);
+watch(resultCorrect, () => {
+  if (resultCorrect.value) {
+    allSents.value = allSents.value.concat(
+      resultCorrect.value.examineCorrectSents
+    );
   }
 });
 
-watch(result2, () => {
-  if (result2.value) {
-    allSents.value = allSents.value.concat(result2.value.examineIncorrectSents);
+watch(resultIncorrect, () => {
+  if (resultIncorrect.value) {
+    allSents.value = allSents.value.concat(
+      resultIncorrect.value.examineIncorrectSents
+    );
   }
 });
 
-const sentsSorted = computed<examineSent[]>(() => {
-  return [...allSents.value].sort(
+const sentsSorted = ref<examineSent[]>({});
+watch(allSents, () => {
+  sentsSorted.value = [...allSents.value].sort(
     (a, b) => a.indexInArticle - b.indexInArticle
   );
 });
@@ -88,11 +94,11 @@ watch(sentsSorted, () => {
 </script>
 
 <template>
-  <ScoreCircle v-if="score !== 0 && !isNaN(score)" :score="score" />
+  <score-circle v-if="score !== 0 && !isNaN(score)" :score="score" />
   <div class="view-content-wrapper">
     <div v-for="sent in sentsSorted" :key="sent.indexInArticle">
       <div v-if="sent.tryText">
-        <SentenceTried
+        <sentence-tried
           :is-correct="true"
           :is-summary="true"
           :sent-id="sent.sentId"
@@ -101,7 +107,7 @@ watch(sentsSorted, () => {
         />
       </div>
       <div v-else>
-        <SentenceTried
+        <sentence-tried
           :is-correct="false"
           :is-summary="true"
           :sent-id="sent.sentId"
@@ -110,21 +116,23 @@ watch(sentsSorted, () => {
         />
       </div>
     </div>
-    <!-- <h2>Correct sentences:</h2>
-    <div v-if="result1">{{ result1.examineCorrectSents }}</div>
-    <div v-if="loading1">Loading correct sentences...</div>
-    <div v-if="error1">{{ error1.message }}</div>
-
-    <h2>Incorrect sentences:</h2>
-    <div v-if="result2">{{ result2.examineIncorrectSents }}</div>
-    <div v-if="loading2">Loading incorrect sentences...</div>
-    <div v-if="error2">{{ error2.message }}</div> -->
+    <div class="bottom-text-button">
+      <template v-if="loadingCorrect || loadingIncorrect">
+        <loading-ellipsis />
+      </template>
+      <text-nav-button href="/">complete</text-nav-button>
+    </div>
   </div>
-  <TextNavButton href="/">Complete</TextNavButton>
 </template>
 
-<style>
+<style lang="scss">
 .view-content-wrapper {
   margin-right: 30px;
+}
+
+.bottom-text-button {
+  text-align: center;
+  margin: 50px;
+  margin-bottom: 150px;
 }
 </style>

@@ -78,7 +78,7 @@ export const seenSents = gql`
 `;
 
 export const mutationTrySent = gql`
-  mutation submitSentence($sentId: Int!, $userInputJson: String!) {
+  mutation trySent($sentId: Int!, $userInputJson: String!) {
     trySent(input: { sentId: $sentId, userInputJson: $userInputJson }) {
       sentId
       indexInArticle
@@ -88,7 +88,7 @@ export const mutationTrySent = gql`
 `;
 
 export const singleArticle = gql`
-  query ($articleId: Int!) {
+  query getUserArticle($articleId: Int!) {
     getUserArticle(articleId: $articleId) {
       articleId
       articleTitle
