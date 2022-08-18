@@ -59,9 +59,7 @@ const progStyling: ComputedRef<{
 
 const emit = defineEmits(["go-to-article"]);
 const clickHandler = () => {
-  if (status.value !== "complete") {
-    emit("go-to-article", props.id);
-  }
+  emit("go-to-article", props.id);
 };
 </script>
 
@@ -125,7 +123,7 @@ const clickHandler = () => {
     .article-item__title {
       color: $yellow-canary;
       border-bottom: 2px solid $yellow-cream;
-      cursor: auto;
+      cursor: pointer;
     }
 
     .article-item__description {

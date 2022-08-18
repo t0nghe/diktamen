@@ -8,7 +8,7 @@ const playing = ref(false);
 const parentClickPlayCount = computed(() => props.parentClickPlay);
 watch(parentClickPlayCount, () => {
   if (!playing.value) {
-    audioPlayerRef.value.play();
+    audioPlayerRef.value?.play();
     playing.value = true;
   }
 });
@@ -23,10 +23,10 @@ const stopHandler = () => {
 
 const toggle = () => {
   if (playing.value) {
-    audioPlayerRef.value.pause();
+    audioPlayerRef.value?.pause();
     playing.value = false;
   } else {
-    audioPlayerRef.value.play();
+    audioPlayerRef.value?.play();
     playing.value = true;
   }
 };

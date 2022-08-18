@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router";
-import TopBar from "./components/TopBar/TopBar.vue";
 import NavSidebar from "./components/NavSidebar/NavSidebar.vue";
 </script>
 
 <template>
-  <TopBar state="waitlist" />
-  <NavSidebar />
+  <NavSidebar :wide="true" />
   <div class="main">
     <RouterView />
   </div>
@@ -17,7 +15,6 @@ export default {
   name: "App",
   components: {
     RouterView,
-    TopBar,
     NavSidebar,
   },
 };

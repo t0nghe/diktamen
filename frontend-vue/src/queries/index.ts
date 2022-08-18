@@ -98,3 +98,20 @@ export const singleArticle = gql`
     }
   }
 `;
+
+export const dueSents = gql`
+  query displayDueSents($days: Int) {
+    displayDueSents(daysAhead: $days) {
+      sentId
+      mediaUri
+      sentWords {
+        length
+        isCloze
+        wordform
+        indexInSent
+        lastInputText
+        lastInputScore
+      }
+    }
+  }
+`;

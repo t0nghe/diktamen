@@ -17,6 +17,7 @@ import PlayPause from "@/components/Interaction/PlayPause.vue";
 import CompleteCircle from "@/components/Interaction/CompleteCircle.vue";
 import LoadingEllipsis from "@/components/Interaction/LoadingEllipsis.vue";
 import TextNavButton from "@/components/Interaction/TextNavButton.vue";
+import TopBar from "@/components/TopBar/TopBar.vue";
 
 const route = useRoute();
 const articleId = computed<string>(() => {
@@ -99,7 +100,6 @@ const submitSentHandler = (payload: {
   sentId: number;
   userInputWords: { indexInSent: number; inputText: string }[];
 }) => {
-  console.log(payload);
   const { sentId, userInputWords } = payload;
   const tryTextArray = [];
   const sentWords = activeSentence.value.sentWords;
@@ -128,11 +128,7 @@ const submitSentHandler = (payload: {
 </script>
 
 <template>
-  <!-- TODO: Where should we put this loading indicator though? -->
-  <h2 v-if="thisArticle && thisArticle.articleTitle">
-    {{ thisArticle.articleTitle }}
-  </h2>
-
+  <top-bar state="learn" :title="thisArticle.articleTitle ?? ''" />
   <template v-if="seenResult && seenResult.displaySeenSents">
     <div v-for="sent in seenResult.displaySeenSents" :key="sent.sentId">
       <template v-if="sent.indexInArticle <= thisArticle.userFinishedIndex">
