@@ -4,11 +4,12 @@ import logoWide from "../../assets/logo-wide.svg";
 import ReviewProgress from "./ReviewProgress.vue";
 
 const props = defineProps<{
-  state: "waitlist" | "review" | "articles" | "learn" | "summary";
+  state: "waitlist" | "review" | "articles" | "learn" | "summary" | "heading";
   title?: string | null;
   revcount?: number | null;
   duecount?: number | null;
   ahref?: string | null;
+  heading?: string | null;
 }>();
 
 const className = ref("");
@@ -34,6 +35,10 @@ switch (props.state) {
   case "summary":
     className.value = "top-bar-summary";
     heading.value = "summary";
+    break;
+  case "heading":
+    className.value = "top-bar-summary";
+    heading.value = props.heading ?? "";
     break;
   default:
     className.value = "top-bar-summary";

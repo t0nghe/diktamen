@@ -8,6 +8,7 @@ import SentenceTried from "../components/Sentence/SentenceTried.vue";
 import LoadingEllipsis from "@/components/Interaction/LoadingEllipsis.vue";
 import { corrSents, incorrSents } from "../queries";
 import { examineSent } from "@/types";
+import TopBar from "@/components/TopBar/TopBar.vue";
 
 const route = useRoute();
 const articleId = computed(() => {
@@ -94,6 +95,7 @@ watch(sentsSorted, () => {
 </script>
 
 <template>
+  <top-bar state="summary" />
   <score-circle v-if="score !== 0 && !isNaN(score)" :score="score" />
   <div class="view-content-wrapper">
     <div v-for="sent in sentsSorted" :key="sent.indexInArticle">
@@ -120,7 +122,7 @@ watch(sentsSorted, () => {
       <template v-if="loadingCorrect || loadingIncorrect">
         <loading-ellipsis />
       </template>
-      <text-nav-button href="/">complete</text-nav-button>
+      <text-nav-button href="/articles">complete</text-nav-button>
     </div>
   </div>
 </template>

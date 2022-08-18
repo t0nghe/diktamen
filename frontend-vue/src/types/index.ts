@@ -40,3 +40,9 @@ export type userArticleType = {
   articleDescription: string;
   userFinishedIndex: number;
 };
+
+export type reviewSentType = {
+  sentId: number;
+  mediaUri: string;
+  sentWords: sentWord[];
+};

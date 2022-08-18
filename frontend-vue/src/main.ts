@@ -20,7 +20,6 @@ const getHeaders = () => {
   }
   headers["Content-Type"] = "application/json";
 
-  console.log(headers);
   return headers;
 };
 
