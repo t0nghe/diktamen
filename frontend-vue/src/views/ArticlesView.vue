@@ -32,7 +32,13 @@ const navSummaryHandler = (data: number) => {
 
 <template>
   <top-bar state="articles" />
-  <div v-if="resultSeen && resultSeen.listUserArticles">
+  <div
+    v-if="
+      resultSeen &&
+      resultSeen.listUserArticles &&
+      resultSeen.listUserArticles.length > 0
+    "
+  >
     <h2>continue...</h2>
     <div v-for="art in resultSeen.listUserArticles" :key="art.articleId">
       <template v-if="art.userFinishedIndex < art.articleSentCount">
@@ -69,7 +75,13 @@ const navSummaryHandler = (data: number) => {
       />
     </div>
   </div>
-  <div v-if="resultSeen && resultSeen.listUserArticles">
+  <div
+    v-if="
+      resultSeen &&
+      resultSeen.listUserArticles &&
+      resultSeen.listUserArticles.length > 0
+    "
+  >
     <h2>finished...</h2>
     <div v-for="art in resultSeen.listUserArticles" :key="art.articleId">
       <template v-if="art.userFinishedIndex === art.articleSentCount">

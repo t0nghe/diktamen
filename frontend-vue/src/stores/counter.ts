@@ -1,16 +1,19 @@
 import { defineStore } from "pinia";
 
-export const useCounterStore = defineStore({
-  id: "counter",
+export const useLoggedInStore = defineStore({
+  id: "loggedIn",
   state: () => ({
-    counter: 0,
+    loggedIn: false,
   }),
   getters: {
-    doubleCount: (state) => state.counter * 2,
+    isLoggedIn: (state) => state.loggedIn,
   },
   actions: {
-    increment() {
-      this.counter++;
+    piniaLogOut() {
+      this.loggedIn = false;
+    },
+    piniaLogIn() {
+      this.loggedIn = true;
     },
   },
 });

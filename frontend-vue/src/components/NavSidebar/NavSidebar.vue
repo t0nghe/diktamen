@@ -35,7 +35,7 @@ const logout = () => {
 </script>
 
 <template>
-  <!-- LOGGEIN IN -->
+  <!-- LOGGED IN -->
   <div v-if="loggedIn" class="nav-sidebar-container">
     <div v-if="wideMode" id="sidebar-control-area" @click="toggleWide"></div>
     <div v-else id="sidebar-control-area" @click="toggleWide"></div>
