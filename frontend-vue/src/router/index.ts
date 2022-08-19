@@ -7,11 +7,15 @@ import OnboardingView from "../views/OnboardingView.vue";
 import LoginView from "../views/LoginView.vue";
 import SignupView from "../views/SignupView.vue";
 import { checkLoggedIn } from "../helpers/checkLoggedIn";
+import { useLoginStore } from "../stores/loginStore";
 
 async function GoToOnboardingIfNoToken(): Promise<{ path: string }> {
+  const loginStore = useLoginStore()
   const isLoggedIn: boolean = await checkLoggedIn();
   if (!isLoggedIn) {
     return { path: "/" };
+  } else {
+    loginStore.piniaLogIn();
   }
 }
 

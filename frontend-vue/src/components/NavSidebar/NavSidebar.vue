@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { useLoginStore } from "../../stores/loginStore";
+
 const props = defineProps<{ wide: boolean }>();
 const router = useRouter();
+const loginStore = useLoginStore();
 
 const wideMode = ref(true);
-const loggedIn = ref(false);
-if (window.localStorage.getItem("token") !== null) {
-  loggedIn.value = true;
-}
-// eslint-disable-next-line vue/no-setup-props-destructure
 wideMode.value = props.wide;
 
 const toggleWide = () => {
@@ -29,14 +27,14 @@ const goToReview = () => {
 
 const logout = () => {
   window.localStorage.removeItem("token");
-  loggedIn.value = false;
+  loginStore.piniaLogOut();
   router.push("/");
 };
 </script>
 
 <template>
   <!-- LOGGED IN -->
-  <div v-if="loggedIn" class="nav-sidebar-container">
+  <div v-if="loginStore.isLoggedIn" class="nav-sidebar-container">
     <div v-if="wideMode" id="sidebar-control-area" @click="toggleWide"></div>
     <div v-else id="sidebar-control-area" @click="toggleWide"></div>
     <div
