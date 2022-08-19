@@ -164,7 +164,7 @@ const constructNew = (tryTextArray, activeSentence) => {
             :key="item.sentId"
             class="rev-list-of-errors"
           >
-            <SentenceTried
+            <sentence-tried
               :is-correct="false"
               :is-summary="false"
               :sent-id="item.sentId"

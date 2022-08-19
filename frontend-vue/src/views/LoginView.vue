@@ -4,11 +4,13 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { loginMutation } from "../graphql";
 import { useMutation } from "@vue/apollo-composable";
+import { useLoginStore } from "../stores/loginStore";
 
 const router = useRouter();
 const errorMessages = ref<string[]>([]);
 const usernameField = ref("");
 const passwordField = ref("");
+const loginStore = useLoginStore();
 
 const clearErrors = () => {
   errorMessages.value = [];
@@ -34,6 +36,7 @@ const login = () => {
       if (res && res.data && res.data.userLogIn && res.data.userLogIn.token) {
         const obtainedToken = res.data.userLogIn.token;
         window.localStorage.setItem("token", obtainedToken);
+        loginStore.piniaLogIn();
         router.push("/articles");
       } else if (res && !res.data && res.errors && res.errors.length > 0) {
         const message =

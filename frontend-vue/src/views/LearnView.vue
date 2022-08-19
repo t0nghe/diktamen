@@ -68,6 +68,7 @@ const spacebarPressHandler = () => {
 
 const thisArticle = computed(() => {
   if (articleResult.value && articleResult.value.getUserArticle) {
+    // console.log(articleResult.value.getUserArticle);
     return articleResult.value.getUserArticle;
   } else {
     return null; // THIS MIGHT BE PROBLEMATIC.
@@ -75,6 +76,8 @@ const thisArticle = computed(() => {
 });
 
 const learningIndex = computed(() => {
+  // console.log(thisArticle.value);
+  // console.log(thisArticle.value.userFinishedIndex);
   if (thisArticle.value && thisArticle.value.userFinishedIndex) {
     return thisArticle.value.userFinishedIndex + 1;
   } else {
