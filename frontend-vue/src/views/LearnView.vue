@@ -6,7 +6,7 @@ import {
   seenSents,
   singleArticle,
   mutationTrySent,
-} from "../queries";
+} from "../graphql";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import { seenArticleType } from "../types";
 import SentenceTried from "../components/Sentence/SentenceTried.vue";
