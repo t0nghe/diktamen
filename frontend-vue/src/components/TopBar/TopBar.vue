@@ -56,7 +56,7 @@ switch (props.state) {
       <div v-else class="top-bar-heading">{{ heading }}</div>
     </template>
     <div v-else class="top-bar-heading">
-      <a :href="props.ahref ? props.ahref : ''">{{ heading }}</a>
+      <a :href="props.ahref ? props.ahref : ''" target="_new">{{ heading }}</a>
     </div>
     <div>
       <!-- empty div to arrange -->

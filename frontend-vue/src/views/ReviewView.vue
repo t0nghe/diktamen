@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { dueSents, mutationTrySent } from "../queries";
+import { dueSents, mutationTrySent } from "../graphql";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import { useRoute } from "vue-router";
 import LoadingEllipsis from "@/components/Interaction/LoadingEllipsis.vue";

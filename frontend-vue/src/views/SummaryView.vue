@@ -6,7 +6,7 @@ import TextNavButton from "../components/Interaction/TextNavButton.vue";
 import ScoreCircle from "../components/Interaction/ScoreCircle.vue";
 import SentenceTried from "../components/Sentence/SentenceTried.vue";
 import LoadingEllipsis from "@/components/Interaction/LoadingEllipsis.vue";
-import { corrSents, incorrSents } from "../queries";
+import { corrSents, incorrSents } from "../graphql";
 import { examineSent } from "@/types";
 import TopBar from "@/components/TopBar/TopBar.vue";
 

@@ -3,7 +3,7 @@ import ArticleItem from "../components/ArticleItem/ArticleItem.vue";
 import LoadingEllipsis from "@/components/Interaction/LoadingEllipsis.vue";
 import { useQuery } from "@vue/apollo-composable";
 import { userArticleType } from "../types";
-import { seenArticles, unseenArticles } from "../queries";
+import { seenArticles, unseenArticles } from "../graphql";
 import { useRouter } from "vue-router";
 import TopBar from "@/components/TopBar/TopBar.vue";
 

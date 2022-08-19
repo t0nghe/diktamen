@@ -115,3 +115,23 @@ export const dueSents = gql`
     }
   }
 `;
+
+export const loginMutation = gql`
+  mutation userLogIn($username: String!, $password: String!) {
+    userLogIn(input: { username: $username, password: $password }) {
+      success
+      token
+    }
+  }
+`;
+
+export const signupMutation = gql`
+  mutation userSignUp($username: String!, $email: String, $password: String!) {
+    userSignUp(
+      input: { username: $username, password: $password, email: $email }
+    ) {
+      success
+      message
+    }
+  }
+`;
