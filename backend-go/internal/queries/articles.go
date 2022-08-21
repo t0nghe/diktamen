@@ -77,7 +77,7 @@ func GetUserArticlesList(userId int) ([]*model.UserArticle, error) {
 }
 
 func GetUserUnseenArticlesList(userId int) ([]*model.UserArticle, error) {
-	stmt, err := dbconn.Db.Prepare("SELECT DISTINCT a.id, a.title, a.sent_count, a.description FROM article a LEFT JOIN user_article ua ON a.id = ua.article_id WHERE ua.user_id != ? OR ua.user_id IS NULL;")
+	stmt, err := dbconn.Db.Prepare("SELECT DISTINCT a.id, a.title, a.sent_count, a.description FROM article a LEFT JOIN user_article ua ON a.id = ua.article_id WHERE a.id NOT IN (SELECT article_id FROM user_article WHERE user_id=?);")
 
 	if err != nil {
 		log.Fatal(err)

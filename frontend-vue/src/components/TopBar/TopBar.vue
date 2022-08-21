@@ -48,7 +48,11 @@ switch (props.state) {
 
 <template>
   <div class="top-bar-wrapper" :class="className">
-    <div class="top-bar-logo"><img :src="logoWide" alt="logo" /></div>
+    <div class="top-bar-logo">
+      <router-link to="/">
+        <img :src="logoWide" alt="logo" />
+      </router-link>
+    </div>
     <template v-if="props.state !== 'waitlist'">
       <template v-if="props.state === 'review'">
         <ReviewProgress :revcount="props.revcount" :duecount="props.duecount" />

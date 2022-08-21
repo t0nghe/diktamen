@@ -10,7 +10,7 @@ import { checkLoggedIn } from "../helpers/checkLoggedIn";
 import { useLoginStore } from "../stores/loginStore";
 
 async function GoToOnboardingIfNoToken(): Promise<{ path: string }> {
-  const loginStore = useLoginStore()
+  const loginStore = useLoginStore();
   const isLoggedIn: boolean = await checkLoggedIn();
   if (!isLoggedIn) {
     return { path: "/" };
