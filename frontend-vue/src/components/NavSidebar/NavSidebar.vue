@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useLoginStore } from "../../stores/loginStore";
 
@@ -8,7 +8,7 @@ const router = useRouter();
 const loginStore = useLoginStore();
 
 const wideMode = ref(true);
-wideMode.value = props.wide;
+wideMode.value = computed(() => props.wide);
 
 const toggleWide = () => {
   wideMode.value = !wideMode.value;

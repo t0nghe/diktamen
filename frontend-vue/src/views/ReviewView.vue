@@ -25,7 +25,15 @@ const {
   result: resultDue,
   loading: loadingDue,
   error: errorDue,
-} = useQuery(dueSents, { days: daysAhead.value });
+} = useQuery(
+  dueSents,
+  {
+    days: daysAhead.value,
+  },
+  {
+    fetchPolicy: "network-only",
+  }
+);
 
 const { mutate: trySent } = useMutation(mutationTrySent);
 
@@ -178,7 +186,9 @@ const constructNew = (tryTextArray, activeSentence) => {
         <text-nav-button href="/articles">complete</text-nav-button>
       </div>
     </template>
-    <template v-if="!dueSentsArray || dueSentsArray.length === 0">
+    <template
+      v-if="!loadingDue && (!dueSentsArray || dueSentsArray.length === 0)"
+    >
       <img
         src="@/assets/buttons/circledStar.svg"
         alt="Star"

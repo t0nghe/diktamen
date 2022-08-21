@@ -1,3 +1,4 @@
+<!-- eslint-disable prettier/prettier -->
 <script setup lang="ts">
 import ArticleItem from "../components/ArticleItem/ArticleItem.vue";
 import LoadingEllipsis from "@/components/Interaction/LoadingEllipsis.vue";
@@ -13,13 +14,17 @@ const {
   result: resultSeen,
   loading: loadingSeen, // TODO: make a svg to indicate loading
   // error: errorSeen, // TODO: handle these possible errors
-} = useQuery(seenArticles);
+} = useQuery(seenArticles, null, { // You need to explicitly state variables are null.
+    fetchPolicy: "network-only",
+  });
 
 const {
   result: resultUnseen,
   loading: loadingUnseen,
   // error: errorUnseen,
-} = useQuery(unseenArticles);
+} = useQuery(unseenArticles, null, {
+    fetchPolicy: "network-only",
+  },);
 
 const navLearnHandler = (data: number) => {
   router.push(`/articles/${data}/learn`);
