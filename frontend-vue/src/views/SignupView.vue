@@ -42,7 +42,7 @@ const signupClickHandler = () => {
     conditionsNotMet.push("password needs to include at least 1 digit");
   }
   if (passwordField.value !== passwordConfirmField.value) {
-    conditionsNotMet.push("passwords do not patch");
+    conditionsNotMet.push("passwords do not match");
   }
   if (conditionsNotMet.length > 0) {
     errorMessages.value = conditionsNotMet;

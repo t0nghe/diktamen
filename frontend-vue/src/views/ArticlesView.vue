@@ -65,14 +65,16 @@ const navSummaryHandler = (data: number) => {
       v-for="art in resultUnseen.listUserUnseenArticles"
       :key="art.articleId"
     >
-      <ArticleItem
-        :id="art.articleId"
-        :title="art.articleTitle"
-        :description="art.articleDescription"
-        :progress="art.userFinishedIndex"
-        :goal="art.articleSentCount"
-        @go-to-article="navLearnHandler"
-      />
+      <template v-if="art.userFinishedIndex === 0">
+        <ArticleItem
+          :id="art.articleId"
+          :title="art.articleTitle"
+          :description="art.articleDescription"
+          :progress="art.userFinishedIndex"
+          :goal="art.articleSentCount"
+          @go-to-article="navLearnHandler"
+        />
+      </template>
     </div>
   </div>
   <div
