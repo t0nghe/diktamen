@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed } from "vue";
+import { ref, watch, computed, onMounted } from "vue";
 import {
   sentWord,
   userTrySent,
@@ -141,6 +141,8 @@ const onDownHandler = (ev) => {
   const idxSent: string = ev.target.attributes["data-index"].value;
   focusNextInput(idxSent);
 };
+
+onMounted(() => trySubmitSent());
 </script>
 
 <template>
@@ -149,6 +151,7 @@ const onDownHandler = (ev) => {
       <play-pause-rev
         :media-uri="props.mediaUri"
         :parent-play-pause="playPauseCounter"
+        :dimension="150"
       />
     </div>
     <!-- <div>

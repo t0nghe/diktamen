@@ -4,7 +4,7 @@ const emit = defineEmits<{ (e: "click-down-arrow") }>();
 </script>
 
 <template>
-  <button @click="emit('click-down-arrow')" class="fixed-downward-arrow">
+  <button @click="emit('click-down-arrow')">
     <svg
       width="66.609467"
       height="78.325195"
@@ -70,18 +70,3 @@ const emit = defineEmits<{ (e: "click-down-arrow") }>();
     </svg>
   </button>
 </template>
-
-<style lang="scss">
-@import "@/assets/variables";
-
-.fixed-downward-arrow {
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
-
-  position: fixed;
-  top: calc(100vh - 100px);
-  left: calc(50vw + ($logo-width / 2) - 36px);
-  z-index: 1;
-}
-</style>
