@@ -4,9 +4,9 @@ import NavSidebar from "./components/NavSidebar/NavSidebar.vue";
 </script>
 
 <template>
-  <NavSidebar :wide="true" />
+  <nav-sidebar :wide="true" />
   <div class="main">
-    <RouterView />
+    <router-view />
   </div>
 </template>
 
