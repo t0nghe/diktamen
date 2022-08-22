@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref, watch, computed } from "vue";
-const props = defineProps<{ mediaUri: string; parentPlayPause: number }>();
+const props = defineProps<{
+  mediaUri: string;
+  parentPlayPause: number;
+  dimension: number;
+}>();
 const revAudioPlayerRef = ref<HTMLMediaElement | null>(null);
 
 const playing = ref(false);
@@ -12,6 +16,8 @@ watch(parentPlayPauseCounter, () => {
     playing.value = true;
   }
 });
+
+const dimCss = computed(() => `${props.dimension}px`);
 
 const playHandler = () => {
   playing.value = true;
@@ -52,8 +58,8 @@ const toggle = () => {
 
 <style lang="scss">
 .rev-audio {
-  width: 150px;
-  height: 150px;
+  width: v-bind(dimCss);
+  height: v-bind(dimCss);
 }
 
 .rev-audio-bg-pause {

@@ -83,8 +83,8 @@ const submitSentHandler = (payload: {
         wordAtK.wordform &&
         wordAtK.wordform !== userInputWordAtK.inputText
       ) {
-        console.log("wordAtK.wordform", wordAtK.wordform);
-        console.log("userInputWordAtK", userInputWordAtK);
+        // console.log("wordAtK.wordform", wordAtK.wordform);
+        // console.log("userInputWordAtK", userInputWordAtK);
         userInputCorrect = false;
       }
     } else {

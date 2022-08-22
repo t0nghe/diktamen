@@ -1,0 +1,45 @@
+<script setup lang="ts">
+import { ref } from "vue";
+import SentenceRev from "@/components/Sentence/SentenceRev.vue";
+import { sent3words, sent3audio } from "./data.ts";
+
+const showCtaRef = ref(false);
+
+const showCta = () => {
+  showCtaRef.value = true;
+};
+</script>
+
+<template>
+  <div class="onboarding-content onboarding-screen3">
+    <sentence-rev
+      :sent-id="3"
+      :media-uri="sent3audio"
+      :sent-words="sent3words"
+      :finns-next="false"
+      @submit-sent="showCta"
+    />
+    <div v-if="showCtaRef" class="signup-cta">
+      <router-link to="/test-signup">sign up</router-link> to try it out
+    </div>
+  </div>
+</template>
+
+<style lang="scss">
+@import "@/assets/variables";
+
+.onboarding-screen3 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .signup-cta,
+  a {
+    font-size: 1.4rem;
+    color: $blue-primary;
+    font-weight: 200;
+    margin: 10px;
+  }
+}
+</style>

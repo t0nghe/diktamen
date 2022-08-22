@@ -1,18 +1,15 @@
 <script setup lang="ts">
 import TopBar from "@/components/TopBar/TopBar.vue";
-import screens from "../components/Onboarding/";
+import slides from "../components/Onboarding/";
 import { ref } from "vue";
 
 const scrIdx = ref<number>(0);
-const scrArr = [screens.ScreenOne, screens.ScreenTwo, screens.ScreenThree];
-
-const prevHandler = () => {
-  if (scrIdx.value === 0) {
-    scrIdx.value = 2;
-  } else {
-    scrIdx.value--;
-  }
-};
+const scrArr = [slides.SlideOne, slides.SlideTwo, slides.SlideThree];
+const strArr = [
+  "type out what you hear",
+  "review mistakes",
+  "learn again in a few days",
+];
 
 const nextHandler = () => {
   if (scrIdx.value === 2) {
@@ -25,8 +22,37 @@ const nextHandler = () => {
 
 <template>
   <top-bar state="waitlist" ahref="https://forms.gle/nvc46wgCnDTZty3d6" />
-  <component :is="scrArr[scrIdx]"></component>
-  <button @click="prevHandler">Previous</button>
-  <button @click="nextHandler">Next</button>
-  <p>Go to <router-link to="/test-signup">Sign up</router-link></p>
+  <div class="onboarding-container">
+    <div class="slide-desc">{{ strArr[scrIdx] }}</div>
+    <component :is="scrArr[scrIdx]" @next-screen="nextHandler"></component>
+  </div>
 </template>
+
+<style lang="scss">
+@import "@/assets/variables";
+
+.onboarding-container {
+  background: url("@/assets/earphones.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  width: calc(
+    100vw - $nav-sidebar-display-width-wide - $nav-sidebar-control-width
+  );
+  height: calc(100vh - $topbar-height);
+  position: fixed;
+  top: $topbar-height;
+  left: $nav-sidebar-display-width-wide + $nav-sidebar-control-width;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.slide-desc {
+  font-size: 1.5rem;
+  color: $blue-primary;
+  font-weight: 200;
+  margin: 10px 0px;
+}
+</style>
