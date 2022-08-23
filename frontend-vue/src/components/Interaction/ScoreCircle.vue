@@ -22,14 +22,14 @@ const props = defineProps<{ score: number }>();
   background: transparent;
   z-index: -2;
 
-  border: 32px solid $azure-primary;
+  border: 32px solid $blue-secondary;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
 
   font-size: 20rem;
-  color: $azure-primary;
+  color: $blue-secondary;
   font-weight: bold;
 }
 </style>
