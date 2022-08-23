@@ -13,7 +13,8 @@ var Db *sql.DB
 func InitDb() {
 	log.Println("before getting env var for db string")
 	dbstr := os.Getenv("DIKTAMEN_DB_STRING")
-	log.Println("obtained dbstr")
+	log.Println("[diktamen] obtained dbstr")
+	log.Println("[diktamen] ", dbstr)
 	if len(dbstr) == 0 {
 		log.Panic("No dbstring")
 	}

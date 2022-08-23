@@ -6,11 +6,9 @@ import (
 	"backend-go/internal/auth"
 	dbconn "backend-go/internal/pkg/database"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
 	"github.com/rs/cors"
 )
@@ -18,6 +16,7 @@ import (
 const defaultPort = "9090"
 
 func main() {
+	log.Println("[diktamen] before getting port")
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
@@ -37,11 +36,12 @@ func main() {
 	dbconn.InitDb()
 	defer dbconn.CloseDb()
 
+	log.Print("[diktamen] let's try serving first")
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 
-	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	// router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", srv)
 
-	log.Printf("connect to :%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, router))
+	// log.Printf("connect to :%s/ for GraphQL playground", port)
+	// log.Fatal(http.ListenAndServe(":"+port, router))
 }
