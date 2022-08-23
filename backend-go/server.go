@@ -6,7 +6,6 @@ import (
 	"backend-go/internal/auth"
 	dbconn "backend-go/internal/pkg/database"
 	"log"
-	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/go-chi/chi"
@@ -16,11 +15,10 @@ import (
 const defaultPort = "9090"
 
 func main() {
-	log.Println("[diktamen] before getting port")
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultPort
-	}
+	// port := os.Getenv("PORT")
+	// if port == "" {
+	// 	port = defaultPort
+	// }
 
 	router := chi.NewRouter()
 	// router.Use(cors.New(cors.Options{
