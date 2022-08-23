@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import logoWide from "../../assets/logo-wide.svg";
 import ReviewProgress from "./ReviewProgress.vue";
 
 const props = defineProps<{
@@ -50,7 +49,7 @@ switch (props.state) {
   <div class="top-bar-wrapper" :class="className">
     <div class="top-bar-logo">
       <router-link to="/">
-        <img :src="logoWide" alt="logo" />
+        <img src="@/assets/logo-wide.svg" alt="logo" />
       </router-link>
     </div>
     <template v-if="props.state === 'review'">
@@ -127,6 +126,7 @@ switch (props.state) {
   .top-bar-heading {
     font-size: 1.5rem;
     font-weight: bold;
+    margin-left: -10vw;
   }
 
   .top-bar-logo {

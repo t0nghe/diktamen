@@ -67,7 +67,10 @@ const indexClassName = computed(() => {
   flex-direction: row;
   align-items: flex-start;
   color: $blue-primary;
-  margin: 8px;
+  margin: 4px;
+  background-color: rgba($yellow-beige, 0.75);
+  box-shadow: 2px 2px rgba(#f0f0f0, 0.75);
+  padding: 4px;
 }
 
 .learn-sent-index-correct {

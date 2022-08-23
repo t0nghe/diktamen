@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { defineEmits } from "vue";
+import { useNavStore } from "../stores/navWidthStore";
+
+const navWidthStore = useNavStore();
 const emit = defineEmits<{ (e: "click-down-arrow") }>();
 </script>
 
 <template>
-  <button @click="emit('click-down-arrow')" class="fixed-downward-arrow">
+  <button @click="emit('click-down-arrow')" class="fixed-downward-arrow"
+  :class="navWidthStore.isWide ? 'fixed-downward-arrow-wide-side':'fixed-downward-arrow-narrow-side'">
     <svg
       width="66.609467"
       height="78.325195"
@@ -78,10 +82,18 @@ const emit = defineEmits<{ (e: "click-down-arrow") }>();
   border: none;
   background-color: transparent;
   cursor: pointer;
-
   position: fixed;
   top: calc(100vh - 100px);
-  left: calc(50vw + ($logo-width / 2) - 36px);
   z-index: 1;
+}
+
+.fixed-downward-arrow-wide-side {
+  left: calc((100vw - $logo-width) / 2 - 10vw);
+}
+
+.fixed-downward-arrow-narrow-side {
+  left: calc(
+    (100vw - $nav-sidebar-display-width-narrow - $nav-sidebar-control-width) / 2 - 10vw
+  );
 }
 </style>
