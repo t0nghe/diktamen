@@ -21,6 +21,7 @@ func InitDb() {
 
 	db, err := sql.Open("mysql", dbstr)
 	if err != nil {
+		log.Println("[diktamen] connection to db failed")
 		log.Panic(err)
 	}
 
