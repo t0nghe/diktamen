@@ -90,11 +90,15 @@ const clickHandler = () => {
 
 .article-item {
   /* display and size */
-  width: 1130px;
+  max-width: 1130px;
+  width: 75vw;
+  min-width: 500px;
   height: auto;
   display: flex;
   flex-direction: row;
   align-content: space-between;
+  margin-top: 20px;
+  margin-bottom: 30px;
 
   /* color: changing depending on state of article */
   &.article-item-progress {
@@ -148,7 +152,10 @@ const clickHandler = () => {
   }
 
   &__summary {
-    width: 990px;
+    /* width: 990px; */
+    width: calc(75vw - 180px);
+    max-width: 950px;
+    min-width: 320px;
     height: auto;
     padding: 20px;
     display: flex;

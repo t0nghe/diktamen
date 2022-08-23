@@ -53,7 +53,7 @@ const emit = defineEmits<{ (e: "next-screen") }>();
   display: grid;
   grid-auto-columns: auto 250px;
   grid-auto-rows: auto 95px;
-  gap: 20px;
+  gap: 10px;
 
   .onboarding-screen2-left {
     grid-column: 1;
@@ -61,7 +61,7 @@ const emit = defineEmits<{ (e: "next-screen") }>();
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    padding: 50px;
+    padding: 30px;
   }
 
   .onboarding-screen2-right {

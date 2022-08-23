@@ -65,12 +65,13 @@ onMounted(() => {
 @import "@/assets/variables";
 
 .onboarding-content {
-  padding: 20px 60px;
-  background-color: rgba($azure-secondary, 0.6);
+  padding: 30px 30px;
+  background-color: rgba($yellow-beige, 0.85);
   height: 60vh;
+  min-height: 480px;
   width: 60vw;
-  border: 1px solid $azure-secondary;
-  box-shadow: 4px 4px $azure-primary, 4px 4px 0px 1px $blue-secondary;
+  border: 2px solid $yellow-canary;
+  box-shadow: 5px 5px $yellow-gold;
 
   .arrow-onboarding {
     button {

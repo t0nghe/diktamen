@@ -18,7 +18,7 @@ const heading = ref("");
 switch (props.state) {
   case "waitlist":
     className.value = "top-bar-waitlist";
-    heading.value = "join waitlist";
+    heading.value = "";
     break;
   case "review":
     className.value = "top-bar-review";
@@ -53,15 +53,10 @@ switch (props.state) {
         <img :src="logoWide" alt="logo" />
       </router-link>
     </div>
-    <template v-if="props.state !== 'waitlist'">
-      <template v-if="props.state === 'review'">
-        <ReviewProgress :revcount="props.revcount" :duecount="props.duecount" />
-      </template>
-      <div v-else class="top-bar-heading">{{ heading }}</div>
+    <template v-if="props.state === 'review'">
+      <ReviewProgress :revcount="props.revcount" :duecount="props.duecount" />
     </template>
-    <div v-else class="top-bar-heading">
-      <a :href="props.ahref ? props.ahref : ''" target="_new">{{ heading }}</a>
-    </div>
+    <div v-else class="top-bar-heading">{{ heading }}</div>
     <div>
       <!-- empty div to arrange -->
     </div>
@@ -72,7 +67,7 @@ switch (props.state) {
 @import "../../assets/variables";
 
 .top-bar-waitlist {
-  background-color: $azure-primary;
+  background-color: $blue-secondary;
   color: $blue-primary;
 
   a {
@@ -84,15 +79,14 @@ switch (props.state) {
 }
 
 .top-bar-articles {
-  background-color: $yellow-cream;
+  background-color: $azure-primary;
   color: $blue-primary;
 
   .top-bar-logo {
-    /* background-color: $blue-primary !important; */
     background: linear-gradient(
       to right,
       $blue-primary 0 50%,
-      $blue-secondary 50% 100%
+      $azure-primary 50% 100%
     ) !important;
     text-align: left;
     padding-right: 4px;
@@ -105,7 +99,7 @@ switch (props.state) {
 }
 
 .top-bar-summary {
-  background-color: $blue-primary;
+  background-color: $blue-secondary;
   color: $yellow-cream;
 }
 
@@ -138,8 +132,8 @@ switch (props.state) {
   .top-bar-logo {
     background: linear-gradient(
       to right,
-      $blue-primary 0 50%,
-      transparent 50% 100%
+      $blue-primary 0 30%,
+      transparent 30% 100%
     );
     height: 100%;
 

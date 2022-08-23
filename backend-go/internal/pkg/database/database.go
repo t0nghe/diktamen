@@ -2,14 +2,21 @@ package database
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"os"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var Db *sql.DB
 
 func InitDb() {
-	db, err := sql.Open("mysql", "root:dbpass@(0.0.0.0:3306)/diktdev")
+	dbstr := os.Getenv("DIKTAMEN_DB_STRING")
+	if len(dbstr) == 0 {
+		log.Panic("No dbstring")
+	}
+
+	db, err := sql.Open("mysql", dbstr)
 	if err != nil {
 		log.Panic(err)
 	}
