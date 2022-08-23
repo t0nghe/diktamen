@@ -23,7 +23,7 @@ const nextHandler = () => {
 </script>
 
 <template>
-  <top-bar state="waitlist" ahref="https://forms.gle/nvc46wgCnDTZty3d6" />
+  <top-bar state="waitlist" />
   <div
     class="onboarding-container"
     :class="

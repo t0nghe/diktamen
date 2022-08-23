@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import TopBar from "@/components/TopBar/TopBar.vue";
 import { ref } from "vue";
-import { useRouter } from "vue-router";
 import { signupMutation } from "../graphql";
 import { useMutation } from "@vue/apollo-composable";
 import TextNavButton from "@/components/Interaction/TextNavButton.vue";
@@ -21,7 +20,6 @@ const clearErrors = () => {
   errorMessages.value = [];
 };
 
-const reSymbol = /[!@$&*_\-.,"#%'()+/:;<=>?[\\\]^{|}~\]]/;
 const reLetter = /[A-Za-z]/;
 const reDigit = /[0-9]/;
 
@@ -129,7 +127,8 @@ const signupClickHandler = () => {
                     @input="clearErrors"
                   />
                   <p>
-                    at least 4 characters, containing<br />at least 1 letter and 1 digit
+                    at least 4 characters, containing<br />at least 1 letter and
+                    1 digit
                   </p>
                 </td>
               </tr>

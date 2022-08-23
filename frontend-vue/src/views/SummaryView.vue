@@ -9,7 +9,9 @@ import LoadingEllipsis from "@/components/Interaction/LoadingEllipsis.vue";
 import { corrSents, incorrSents } from "../graphql";
 import { examineSent } from "@/types";
 import TopBar from "@/components/TopBar/TopBar.vue";
+import { useNavStore } from "../stores/navWidthStore";
 
+const navWidthStore = useNavStore();
 const route = useRoute();
 const articleId = computed(() => {
   return route.params.id;
@@ -21,17 +23,25 @@ const {
   result: resultCorrect,
   loading: loadingCorrect,
   // error: error1,
-} = useQuery(corrSents, {
-  articleId: articleId.value,
-});
+} = useQuery(
+  corrSents,
+  {
+    articleId: articleId.value,
+  },
+  { fetchPolicy: "network-only" }
+);
 
 const {
   result: resultIncorrect,
   loading: loadingIncorrect,
   // error: error2,
-} = useQuery(incorrSents, {
-  articleId: articleId.value,
-});
+} = useQuery(
+  incorrSents,
+  {
+    articleId: articleId.value,
+  },
+  { fetchPolicy: "network-only" }
+);
 
 const allSents = ref<examineSent[]>([]);
 
@@ -96,40 +106,51 @@ watch(sentsSorted, () => {
 
 <template>
   <top-bar state="summary" />
-  <score-circle v-if="score !== 0 && !isNaN(score)" :score="score" />
-  <div class="view-content-wrapper">
-    <div v-for="sent in sentsSorted" :key="sent.indexInArticle">
-      <div v-if="sent.tryText">
-        <sentence-tried
-          :is-correct="true"
-          :is-summary="true"
-          :sent-id="sent.sentId"
-          :index-in-article="sent.indexInArticle"
-          :try-text="sent.tryText"
-        />
+  <div
+    class="view-container"
+    :class="
+      navWidthStore.isWide
+        ? 'container-position-wide-side'
+        : 'container-position-narrow-side'
+    "
+  >
+    <score-circle v-if="score !== 0 && !isNaN(score)" :score="score" />
+    <div class="view-content-wrapper">
+      <div v-for="sent in sentsSorted" :key="sent.indexInArticle">
+        <div v-if="sent.tryText">
+          <sentence-tried
+            :is-correct="true"
+            :is-summary="true"
+            :sent-id="sent.sentId"
+            :index-in-article="sent.indexInArticle"
+            :try-text="sent.tryText"
+          />
+        </div>
+        <div v-else>
+          <sentence-tried
+            :is-correct="false"
+            :is-summary="true"
+            :sent-id="sent.sentId"
+            :index-in-article="sent.indexInArticle"
+            :sent-words="sent.sentWords"
+          />
+        </div>
       </div>
-      <div v-else>
-        <sentence-tried
-          :is-correct="false"
-          :is-summary="true"
-          :sent-id="sent.sentId"
-          :index-in-article="sent.indexInArticle"
-          :sent-words="sent.sentWords"
-        />
+      <div class="bottom-text-button">
+        <template v-if="loadingCorrect || loadingIncorrect">
+          <loading-ellipsis />
+        </template>
+        <text-nav-button href="/articles">complete</text-nav-button>
       </div>
-    </div>
-    <div class="bottom-text-button">
-      <template v-if="loadingCorrect || loadingIncorrect">
-        <loading-ellipsis />
-      </template>
-      <text-nav-button href="/articles">complete</text-nav-button>
     </div>
   </div>
 </template>
 
 <style lang="scss">
 .view-content-wrapper {
-  margin-right: 30px;
+  width: 60%;
+  margin-left: -5vw;
+  margin-right: 15vw;
 }
 
 .bottom-text-button {

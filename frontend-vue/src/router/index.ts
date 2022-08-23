@@ -27,6 +27,7 @@ async function GoToArticlesIfLoggedIn(): Promise<{ path: string } | void> {
 }
 
 const router = createRouter({
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [

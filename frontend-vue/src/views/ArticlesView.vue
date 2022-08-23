@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed } from "vue";
 import ArticleItem from "../components/ArticleItem/ArticleItem.vue";
 import LoadingEllipsis from "@/components/Interaction/LoadingEllipsis.vue";
 import { useQuery } from "@vue/apollo-composable";
-import { userArticleType } from "../types";
 import { seenArticles, unseenArticles } from "../graphql";
 import { useRouter } from "vue-router";
 import TopBar from "@/components/TopBar/TopBar.vue";
@@ -11,10 +10,6 @@ import { useNavStore } from "../stores/navWidthStore";
 
 const navWidthStore = useNavStore();
 const router = useRouter();
-
-onMounted(() => {
-  navWidthStore.$patch({ wide: false });
-});
 
 const {
   result: resultSeen,

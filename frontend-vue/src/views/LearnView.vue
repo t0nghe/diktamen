@@ -8,7 +8,6 @@ import {
   mutationTrySent,
 } from "../graphql";
 import { useQuery, useMutation } from "@vue/apollo-composable";
-import { seenArticleType } from "../types";
 import SentenceTried from "../components/Sentence/SentenceTried.vue";
 import SentenceNew from "../components/Sentence/SentenceNew.vue";
 import SentenceTrying from "../components/Sentence/SentenceTrying.vue";
