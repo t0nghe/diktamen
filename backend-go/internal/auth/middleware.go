@@ -4,6 +4,7 @@ import (
 	"backend-go/internal/pkg/token"
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"reflect"
 	"strings"
@@ -15,6 +16,8 @@ func Middleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { // It makes sense how the request needs to be a pointer. This makes sure the value of this request is accessible to multiple functions.
 			header := r.Header.Get("Authorization")
+			forwarded := r.Header.Get("x-forwarded-for")
+			log.Println("[diktamen] x-forwared-for header", forwarded)
 
 			// next feels like Express
 			// If there's not an Authorization entry in the header of this request, the user is not logged in.
