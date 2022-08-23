@@ -30,13 +30,13 @@ const signupClickHandler = () => {
   if (usernameField.value.length < 4) {
     conditionsNotMet.push("username needs to contain at lease 4 characters");
   }
-  if (passwordField.value.length < 6) {
-    conditionsNotMet.push("password needs to contain at lease 6 characters");
+  if (!reLetter.test(usernameField.value[0])) {
+    conditionsNotMet.push("username needs to start with a letter");
+  }
+  if (passwordField.value.length < 4) {
+    conditionsNotMet.push("password needs to contain at lease 4 characters");
   }
 
-  if (!reSymbol.test(passwordField.value)) {
-    conditionsNotMet.push("password needs to include at least 1 symbol");
-  }
   if (!reLetter.test(passwordField.value)) {
     conditionsNotMet.push("password needs to include at least 1 letter");
   }
@@ -129,8 +129,7 @@ const signupClickHandler = () => {
                     @input="clearErrors"
                   />
                   <p>
-                    at least 6 characters<br />containing at least 1 symbol, 1
-                    and 1 digit
+                    at least 4 characters, containing<br />at least 1 letter and 1 digit
                   </p>
                 </td>
               </tr>

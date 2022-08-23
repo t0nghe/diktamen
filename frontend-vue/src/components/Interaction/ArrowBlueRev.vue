@@ -1,5 +1,16 @@
+<script setup lang="ts">
+import { useNavStore } from "@/stores/navWidthStore";
+
+const navWidthStore = useNavStore();
+</script>
+
 <template>
-  <div class="rev-downward-arrow">
+  <div
+    class="rev-downward-arrow"
+    :class="
+      navWidthStore.isWide ? 'rev-arrow-wide-side' : 'rev-arrow-narrow-side'
+    "
+  >
     <svg
       width="66.609467"
       height="78.325195"
@@ -68,9 +79,24 @@
 </template>
 
 <style lang="scss">
+@import "@/assets/variables";
 .rev-downward-arrow {
   border: none;
   background-color: transparent;
   cursor: pointer;
+  position: fixed;
+  top: calc(100vh - 100px);
+  z-index: 1;
+}
+
+.rev-arrow-narrow-side {
+  left: 50vw;
+}
+
+.rev-arrow-wide-side {
+  left: calc(
+    50vw + ($nav-sidebar-display-width-wide - $nav-sidebar-display-width-narrow) /
+      2
+  );
 }
 </style>

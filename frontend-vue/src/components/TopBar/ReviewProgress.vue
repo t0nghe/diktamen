@@ -46,6 +46,7 @@ const pct = computed(() => {
     font-weight: bold;
     text-align: center;
     width: auto;
+    margin-left: -8vw;
   }
 
   .review-progress-numbers {

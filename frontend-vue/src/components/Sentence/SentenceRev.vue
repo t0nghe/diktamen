@@ -213,12 +213,12 @@ onMounted(() => trySubmitSent());
 @import "@/assets/variables";
 
 .div-review-sent {
-  width: 100%;
-  max-width: 500px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   padding: 10px;
+  max-width: 700px;
 }
 
 .rev-sentence-input {

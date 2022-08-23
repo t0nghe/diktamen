@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, defineEmits, computed } from "vue";
+import { ref, watch, computed, onMounted } from "vue";
 import {
   sentWord,
   userTrySent,
@@ -147,6 +147,8 @@ const onDownHandler = (ev) => {
   const idxSent: string = ev.target.attributes["data-index"].value;
   focusNextInput(idxSent);
 };
+
+onMounted(() => trySubmitSent());
 </script>
 
 <template>

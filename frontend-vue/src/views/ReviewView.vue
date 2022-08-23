@@ -9,7 +9,9 @@ import SentenceRev from "@/components/Sentence/SentenceRev.vue";
 import SentenceTried from "@/components/Sentence/SentenceTried.vue";
 import TextNavButton from "@/components/Interaction/TextNavButton.vue";
 import TopBar from "@/components/TopBar/TopBar.vue";
+import { useNavStore } from "../stores/navWidthStore";
 
+const navWidthStore = useNavStore();
 const route = useRoute();
 const daysAhead = computed<number>(() => {
   // Routes that direct here are:
@@ -137,7 +139,14 @@ const constructNew = (tryTextArray, activeSentence) => {
     <top-bar state="heading" heading="review" />
   </template>
 
-  <div class="review-view-container">
+  <div
+    class="view-container-review"
+    :class="
+      navWidthStore.isWide
+        ? 'container-position-wide-side'
+        : 'container-position-narrow-side'
+    "
+  >
     <div v-if="loadingDue" style="text-align: center">
       <loading-ellipsis />
     </div>
@@ -206,13 +215,16 @@ const constructNew = (tryTextArray, activeSentence) => {
 <style lang="scss">
 @import "@/assets/variables";
 
-.review-view-container {
-  margin-top: 100px;
-  padding-right: 20%;
+.view-container-review {
+  /* padding-right: 20%; */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  position: fixed;
+  top: $topbar-height;
+  height: calc(100vh - $topbar-height);
 }
 
 .congrats-star {

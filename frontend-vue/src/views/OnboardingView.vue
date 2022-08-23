@@ -41,7 +41,7 @@ const nextHandler = () => {
 @import "@/assets/variables";
 
 .onboarding-container {
-  background: url("@/assets/earphones.jpg");
+  background: url("@/assets/onboarding-bg.jpg");
   background-size: cover;
   background-repeat: no-repeat;
   height: calc(100vh - $topbar-height);
