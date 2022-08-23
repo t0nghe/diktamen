@@ -19,6 +19,8 @@ $yellow-pale: #fff9e0;
 // dimensions
 $topbar-height: 78px; // also logo height
 $logo-width: 250px;
-$nav-sidebar-control-width: 8px;
-$nav-sidebar-display-width-wide: 242px;
-$nav-sidebar-display-width-narrow: 54px;
+$nav-sidebar-control-width: 10px;
+$nav-sidebar-display-width-wide: 235px;
+// to accomodate the right < in logo.
+// $nav-sidebar-display-width-wide: 240px;
+$nav-sidebar-display-width-narrow: 58px;

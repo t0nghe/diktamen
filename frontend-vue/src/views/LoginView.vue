@@ -5,7 +5,9 @@ import { useRouter } from "vue-router";
 import { loginMutation } from "../graphql";
 import { useMutation } from "@vue/apollo-composable";
 import { useLoginStore } from "../stores/loginStore";
+import { useNavStore } from "../stores/navWidthStore";
 
+const navWidthStore = useNavStore();
 const router = useRouter();
 const errorMessages = ref<string[]>([]);
 const usernameField = ref("");
@@ -54,54 +56,100 @@ const login = () => {
 
 <template>
   <top-bar state="heading" heading="login" />
-  <div class="auth-container">
-    <form class="auth-login-form">
-      <h2>login</h2>
-      <div>
-        <label for="login-username"
-          >username:
-          <input
-            type="text"
-            name="username"
-            id="login-username"
-            v-model="usernameField"
-            @input="clearErrors"
-          />
-        </label>
-      </div>
-      <div>
-        <label for="login-password"
-          >password:
-          <input
-            type="password"
-            name="password"
-            id="login-password"
-            v-model="passwordField"
-            @input="clearErrors"
-          />
-        </label>
-      </div>
-      <button @click.prevent="login">login</button>
-    </form>
-  </div>
-  <div v-if="errorMessages.length > 0" class="auth-error-message">
-    <ul>
-      <li v-for="(item, idx) in errorMessages" :key="idx">{{ item }}</li>
-    </ul>
+  <div
+    class="onboarding-container onboarding-container-login"
+    :class="
+      navWidthStore.isWide
+        ? 'container-position-wide-side'
+        : 'container-position-narrow-side'
+    "
+  >
+    <div class="onboarding-content">
+      <form class="auth-login-form">
+        <div>
+          <label for="login-username"
+            >username:
+            <input
+              type="text"
+              name="username"
+              id="login-username"
+              v-model="usernameField"
+              @input="clearErrors"
+            />
+          </label>
+        </div>
+        <div>
+          <label for="login-password"
+            >password:
+            <input
+              type="password"
+              name="password"
+              id="login-password"
+              v-model="passwordField"
+              @input="clearErrors"
+            />
+          </label>
+        </div>
+        <div>
+          <button @click.prevent="login">login</button>
+        </div>
+        <div class="auth-error-message">
+          <ul v-if="errorMessages.length > 0">
+            <li v-for="(item, idx) in errorMessages" :key="idx">{{ item }}</li>
+          </ul>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
 <style lang="scss">
 @import "../assets/variables";
-@import "../assets/base.css";
 /* This will be used for the form in login view and sign up view */
-.auth-container {
+.auth-login-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+
+  div {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  label {
+    font-weight: 200;
+    font-size: 1.5rem;
+    line-height: 2.2rem;
+  }
+
   input {
     background-color: $azure-secondary;
+    font-size: 1.4rem;
+    height: 1.8rem;
+    color: $blue-primary;
+    line-height: 2.2rem;
+    margin-left: 0.3rem;
+    border: 1px solid $azure-primary;
+    box-shadow: 2px 2px $blue-secondary;
   }
 
   button {
-    background-color: $blue-secondary;
+    text-align: center;
+    background-color: $blue-primary;
+    border: 2px solid $yellow-canary;
+    cursor: pointer;
+    padding: 0rem 3rem;
+    height: 3rem;
+    margin-left: 2rem;
+    margin-right: 2rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    text-decoration: none;
+    color: $yellow-gold;
+    font-size: 1.2rem;
+    /* font-weight: bold; */
   }
 }
 </style>

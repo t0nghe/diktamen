@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import SentenceRev from "@/components/Sentence/SentenceRev.vue";
 import { sent3words, sent3audio } from "./data.ts";
+import TextNavButton from "@/components/Interaction/TextNavButton.vue";
 
 const showCtaRef = ref(false);
 
@@ -19,10 +20,10 @@ const showCta = () => {
       :finns-next="false"
       @submit-sent="showCta"
     />
-    <div v-if="showCtaRef" class="signup-cta">
-      <router-link to="/test-signup">sign up</router-link> to try it out
-    </div>
   </div>
+  <template v-if="showCtaRef">
+    <text-nav-button href="/test-signup">sign up to try it out</text-nav-button>
+  </template>
 </template>
 
 <style lang="scss">
@@ -33,13 +34,5 @@ const showCta = () => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
-  .signup-cta,
-  a {
-    font-size: 1.4rem;
-    color: $blue-primary;
-    font-weight: 200;
-    margin: 10px;
-  }
 }
 </style>

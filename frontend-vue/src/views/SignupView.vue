@@ -5,7 +5,9 @@ import { useRouter } from "vue-router";
 import { signupMutation } from "../graphql";
 import { useMutation } from "@vue/apollo-composable";
 import TextNavButton from "@/components/Interaction/TextNavButton.vue";
+import { useNavStore } from "../stores/navWidthStore";
 
+const navWidthStore = useNavStore();
 const signUpSuccess = ref(false);
 const errorMessages = ref<string[]>([]);
 const usernameField = ref("");
@@ -76,88 +78,154 @@ const signupClickHandler = () => {
 
 <template>
   <top-bar state="heading" heading="sign up" />
-  <div class="auth-container">
-    <template v-if="!signUpSuccess">
-      <form class="auth-signup-form">
-        <h2>sign up</h2>
-        <p>
-          Username needs to be at least 4 characters. Password needs to be at
-          least 6 characters and should contain at least 1 symbol, 1 letter and
-          1 digit.
-        </p>
-        <div>
-          <label for="signup-username"
-            >username:
-            <input
-              type="text"
-              name="username"
-              id="signup-username"
-              v-model="usernameField"
-              @input="clearErrors"
-            />
-          </label>
+  <div
+    class="onboarding-container"
+    :class="
+      navWidthStore.isWide
+        ? 'container-position-wide-side'
+        : 'container-position-narrow-side'
+    "
+  >
+    <div class="onboarding-content onboarding-content-signup">
+      <template v-if="!signUpSuccess">
+        <form class="auth-signup-form">
+          <table>
+            <tbody>
+              <tr>
+                <th><label for="signup-username">username:</label></th>
+                <td>
+                  <input
+                    type="text"
+                    name="username"
+                    id="signup-username"
+                    v-model="usernameField"
+                    @input="clearErrors"
+                  />
+                  <p>at least 4 characters</p>
+                </td>
+              </tr>
+              <tr>
+                <th><label for="signup-password">password:</label></th>
+                <td>
+                  <input
+                    type="password"
+                    name="password"
+                    id="signup-password"
+                    v-model="passwordField"
+                    @input="clearErrors"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <th>
+                  <label for="signup-password-confirm">repeat password:</label>
+                </th>
+                <td>
+                  <input
+                    type="password"
+                    name="password"
+                    id="signup-password-confirm"
+                    v-model="passwordConfirmField"
+                    @input="clearErrors"
+                  />
+                  <p>
+                    at least 6 characters<br />containing at least 1 symbol, 1
+                    and 1 digit
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <th><label for="signup-password">email:</label></th>
+                <td>
+                  <input
+                    type="email"
+                    name="email"
+                    id="signup-email"
+                    v-model="emailField"
+                    @input="clearErrors"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <button @click.prevent="signupClickHandler">sign up</button>
+        </form>
+        <div v-if="errorMessages.length > 0" class="auth-error-message">
+          <ul>
+            <li v-for="(item, idx) in errorMessages" :key="idx">{{ item }}</li>
+          </ul>
         </div>
-        <div>
-          <label for="signup-password"
-            >password:
-            <input
-              type="password"
-              name="password"
-              id="signup-password"
-              v-model="passwordField"
-              @input="clearErrors"
-            />
-          </label>
-        </div>
-        <div>
-          <label for="signup-password-confirm"
-            >confirm password:
-            <input
-              type="password"
-              name="password"
-              id="signup-password-confirm"
-              v-model="passwordConfirmField"
-              @input="clearErrors"
-            />
-          </label>
-        </div>
-        <div>
-          <label for="signup-password"
-            >email (optional):
-            <input
-              type="email"
-              name="email"
-              id="signup-email"
-              v-model="emailField"
-              @input="clearErrors"
-            />
-          </label>
-        </div>
-        <button @click.prevent="signupClickHandler">sign up</button>
-      </form>
-      <div v-if="errorMessages.length > 0" class="auth-error-message">
-        <ul>
-          <li v-for="(item, idx) in errorMessages" :key="idx">{{ item }}</li>
-        </ul>
-      </div>
-    </template>
-    <template v-else>
-      <h2>You've signed up!</h2>
-      <text-nav-button href="/login">continue to log in</text-nav-button>
-    </template>
+      </template>
+      <template v-else>
+        <h2>you have signed up</h2>
+        <text-nav-button href="/login">continue to log in</text-nav-button>
+      </template>
+    </div>
   </div>
 </template>
 
 <style lang="scss">
 @import "../assets/variables";
 /* This will be used for the form in login view and sign up view */
-.auth-container {
+.onboarding-content-signup {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  th {
+    text-align: right;
+    vertical-align: top;
+  }
+  td {
+    text-align: left;
+    vertical-align: top;
+  }
+
+  label {
+    font-weight: 200;
+    font-size: 1.5rem;
+    line-height: 2.2rem;
+  }
+
+  p {
+    font-weight: 300;
+    font-size: 1rem;
+    margin-left: 1rem;
+    line-height: 1.5rem;
+  }
+
   input {
     background-color: $azure-secondary;
+    font-size: 1.4rem;
+    height: 1.8rem;
+    width: 20rem;
+    color: $blue-primary;
+    line-height: 2.2rem;
+    margin-left: 1rem;
+    border: 1px solid $azure-primary;
+    box-shadow: 2px 2px $blue-secondary;
   }
 
   button {
-    background-color: $blue-secondary;
+    text-align: center;
+    background-color: $blue-primary;
+    border: 2px solid $yellow-canary;
+    cursor: pointer;
+    padding: 0rem 3rem;
+    height: 3rem;
+    margin-left: 2rem;
+    margin-right: 2rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    text-decoration: none;
+    color: $yellow-gold;
+    font-size: 1.2rem;
+    font-weight: bold;
   }
+}
+
+.auth-signup-form {
+  text-align: center;
 }
 </style>
