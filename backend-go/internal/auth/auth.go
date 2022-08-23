@@ -13,14 +13,10 @@ import (
 
 // validatePasswordNaive checks if the password contains at least chars, in which there are at least 1 letter, 1 digit and 1 symbol.
 func validatePasswordNaive(password string) bool {
-	re_symbol := regexp.MustCompile(`[!@$&\*_\-.,"#%'\(\)+\/:;<=>?\[\\\]^{\|}~\]]`)
 	re_letter := regexp.MustCompile(`[A-Za-z]`)
 	re_digit := regexp.MustCompile(`[0-9]`)
 
-	if len(password) < 6 {
-		return false
-	}
-	if len(re_symbol.FindStringSubmatchIndex(password)) == 0 {
+	if len(password) < 4 {
 		return false
 	}
 	if len(re_letter.FindStringSubmatchIndex(password)) == 0 {

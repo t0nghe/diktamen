@@ -8,7 +8,6 @@ import {
   mutationTrySent,
 } from "../graphql";
 import { useQuery, useMutation } from "@vue/apollo-composable";
-import { seenArticleType } from "../types";
 import SentenceTried from "../components/Sentence/SentenceTried.vue";
 import SentenceNew from "../components/Sentence/SentenceNew.vue";
 import SentenceTrying from "../components/Sentence/SentenceTrying.vue";
@@ -18,7 +17,9 @@ import CompleteCircle from "@/components/Interaction/CompleteCircle.vue";
 import LoadingEllipsis from "@/components/Interaction/LoadingEllipsis.vue";
 import TextNavButton from "@/components/Interaction/TextNavButton.vue";
 import TopBar from "@/components/TopBar/TopBar.vue";
+import { useNavStore } from "../stores/navWidthStore";
 
+const navWidthStore = useNavStore();
 const route = useRoute();
 const articleId = computed<string>(() => {
   if (typeof route.params.id === "string") {
@@ -132,79 +133,110 @@ const submitSentHandler = (payload: {
 
 <template>
   <top-bar state="learn" :title="thisArticle.articleTitle ?? ''" />
-  <template v-if="seenResult && seenResult.displaySeenSents">
-    <div v-for="sent in seenResult.displaySeenSents" :key="sent.sentId">
-      <template v-if="sent.indexInArticle <= thisArticle.userFinishedIndex">
-        <sentence-tried
-          :is-correct="true"
-          :is-summary="false"
-          :sent-id="sent.sentId"
-          :index-in-article="sent.indexInArticle"
-          :try-text="sent.tryText"
-        />
-      </template>
-    </div>
-  </template>
 
   <div
-    v-if="articleLoading || unseenLoading || seenLoading"
-    style="text-align: center"
-  >
-    <loading-ellipsis />
-  </div>
-  <template
-    v-if="
-      activeSentence &&
-      thisArticle.userFinishedIndex < thisArticle.articleSentCount
+    class="view-container view-container-learn"
+    :class="
+      navWidthStore.isWide
+        ? 'container-position-wide-side'
+        : 'container-position-narrow-side'
     "
   >
-    <sentence-trying
-      @play-sound="spacebarPressHandler"
-      @submit-sent="submitSentHandler"
-      :sent-id="activeSentence.sentId"
-      :index-in-article="activeSentence.indexInArticle"
-      :sent-words="activeSentence.sentWords"
-      :parent-arrow-click="arrowClickCounter"
-    />
-  </template>
+    <template v-if="seenResult && seenResult.displaySeenSents">
+      <div
+        v-for="sent in seenResult.displaySeenSents"
+        :key="sent.sentId"
+        class="learn-view-section"
+      >
+        <template v-if="sent.indexInArticle <= thisArticle.userFinishedIndex">
+          <sentence-tried
+            :is-correct="true"
+            :is-summary="false"
+            :sent-id="sent.sentId"
+            :index-in-article="sent.indexInArticle"
+            :try-text="sent.tryText"
+          />
+        </template>
+      </div>
+    </template>
 
-  <template v-if="unseenResult && unseenResult.displayUnseenSents">
-    <div v-for="sent in unseenResult.displayUnseenSents" :key="sent.sentId">
-      <template v-if="sent.indexInArticle > learningIndex">
-        <sentence-new
-          :sent-id="sent.sentId"
-          :index-in-article="sent.indexInArticle"
-          :sent-words="sent.sentWords"
-        />
-      </template>
-    </div>
-  </template>
-
-  <template
-    v-if="
-      activeSentence &&
-      activeSentence.mediaUri &&
-      thisArticle.userFinishedIndex < thisArticle.articleSentCount
-    "
-    ><play-pause
-      :media-url="activeSentence.mediaUri"
-      :parent-click-play="spacebarPressCount"
-    />
-  </template>
-
-  <arrow-yellow
-    v-if="thisArticle.userFinishedIndex < thisArticle.articleSentCount"
-    @click-down-arrow="arrowClickHandler"
-  />
-
-  <template
-    v-if="thisArticle.userFinishedIndex >= thisArticle.articleSentCount"
-  >
-    <complete-circle />
-    <text-nav-button :href="`/articles/${articleId}/summary`"
-      >summary</text-nav-button
+    <div
+      v-if="articleLoading || unseenLoading || seenLoading"
+      style="text-align: center"
     >
-  </template>
+      <loading-ellipsis />
+    </div>
+    <div
+      v-if="
+        activeSentence &&
+        thisArticle.userFinishedIndex < thisArticle.articleSentCount
+      "
+      class="learn-view-section"
+    >
+      <sentence-trying
+        @play-sound="spacebarPressHandler"
+        @submit-sent="submitSentHandler"
+        :sent-id="activeSentence.sentId"
+        :index-in-article="activeSentence.indexInArticle"
+        :sent-words="activeSentence.sentWords"
+        :parent-arrow-click="arrowClickCounter"
+      />
+    </div>
+
+    <template v-if="unseenResult && unseenResult.displayUnseenSents">
+      <div
+        v-for="sent in unseenResult.displayUnseenSents"
+        :key="sent.sentId"
+        class="learn-view-section"
+      >
+        <template v-if="sent.indexInArticle > learningIndex">
+          <sentence-new
+            :sent-id="sent.sentId"
+            :index-in-article="sent.indexInArticle"
+            :sent-words="sent.sentWords"
+          />
+        </template>
+      </div>
+    </template>
+
+    <template
+      v-if="
+        activeSentence &&
+        activeSentence.mediaUri &&
+        thisArticle.userFinishedIndex < thisArticle.articleSentCount
+      "
+      ><play-pause
+        :media-url="activeSentence.mediaUri"
+        :parent-click-play="spacebarPressCount"
+      />
+    </template>
+
+    <arrow-yellow
+      v-if="thisArticle.userFinishedIndex < thisArticle.articleSentCount"
+      @click-down-arrow="arrowClickHandler"
+    />
+
+    <template
+      v-if="thisArticle.userFinishedIndex >= thisArticle.articleSentCount"
+    >
+      <complete-circle />
+      <text-nav-button :href="`/articles/${articleId}/summary`"
+        >summary</text-nav-button
+      >
+    </template>
+  </div>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.view-container-learn {
+  align-items: left !important;
+  justify-content: left !important;
+  padding-bottom: 200px;
+}
+
+.learn-view-section {
+  width: 60%;
+  justify-self: flex-start !important;
+  margin-left: -25vw;
+}
+</style>

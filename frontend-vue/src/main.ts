@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { createApp, h } from "vue";
 import { createPinia } from "pinia";
 
@@ -24,6 +25,7 @@ const getHeaders = () => {
 };
 
 const httpLink = createHttpLink({
+  // @ts-ignore
   uri: import.meta.env.VITE_DEV_GRAPHQL_SERVER,
   fetch: (uri: RequestInfo, options: RequestInit) => {
     options.headers = getHeaders();

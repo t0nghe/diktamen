@@ -21,6 +21,8 @@ const emit = defineEmits<{ (e: "submit-sent", payload: userTrySent): void }>();
 const playPauseCounter = ref(0);
 
 const isComplete = ref<boolean>(false);
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 const inputFields = ref<inputFieldsType>({});
 const inputValues = ref<inputValuesType>({});
 
@@ -213,12 +215,12 @@ onMounted(() => trySubmitSent());
 @import "@/assets/variables";
 
 .div-review-sent {
-  width: 100%;
-  max-width: 500px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   padding: 10px;
+  max-width: 700px;
 }
 
 .rev-sentence-input {

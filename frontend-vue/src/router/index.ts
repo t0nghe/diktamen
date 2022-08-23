@@ -9,7 +9,7 @@ import SignupView from "../views/SignupView.vue";
 import { checkLoggedIn } from "../helpers/checkLoggedIn";
 import { useLoginStore } from "../stores/loginStore";
 
-async function GoToOnboardingIfNoToken(): Promise<{ path: string }> {
+async function GoToOnboardingIfNoToken(): Promise<{ path: string } | void> {
   const loginStore = useLoginStore();
   const isLoggedIn: boolean = await checkLoggedIn();
   if (!isLoggedIn) {
@@ -19,13 +19,23 @@ async function GoToOnboardingIfNoToken(): Promise<{ path: string }> {
   }
 }
 
+async function GoToArticlesIfLoggedIn(): Promise<{ path: string } | void> {
+  const isLoggedIn: boolean = await checkLoggedIn();
+  if (isLoggedIn) {
+    return { path: "/articles" };
+  }
+}
+
 const router = createRouter({
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: "/",
       name: "OnboardingView",
       component: OnboardingView,
+      beforeEnter: [GoToArticlesIfLoggedIn],
     },
     {
       path: "/login",

@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { computed } from "vue";
 import ArticleItem from "../components/ArticleItem/ArticleItem.vue";
 import LoadingEllipsis from "@/components/Interaction/LoadingEllipsis.vue";
 import { useQuery } from "@vue/apollo-composable";
-import { userArticleType } from "../types";
 import { seenArticles, unseenArticles } from "../graphql";
 import { useRouter } from "vue-router";
 import TopBar from "@/components/TopBar/TopBar.vue";
@@ -11,10 +10,6 @@ import { useNavStore } from "../stores/navWidthStore";
 
 const navWidthStore = useNavStore();
 const router = useRouter();
-
-onMounted(() => {
-  navWidthStore.$patch({ wide: false });
-});
 
 const {
   result: resultSeen,
@@ -40,6 +35,28 @@ const navLearnHandler = (data: number) => {
 const navSummaryHandler = (data: number) => {
   router.push(`/articles/${data}/summary`);
 };
+
+// eslint-disable-next-line vue/return-in-computed-property
+const continueSentsArray = computed(() => {
+  if (resultSeen.value && resultSeen.value.listUserArticles) {
+    return resultSeen.value.listUserArticles.filter(
+      (art) => art.userFinishedIndex < art.articleSentCount
+    );
+  } else {
+    return [];
+  }
+});
+
+// eslint-disable-next-line vue/return-in-computed-property
+const finishedSentsArray = computed(() => {
+  if (resultSeen.value && resultSeen.value.listUserArticles) {
+    return resultSeen.value.listUserArticles.filter(
+      (art) => art.userFinishedIndex === art.articleSentCount
+    );
+  } else {
+    return [];
+  }
+});
 </script>
 
 <template>
@@ -53,24 +70,19 @@ const navSummaryHandler = (data: number) => {
     "
   >
     <div
-      v-if="
-        resultSeen &&
-        resultSeen.listUserArticles &&
-        resultSeen.listUserArticles.length > 0
-      "
+      v-if="continueSentsArray && continueSentsArray.length > 0"
+      class="articles-progress-section"
     >
       <h2>continue...</h2>
-      <div v-for="art in resultSeen.listUserArticles" :key="art.articleId">
-        <template v-if="art.userFinishedIndex < art.articleSentCount">
-          <ArticleItem
-            :id="art.articleId"
-            :title="art.articleTitle"
-            :description="art.articleDescription"
-            :progress="art.userFinishedIndex"
-            :goal="art.articleSentCount"
-            @go-to-article="navLearnHandler"
-          />
-        </template>
+      <div v-for="art in continueSentsArray" :key="art.articleId">
+        <ArticleItem
+          :id="art.articleId"
+          :title="art.articleTitle"
+          :description="art.articleDescription"
+          :progress="art.userFinishedIndex"
+          :goal="art.articleSentCount"
+          @go-to-article="navLearnHandler"
+        />
       </div>
     </div>
     <div
@@ -79,6 +91,7 @@ const navSummaryHandler = (data: number) => {
         resultUnseen.listUserUnseenArticles &&
         resultUnseen.listUserUnseenArticles.length > 0
       "
+      class="articles-progress-section"
     >
       <h2>new...</h2>
       <div
@@ -98,24 +111,19 @@ const navSummaryHandler = (data: number) => {
       </div>
     </div>
     <div
-      v-if="
-        resultSeen &&
-        resultSeen.listUserArticles &&
-        resultSeen.listUserArticles.length > 0
-      "
+      v-if="finishedSentsArray && finishedSentsArray.length > 0"
+      class="articles-progress-section"
     >
       <h2>finished...</h2>
-      <div v-for="art in resultSeen.listUserArticles" :key="art.articleId">
-        <template v-if="art.userFinishedIndex === art.articleSentCount">
-          <ArticleItem
-            :id="art.articleId"
-            :title="art.articleTitle"
-            :description="art.articleDescription"
-            :progress="art.userFinishedIndex"
-            :goal="art.articleSentCount"
-            @go-to-article="navSummaryHandler"
-          />
-        </template>
+      <div v-for="art in finishedSentsArray" :key="art.articleId">
+        <ArticleItem
+          :id="art.articleId"
+          :title="art.articleTitle"
+          :description="art.articleDescription"
+          :progress="art.userFinishedIndex"
+          :goal="art.articleSentCount"
+          @go-to-article="navSummaryHandler"
+        />
       </div>
     </div>
     <div v-if="loadingSeen || loadingUnseen" style="text-align: center">
@@ -137,5 +145,9 @@ const navSummaryHandler = (data: number) => {
   justify-content: flex-start;
   align-items: center;
   overflow-y: scroll;
+}
+
+.articles-progress-section {
+  margin-top: 20px;
 }
 </style>

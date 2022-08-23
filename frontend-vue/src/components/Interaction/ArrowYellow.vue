@@ -78,10 +78,9 @@ const emit = defineEmits<{ (e: "click-down-arrow") }>();
   border: none;
   background-color: transparent;
   cursor: pointer;
-
   position: fixed;
   top: calc(100vh - 100px);
-  left: calc(50vw + ($logo-width / 2) - 36px);
   z-index: 1;
+  left: calc(50vw - $logo-width/3);
 }
 </style>

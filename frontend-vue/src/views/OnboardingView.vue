@@ -23,7 +23,7 @@ const nextHandler = () => {
 </script>
 
 <template>
-  <top-bar state="waitlist" ahref="https://forms.gle/nvc46wgCnDTZty3d6" />
+  <top-bar state="waitlist" />
   <div
     class="onboarding-container"
     :class="
@@ -41,7 +41,7 @@ const nextHandler = () => {
 @import "@/assets/variables";
 
 .onboarding-container {
-  background: url("@/assets/earphones.jpg");
+  background: url("@/assets/onboarding-bg.jpg");
   background-size: cover;
   background-repeat: no-repeat;
   height: calc(100vh - $topbar-height);

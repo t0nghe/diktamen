@@ -1,6 +1,6 @@
 <script setup lang="ts">
-const props = defineProps<{ href: string }>();
 import { useRouter } from "vue-router";
+const props = defineProps<{ href: string }>();
 const router = useRouter();
 </script>
 
