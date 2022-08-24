@@ -142,6 +142,7 @@ const signupClickHandler = () => {
                     v-model="emailField"
                     @input="clearErrors"
                   />
+                  <p>optional</p>
                 </td>
               </tr>
             </tbody>
