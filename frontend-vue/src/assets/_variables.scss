@@ -24,3 +24,31 @@ $nav-sidebar-display-width-wide: 235px;
 // to accomodate the right < in logo.
 // $nav-sidebar-display-width-wide: 240px;
 $nav-sidebar-display-width-narrow: 58px;
+
+// for mobile
+$mobile-navbar-height: 54px;
+$mobile-topbar-height: 48px; // could change
+$mobile-logo-width: 154px;
+
+$mobile-max: 767px;
+$tablet-min: 768px;
+$tablet-max: 1023px;
+$desktop-min: 1024px;
+
+@mixin for-mobile {
+    @media (max-width: $tablet-max) {
+        @content;
+    }
+}
+
+// @mixin for-tablet {
+//     @media (min-width: $tablet-min) and (max-width: $tablet-max) {
+//         @content;
+//     }
+// }
+
+@mixin for-desktop {
+    @media (min-width: $desktop-min) {
+        @content
+    }
+}

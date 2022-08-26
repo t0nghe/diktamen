@@ -228,15 +228,27 @@ const submitSentHandler = (payload: {
 </template>
 
 <style lang="scss">
+@import "@/assets/variables";
+
 .view-container-learn {
   align-items: left !important;
   justify-content: left !important;
-  padding-bottom: 200px;
+  padding-bottom: 150px;
+  height: calc(100vh - $topbar-height - 100px) !important;
+
+  @include for-mobile {
+    padding-top: 20%;
+  }
 }
 
 .learn-view-section {
   width: 60%;
   justify-self: flex-start !important;
   margin-left: -25vw;
+
+  @include for-mobile {
+    width: 80%;
+    margin: 0 15% 0 5%;
+  }
 }
 </style>

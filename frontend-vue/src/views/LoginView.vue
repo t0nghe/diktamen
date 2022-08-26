@@ -66,30 +66,36 @@ const login = () => {
   >
     <div class="onboarding-content">
       <form class="auth-login-form">
-        <div>
-          <label for="login-username"
-            >username:
-            <input
-              type="text"
-              name="username"
-              id="login-username"
-              v-model="usernameField"
-              @input="clearErrors"
-            />
-          </label>
-        </div>
-        <div>
-          <label for="login-password"
-            >password:
-            <input
-              type="password"
-              name="password"
-              id="login-password"
-              v-model="passwordField"
-              @input="clearErrors"
-            />
-          </label>
-        </div>
+        <table>
+          <tbody>
+            <tr>
+              <th>
+                <label for="login-username">username:</label>
+              </th>
+              <td>
+                <input
+                  type="text"
+                  name="username"
+                  id="login-username"
+                  v-model="usernameField"
+                  @input="clearErrors"
+                />
+              </td>
+            </tr>
+            <tr>
+              <th><label for="login-password">password:</label></th>
+              <td>
+                <input
+                  type="password"
+                  name="password"
+                  id="login-password"
+                  v-model="passwordField"
+                  @input="clearErrors"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
         <div>
           <button @click.prevent="login">login</button>
         </div>
@@ -107,11 +113,25 @@ const login = () => {
 @import "../assets/variables";
 /* This will be used for the form in login view and sign up view */
 .auth-login-form {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 2rem;
+  margin-top: 10%;
+
+  th {
+    text-align: right;
+    vertical-align: top;
+    height: 2.8rem;
+  }
+  td {
+    text-align: left;
+    vertical-align: top;
+    height: 2.8rem;
+  }
 
   div {
     margin-top: 1rem;
@@ -127,12 +147,18 @@ const login = () => {
   input {
     background-color: $azure-secondary;
     font-size: 1.4rem;
-    height: 1.8rem;
+    height: 2.4rem;
     color: $blue-primary;
     line-height: 2.2rem;
     margin-left: 0.3rem;
     border: 1px solid $azure-primary;
     box-shadow: 2px 2px $blue-secondary;
+
+    @include for-mobile {
+      width: 15rem;
+      max-width: 50vw;
+      font-size: 1rem;
+    }
   }
 
   button {
@@ -149,7 +175,6 @@ const login = () => {
     text-decoration: none;
     color: $yellow-gold;
     font-size: 1.2rem;
-    /* font-weight: bold; */
   }
 }
 </style>

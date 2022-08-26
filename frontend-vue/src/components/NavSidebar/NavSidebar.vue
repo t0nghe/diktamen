@@ -42,7 +42,7 @@ const logout = () => {
       id="sidebar-display-area"
       :class="navWidthStore.isWide ? 'sidebar-wide' : 'sidebar-narrow'"
     >
-      <div>
+      <div class="learn-review-container">
         <div id="sidebar-nav-learn" @click="goToLearn">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -94,10 +94,10 @@ const logout = () => {
       id="sidebar-display-area"
       :class="navWidthStore.isWide ? 'sidebar-wide' : 'sidebar-narrow'"
     >
-      <div>
+      <div class="log-in-out-positioning-gap">
         <!-- This empty div is used to push log in button to the bottom. -->
       </div>
-      <div>
+      <div class="log-in-out-positioning-container">
         <div id="sidebar-button-signup" @click="goToSignup">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -108,7 +108,7 @@ const logout = () => {
               d="M490.3 40.4C512.2 62.27 512.2 97.73 490.3 119.6L460.3 149.7L362.3 51.72L392.4 21.66C414.3-.2135 449.7-.2135 471.6 21.66L490.3 40.4zM172.4 241.7L339.7 74.34L437.7 172.3L270.3 339.6C264.2 345.8 256.7 350.4 248.4 353.2L159.6 382.8C150.1 385.6 141.5 383.4 135 376.1C128.6 370.5 126.4 361 129.2 352.4L158.8 263.6C161.6 255.3 166.2 247.8 172.4 241.7V241.7zM192 63.1C209.7 63.1 224 78.33 224 95.1C224 113.7 209.7 127.1 192 127.1H96C78.33 127.1 64 142.3 64 159.1V416C64 433.7 78.33 448 96 448H352C369.7 448 384 433.7 384 416V319.1C384 302.3 398.3 287.1 416 287.1C433.7 287.1 448 302.3 448 319.1V416C448 469 405 512 352 512H96C42.98 512 0 469 0 416V159.1C0 106.1 42.98 63.1 96 63.1H192z"
             />
           </svg>
-          <span v-if="navWidthStore.isWide">sign up for<br />testing</span>
+          <span v-if="navWidthStore.isWide">sign up for testing</span>
         </div>
         <div id="sidebar-button-login" @click="goToLogin">
           <svg
@@ -128,7 +128,7 @@ const logout = () => {
 </template>
 
 <style lang="scss">
-@import "../../assets/variables";
+@import "@/assets/variables";
 
 .nav-sidebar-container {
   display: flex;
@@ -141,11 +141,24 @@ const logout = () => {
   top: $topbar-height;
   left: 0;
 
+  @include for-mobile {
+    width: 100%;
+    height: $mobile-navbar-height;
+    top: calc(100% - $mobile-navbar-height);
+    /* display: flex;
+    flex-direction: column; */
+    z-index: 10;
+  }
+
   #sidebar-control-area {
     width: $nav-sidebar-control-width;
     height: calc(100vh - $topbar-height);
     background-color: $blue-primary;
     cursor: pointer;
+
+    @include for-mobile {
+      display: none;
+    }
   }
 
   #sidebar-control-area:hover {
@@ -154,10 +167,18 @@ const logout = () => {
 
   #sidebar-display-area.sidebar-wide {
     width: $nav-sidebar-display-width-wide;
+
+    @include for-mobile {
+      width: 100vw;
+    }
   }
 
   #sidebar-display-area.sidebar-narrow {
     width: $nav-sidebar-display-width-narrow;
+
+    @include for-mobile {
+      width: 100vw;
+    }
   }
 
   #sidebar-display-area {
@@ -166,6 +187,13 @@ const logout = () => {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
+    @include for-mobile {
+      height: $mobile-navbar-height;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: space-between;
+    }
   }
 
   #sidebar-nav-learn,
@@ -179,6 +207,12 @@ const logout = () => {
     flex-direction: row;
     align-items: center;
 
+    @include for-mobile {
+      margin-top: 0px;
+      height: $mobile-navbar-height;
+      margin-left: 10px;
+    }
+
     span {
       margin-left: 30px;
       font-size: 1.5rem;
@@ -186,6 +220,10 @@ const logout = () => {
       height: 32px;
       line-height: 32px;
       font-weight: bold;
+
+      @include for-mobile {
+        margin: 5px;
+      }
     }
   }
 
@@ -195,13 +233,24 @@ const logout = () => {
     span {
       font-size: 1.4rem;
     }
+
+    @include for-mobile {
+      margin-bottom: 0px;
+      padding: 0px;
+      margin-right: 10px;
+    }
   }
 
   #sidebar-button-signup {
     padding-bottom: 30px;
 
     span {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
+    }
+
+    @include for-mobile {
+      padding: 0px;
+      margin-left: 10px;
     }
   }
 
@@ -209,7 +258,13 @@ const logout = () => {
     margin-bottom: 20px;
 
     span {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
+    }
+
+    @include for-mobile {
+      margin-bottom: 0px;
+      padding: 0px;
+      margin-right: 10px;
     }
   }
 
@@ -223,6 +278,34 @@ const logout = () => {
 
     path {
       fill: $azure-secondary;
+    }
+
+    @include for-mobile {
+      margin: 6px;
+      width: 40px;
+      height: 40px;
+    }
+  }
+
+  .log-in-out-positioning-gap {
+    @include for-mobile {
+      display: none;
+    }
+  }
+
+  .log-in-out-positioning-container {
+    @include for-mobile {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+
+  .learn-review-container {
+    @include for-mobile {
+      display: flex;
+      flex-direction: row;
     }
   }
 }

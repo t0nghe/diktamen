@@ -116,8 +116,12 @@ watch(sentsSorted, () => {
   >
     <score-circle v-if="score !== 0 && !isNaN(score)" :score="score" />
     <div class="view-content-wrapper">
-      <div v-for="sent in sentsSorted" :key="sent.indexInArticle">
-        <div v-if="sent.tryText">
+      <div
+        v-for="sent in sentsSorted"
+        :key="sent.indexInArticle"
+        class="summary-view-sentence"
+      >
+        <template v-if="sent.tryText">
           <sentence-tried
             :is-correct="true"
             :is-summary="true"
@@ -125,8 +129,8 @@ watch(sentsSorted, () => {
             :index-in-article="sent.indexInArticle"
             :try-text="sent.tryText"
           />
-        </div>
-        <div v-else>
+        </template>
+        <template v-else>
           <sentence-tried
             :is-correct="false"
             :is-summary="true"
@@ -134,7 +138,7 @@ watch(sentsSorted, () => {
             :index-in-article="sent.indexInArticle"
             :sent-words="sent.sentWords"
           />
-        </div>
+        </template>
       </div>
       <div class="bottom-text-button">
         <template v-if="loadingCorrect || loadingIncorrect">
@@ -147,10 +151,17 @@ watch(sentsSorted, () => {
 </template>
 
 <style lang="scss">
+@import "@/assets/variables";
+
 .view-content-wrapper {
   width: 60%;
   margin-left: -5vw;
   margin-right: 15vw;
+
+  @include for-mobile {
+    margin-top: 100px;
+    width: 80%;
+  }
 }
 
 .bottom-text-button {

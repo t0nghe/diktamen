@@ -175,10 +175,12 @@ const signupClickHandler = () => {
   th {
     text-align: right;
     vertical-align: top;
+    height: 2.8rem;
   }
   td {
     text-align: left;
     vertical-align: top;
+    height: 2.8rem;
   }
 
   label {
@@ -197,13 +199,17 @@ const signupClickHandler = () => {
   input {
     background-color: $azure-secondary;
     font-size: 1.4rem;
-    height: 1.8rem;
+    height: 2.4rem;
     width: 20rem;
     color: $blue-primary;
     line-height: 2.2rem;
     margin-left: 1rem;
     border: 1px solid $azure-primary;
     box-shadow: 2px 2px $blue-secondary;
+
+    @include for-mobile {
+      font-size: 1rem;
+    }
   }
 
   button {

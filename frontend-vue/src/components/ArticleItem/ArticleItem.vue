@@ -91,7 +91,7 @@ const clickHandler = () => {
 .article-item {
   /* display and size */
   max-width: 1130px;
-  width: 75vw;
+  width: 70vw;
   min-width: 500px;
   height: auto;
   display: flex;
@@ -99,6 +99,15 @@ const clickHandler = () => {
   align-content: space-between;
   margin-top: 20px;
   margin-bottom: 30px;
+
+  @include for-mobile {
+    width: 90vw;
+    min-width: 300px;
+    display: grid;
+    grid-auto-columns: auto 1fr;
+    grid-auto-rows: 1fr;
+    gap: 0px;
+  }
 
   /* color: changing depending on state of article */
   &.article-item-progress {
@@ -155,18 +164,28 @@ const clickHandler = () => {
     /* width: 990px; */
     width: calc(75vw - 180px);
     max-width: 950px;
-    min-width: 320px;
+    min-width: 300px;
     height: auto;
     padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: flex-begin;
     align-items: flex-begin;
+
+    @include for-mobile {
+      grid-column: 1;
+      grid-row: 1;
+      width: 97%;
+    }
   }
 
   &__title {
     font-size: 2rem;
     font-weight: bold;
+
+    @include for-mobile {
+      font-size: 1.5rem;
+    }
   }
 
   &__description {
@@ -179,6 +198,13 @@ const clickHandler = () => {
     width: 140px;
     height: 140px;
     padding: 10px;
+
+    @include for-mobile {
+      grid-column: 2;
+      grid-row: 1;
+      margin-right: 10px;
+      transform: scale(0.8, 0.8);
+    }
   }
 }
 </style>

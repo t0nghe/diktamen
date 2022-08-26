@@ -49,7 +49,7 @@ switch (props.state) {
   <div class="top-bar-wrapper" :class="className">
     <div class="top-bar-logo">
       <router-link to="/">
-        <img src="@/assets/logo-wide.svg" alt="logo" />
+        <img alt="logo" src="@/assets/logo.svg" class="top-bar-logo-image" />
       </router-link>
     </div>
     <template v-if="props.state === 'review'">
@@ -123,10 +123,19 @@ switch (props.state) {
   left: 0;
   z-index: 5;
 
+  @include for-mobile {
+    height: $mobile-topbar-height;
+  }
+
   .top-bar-heading {
     font-size: 1.5rem;
     font-weight: bold;
     margin-left: -10vw;
+
+    @include for-mobile {
+      font-size: 1.2rem;
+      font-weight: 500;
+    }
   }
 
   .top-bar-logo {
@@ -137,9 +146,14 @@ switch (props.state) {
     );
     height: 100%;
 
-    img {
+    .top-bar-logo-image {
       height: $topbar-height;
       width: $logo-width;
+
+      @include for-mobile {
+        height: $mobile-topbar-height;
+        width: $mobile-logo-width;
+      }
     }
   }
 }

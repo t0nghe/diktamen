@@ -65,13 +65,20 @@ onMounted(() => {
 @import "@/assets/variables";
 
 .onboarding-content {
-  padding: 30px 30px;
+  padding: 20px 20px;
   background-color: rgba($yellow-beige, 0.85);
   height: 60vh;
-  min-height: 480px;
+  min-height: 430px;
   width: 60vw;
   border: 2px solid $yellow-canary;
   box-shadow: 5px 5px $yellow-gold;
+
+  @include for-mobile {
+    width: 90vw;
+    height: 50vh;
+    padding: 10px;
+    background-color: rgba($yellow-beige, 0.75);
+  }
 
   .arrow-onboarding {
     button {
@@ -89,6 +96,13 @@ onMounted(() => {
   grid-auto-rows: auto 95px;
   gap: 20px;
 
+  @include for-mobile {
+    display: grid;
+    grid-auto-columns: 3fr 1fr;
+    grid-auto-rows: 2fr 1fr;
+    gap: 15px;
+  }
+
   .onboarding-screen1-left {
     grid-column: 1;
     grid-row: 1;
@@ -96,15 +110,30 @@ onMounted(() => {
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
+
+    @include for-mobile {
+      grid-column: 1;
+      grid-row: 1/3;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: space-between;
+    }
   }
 
   .onboarding-screen1-right {
     grid-column: 2;
     grid-row: 1;
-
     display: flex;
     justify-content: center;
     align-items: center;
+
+    @include for-mobile {
+      grid-column: 2;
+      grid-row: 1;
+      transform: scale(0.75, 0.75);
+    }
   }
 
   .onboarding-screen1-bottom {
@@ -114,6 +143,11 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     align-items: center;
+
+    @include for-mobile {
+      grid-column: 2;
+      grid-row: 2;
+    }
   }
 }
 </style>

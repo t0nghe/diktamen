@@ -1,32 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;700&display=swap');
 
-/* semantic color variables for this project */
 :root {
-  --color-background: var(--vt-c-white);
-  --color-background-soft: var(--vt-c-white-soft);
-  --color-background-mute: var(--vt-c-white-mute);
+  --white: #fcfafc;
+  --blue-primary: #004b87;
+  --blue-secondary: #1d77bf;
+  --red-primary: #ac071f;
+  --red-secondary: #bc384b;
+  --azure-primary: #dff1ff;
+  --azure-secondary: #e8f2fa;
 
-  --color-border: var(--vt-c-divider-light-2);
-  --color-border-hover: var(--vt-c-divider-light-1);
+  --yellow-beige: #f5eacf;
+  --yellow-canary: #fdd400;
+  --yellow-gold: #ffcd00;
+  --yellow-flax: #ffd117;
+  --yellow-cream: #ffe063;
+  --yellow-pale: #fff9e0;
 
-  --color-heading: var(--vt-c-text-light-1);
-  --color-text: #004b87;
+  --topbar-height: 78px;
+  --logo-width: 250px;
+  --nav-sidebar-control-width: 10px;
+  --nav-sidebar-display-width-wide: 235px;
+  --nav-sidebar-display-width-narrow: 58px;
 
-  --section-gap: 160px;
+  font-size: 14px;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
-/* 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: var(--vt-c-black);
-    --color-background-soft: var(--vt-c-black-soft);
-    --color-background-mute: var(--vt-c-black-mute);
-
-    --color-border: var(--vt-c-divider-dark-2);
-    --color-border-hover: var(--vt-c-divider-dark-1);
-
-    --color-heading: var(--vt-c-text-dark-1);
-    --color-text: var(--vt-c-text-dark-2);
-  }
-} */
 
 *,
 *::before,
@@ -39,13 +37,11 @@
 
 body {
   min-height: 100vh;
-  color: var(--color-text);
-  background: var(--color-background);
+  color: var(--blue-primary);
+  background: var(--white);
   transition: color 0.5s, background-color 0.5s;
   line-height: 1.6;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-    Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  font-size: 15px;
+
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

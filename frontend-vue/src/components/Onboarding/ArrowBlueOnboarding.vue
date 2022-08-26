@@ -66,3 +66,16 @@
     </svg>
   </button>
 </template>
+
+<style lang="scss">
+@import "@/assets/variables";
+
+button {
+  svg {
+    @include for-mobile {
+      width: 42px;
+      height: 50px;
+    }
+  }
+}
+</style>
