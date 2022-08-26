@@ -156,7 +156,7 @@ onMounted(() => {
 
 <template>
   <div class="div-review-sent">
-    <div>
+    <div class="play-pause-rev-container">
       <play-pause-rev
         :media-uri="props.mediaUri"
         :parent-play-pause="playPauseCounter"
@@ -236,6 +236,11 @@ onMounted(() => {
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
+
+  @include for-mobile {
+    margin: 10px 10px;
+    line-height: 2rem;
+  }
 }
 
 .learn-sent-word {
@@ -286,5 +291,17 @@ onMounted(() => {
   color: $yellow-gold;
   font-size: 1.5rem;
   font-weight: bold;
+}
+
+.play-pause-rev-container {
+  --min-dim: min(100vw, 100vh);
+
+  @media (min-width: 401px) and (max-width: 1023px) {
+    margin-top: calc(var(--min-dim) * -0.15);
+  }
+
+  @media (max-width: 400px) {
+    margin-top: calc(var(--min-dim) * -0.22);
+  }
 }
 </style>

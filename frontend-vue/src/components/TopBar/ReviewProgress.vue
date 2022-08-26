@@ -35,6 +35,11 @@ const pct = computed(() => {
   width: calc(100vw - $logo-width);
   height: $topbar-height;
 
+  @include for-mobile {
+    height: $mobile-topbar-height;
+    width: calc(100vw - $mobile-logo-width);
+  }
+
   background: linear-gradient(
     to right,
     $blue-secondary 0 v-bind(pct),
@@ -47,6 +52,11 @@ const pct = computed(() => {
     text-align: center;
     width: auto;
     margin-left: -8vw;
+
+    @include for-mobile {
+      font-size: 1.2rem;
+      font-weight: 500;
+    }
   }
 
   .review-progress-numbers {
@@ -54,6 +64,10 @@ const pct = computed(() => {
     font-weight: 200;
     text-align: right;
     padding-right: 10px;
+
+    @include for-mobile {
+      font-size: 1.2rem;
+    }
   }
 }
 </style>

@@ -135,6 +135,9 @@ switch (props.state) {
     @include for-mobile {
       font-size: 1.2rem;
       font-weight: 500;
+      text-align: right;
+      margin-right: 10px;
+      line-height: 1.4rem;
     }
   }
 
