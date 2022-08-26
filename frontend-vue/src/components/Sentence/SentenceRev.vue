@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed, onMounted } from "vue";
+import { ref, watch, computed, onMounted, inject } from "vue";
 import {
   sentWord,
   userTrySent,
@@ -15,6 +15,9 @@ const props = defineProps<{
   sentWords: sentWord[];
   finnsNext: boolean;
 }>();
+
+const $screen: { width: number } = inject("$screen");
+console.log($screen);
 
 const emit = defineEmits<{ (e: "submit-sent", payload: userTrySent): void }>();
 
@@ -144,7 +147,11 @@ const onDownHandler = (ev) => {
   focusNextInput(idxSent);
 };
 
-onMounted(() => trySubmitSent());
+onMounted(() => {
+  if ($screen.width > 400) {
+    trySubmitSent();
+  }
+});
 </script>
 
 <template>

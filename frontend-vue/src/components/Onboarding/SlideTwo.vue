@@ -107,10 +107,17 @@ const emit = defineEmits<{ (e: "next-screen") }>();
     justify-content: center;
     align-items: center;
 
-    @include for-mobile {
+    @media (min-width: 401px) and (max-width: 1023px) {
       position: absolute;
       top: calc(100% - 65px);
       left: calc(50% - 20px);
+      z-index: 3;
+    }
+
+    @media (max-width: 400px) {
+      position: absolute;
+      top: calc(100% - 75px);
+      left: calc(50% - 25px);
       z-index: 3;
     }
   }

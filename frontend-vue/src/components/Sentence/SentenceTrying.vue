@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed, onMounted } from "vue";
+import { ref, watch, computed, onMounted, inject } from "vue";
 import {
   sentWord,
   userTrySent,
@@ -13,6 +13,9 @@ const props = defineProps<{
   sentWords: sentWord[];
   parentArrowClick: number;
 }>();
+
+const $screen: { width: number } = inject("$screen");
+console.log($screen);
 
 const parentArrowClickRef = computed(() => props.parentArrowClick);
 // Can't watch a single prop from the parent. Need to use a computed ref here.
@@ -148,7 +151,11 @@ const onDownHandler = (ev) => {
   focusNextInput(idxSent);
 };
 
-onMounted(() => trySubmitSent());
+onMounted(() => {
+  if ($screen.width > 400) {
+    trySubmitSent();
+  }
+});
 </script>
 
 <template>

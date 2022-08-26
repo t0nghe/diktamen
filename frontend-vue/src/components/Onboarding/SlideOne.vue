@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, inject } from "vue";
 import PlayPauseRev from "@/components/Interaction/PlayPauseRev.vue";
 import SentenceTried from "@/components/Sentence/SentenceTried.vue";
 import SentenceTrying from "@/components/Sentence/SentenceTrying.vue";
@@ -11,10 +11,6 @@ const playPauseCounter = ref(0);
 const downArrowClicked = ref(0);
 
 const emit = defineEmits<{ (e: "next-screen") }>();
-
-onMounted(() => {
-  downArrowClicked.value++;
-});
 </script>
 
 <template>
@@ -27,6 +23,7 @@ onMounted(() => {
         :index-in-article="1"
         :try-text="sent2"
       />
+      <!-- {{ $screen.width }} -->
       <sentence-trying
         :sent-id="3"
         :index-in-article="2"
@@ -70,11 +67,17 @@ onMounted(() => {
   border: 2px solid $yellow-canary;
   box-shadow: 5px 5px $yellow-gold;
 
-  @include for-mobile {
+  @media (min-width: 401px) and (max-width: 1023px) {
     width: 85vw;
     height: 35vh;
     padding: 10px;
     background-color: rgba($yellow-beige, 0.75);
+  }
+
+  @media (max-width: 400px) {
+    width: 95vw;
+    height: 50%;
+    padding: 5px;
   }
 
   .arrow-onboarding {
@@ -106,10 +109,17 @@ onMounted(() => {
     justify-content: center;
     align-items: flex-start;
 
-    @include for-mobile {
+    @media (min-width: 401px) and (max-width: 1023px) {
       padding-top: 35px;
       padding-left: 5%;
       padding-right: 10%;
+      z-index: 3;
+    }
+
+    @media (max-width: 400px) {
+      padding-top: 25px;
+      padding-left: 3%;
+      padding-right: 5%;
       z-index: 3;
     }
   }
@@ -149,10 +159,17 @@ onMounted(() => {
     justify-content: center;
     align-items: center;
 
-    @include for-mobile {
+    @media (min-width: 401px) and (max-width: 1023px) {
       position: absolute;
       top: calc(100% - 65px);
       left: calc(50% - 20px);
+      z-index: 3;
+    }
+
+    @media (max-width: 400px) {
+      position: absolute;
+      top: calc(100% - 75px);
+      left: calc(50% - 25px);
       z-index: 3;
     }
   }

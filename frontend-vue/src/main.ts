@@ -55,6 +55,7 @@ const app = createApp({
   render: () => h(App),
 });
 
+app.provide("$screen", window.screen);
 app.use(createPinia());
 app.use(router);
 
