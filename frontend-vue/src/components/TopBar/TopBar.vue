@@ -109,10 +109,6 @@ switch (props.state) {
     transparent $logo-width 100%
   );
   color: $yellow-cream;
-
-  /* @include for-mobile {
-    display: none;
-  } */
 }
 
 .top-bar-wrapper {
@@ -136,6 +132,7 @@ switch (props.state) {
     font-weight: bold;
     margin-left: -10vw;
     width: calc(100% - $logo-width);
+    text-align: center;
 
     @include for-mobile {
       width: calc(100% - $mobile-logo-width);
