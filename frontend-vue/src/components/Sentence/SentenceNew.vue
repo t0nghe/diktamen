@@ -43,6 +43,10 @@ const props = defineProps<{
   display: flex;
   flex-direction: row;
 
+  @include for-mobile {
+    font-size: 1rem;
+  }
+
   .learn-sent-index-new {
     font-size: 1rem;
     padding: 0.1rem 0.3rem;

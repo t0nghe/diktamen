@@ -142,6 +142,10 @@ const login = () => {
     font-weight: 200;
     font-size: 1.5rem;
     line-height: 2.2rem;
+
+    @include for-mobile {
+      font-size: 1.2rem;
+    }
   }
 
   input {
@@ -155,7 +159,7 @@ const login = () => {
     box-shadow: 2px 2px $blue-secondary;
 
     @include for-mobile {
-      width: 15rem;
+      width: 12rem;
       max-width: 50vw;
       font-size: 1rem;
     }

@@ -187,6 +187,10 @@ const signupClickHandler = () => {
     font-weight: 200;
     font-size: 1.5rem;
     line-height: 2.2rem;
+
+    @include for-mobile {
+      font-size: 1.2rem;
+    }
   }
 
   p {
@@ -209,6 +213,7 @@ const signupClickHandler = () => {
 
     @include for-mobile {
       font-size: 1rem;
+      width: 12rem;
     }
   }
 

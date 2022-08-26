@@ -9,29 +9,22 @@ const emit = defineEmits<{ (e: "next-screen") }>();
   <div class="onboarding-content onboarding-screen2">
     <div class="onboarding-screen2-left">
       <sentence-tried
-        :sent-id="1"
-        :index-in-article="1"
-        :is-summary="true"
-        :is-correct="true"
-        :try-text="sent1"
-      />
-      <sentence-tried
         :sent-id="2"
-        :index-in-article="2"
+        :index-in-article="1"
         :is-summary="true"
         :is-correct="false"
         :sent-words="sent2words"
       />
       <sentence-tried
         :sent-id="3"
-        :index-in-article="3"
+        :index-in-article="2"
         :is-summary="true"
         :is-correct="false"
         :sent-words="sent3words"
       />
       <sentence-tried
         :sent-id="4"
-        :index-in-article="4"
+        :index-in-article="3"
         :is-summary="true"
         :is-correct="true"
         :try-text="sent4text"
@@ -56,10 +49,8 @@ const emit = defineEmits<{ (e: "next-screen") }>();
   gap: 10px;
 
   @include for-mobile {
-    display: grid;
-    grid-auto-columns: 3fr 1fr;
-    grid-auto-rows: 2fr 1fr;
-    gap: 10px;
+    display: flex;
+    position: relative;
   }
 
   .onboarding-screen2-left {
@@ -71,13 +62,10 @@ const emit = defineEmits<{ (e: "next-screen") }>();
     padding: 20px;
 
     @include for-mobile {
-      grid-column: 1;
-      grid-row: 1/3;
-
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: space-between;
+      padding-top: 35%;
+      padding-left: 5%;
+      padding-right: 10%;
+      z-index: 3;
     }
   }
 
@@ -90,9 +78,10 @@ const emit = defineEmits<{ (e: "next-screen") }>();
     align-items: flex-start;
 
     @include for-mobile {
-      grid-column: 2;
-      grid-row: 1;
-      transform: scale(0.75, 0.75);
+      position: absolute;
+      top: 5%;
+      left: calc(50% - 40px);
+      z-index: 2;
     }
 
     .onboarding-score-circle {
@@ -119,8 +108,10 @@ const emit = defineEmits<{ (e: "next-screen") }>();
     align-items: center;
 
     @include for-mobile {
-      grid-column: 2;
-      grid-row: 2;
+      position: absolute;
+      top: calc(100% - 65px);
+      left: calc(50% - 20px);
+      z-index: 3;
     }
   }
 }

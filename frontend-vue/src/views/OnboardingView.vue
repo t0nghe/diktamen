@@ -57,6 +57,7 @@ const nextHandler = () => {
     position: fixed;
     top: $mobile-topbar-height;
     height: calc(100% - $mobile-topbar-height - $mobile-navbar-height);
+    overflow-y: scroll;
   }
 }
 
@@ -65,9 +66,11 @@ const nextHandler = () => {
   color: $blue-primary;
   margin: 10px 0px;
   text-shadow: 2px 2px 2px $azure-secondary, -2px -2px 3px $azure-secondary;
-  background-color: rgba($azure-secondary, 0.4);
-  border-radius: 5px;
   padding: 5px 30px;
+
+  @include for-mobile {
+    font-size: 1.2rem;
+  }
 }
 
 .container-position-wide-side {

@@ -57,9 +57,16 @@ const toggle = () => {
 </template>
 
 <style lang="scss">
+@import "@/assets/variables";
+
 .rev-audio {
   width: v-bind(dimCss);
   height: v-bind(dimCss);
+  cursor: pointer;
+
+  @include for-mobile {
+    transform: scale(0.8, 0.8);
+  }
 }
 
 .rev-audio-bg-pause {

@@ -5,7 +5,7 @@ import SentenceTried from "@/components/Sentence/SentenceTried.vue";
 import SentenceTrying from "@/components/Sentence/SentenceTrying.vue";
 import SentenceNew from "@/components/Sentence/SentenceNew.vue";
 import ArrowOnboarding from "./ArrowBlueOnboarding.vue";
-import { sent1, sent2, sent3words, sent3audio, sent4words } from "./data.ts";
+import { sent2, sent3words, sent3audio, sent4words } from "./data.ts";
 
 const playPauseCounter = ref(0);
 const downArrowClicked = ref(0);
@@ -23,20 +23,13 @@ onMounted(() => {
       <sentence-tried
         :is-correct="true"
         :is-summary="false"
-        :sent-id="1"
-        :index-in-article="1"
-        :try-text="sent1"
-      />
-      <sentence-tried
-        :is-correct="true"
-        :is-summary="false"
         :sent-id="2"
-        :index-in-article="2"
+        :index-in-article="1"
         :try-text="sent2"
       />
       <sentence-trying
         :sent-id="3"
-        :index-in-article="3"
+        :index-in-article="2"
         :sent-words="sent3words"
         :parent-arrow-click="downArrowClicked"
         @play-sound="playPauseCounter++"
@@ -44,10 +37,14 @@ onMounted(() => {
       />
       <sentence-new
         :sent-id="4"
-        :index-in-article="4"
+        :index-in-article="3"
         :sent-words="sent4words"
       />
     </div>
+    <div
+      class="onboarding-screen1-right-overlay"
+      @click="playPauseCounter++"
+    ></div>
     <div class="onboarding-screen1-right">
       <play-pause-rev
         :media-uri="sent3audio"
@@ -74,8 +71,8 @@ onMounted(() => {
   box-shadow: 5px 5px $yellow-gold;
 
   @include for-mobile {
-    width: 90vw;
-    height: 50vh;
+    width: 85vw;
+    height: 35vh;
     padding: 10px;
     background-color: rgba($yellow-beige, 0.75);
   }
@@ -97,28 +94,35 @@ onMounted(() => {
   gap: 20px;
 
   @include for-mobile {
-    display: grid;
-    grid-auto-columns: 3fr 1fr;
-    grid-auto-rows: 2fr 1fr;
-    gap: 15px;
+    display: flex;
+    position: relative;
   }
 
   .onboarding-screen1-left {
     grid-column: 1;
-    grid-row: 1;
+    grid-row: 1/3;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
 
     @include for-mobile {
-      grid-column: 1;
-      grid-row: 1/3;
+      padding-top: 35px;
+      padding-left: 5%;
+      padding-right: 10%;
+      z-index: 3;
+    }
+  }
 
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: space-between;
+  .onboarding-screen1-right-overlay {
+    @include for-mobile {
+      cursor: pointer;
+      position: absolute;
+      top: 0%;
+      left: calc(50% - 20px);
+      z-index: 4;
+      width: 160px;
+      height: 160px;
     }
   }
 
@@ -130,9 +134,10 @@ onMounted(() => {
     align-items: center;
 
     @include for-mobile {
-      grid-column: 2;
-      grid-row: 1;
-      transform: scale(0.75, 0.75);
+      position: absolute;
+      top: 0%;
+      left: calc(50% - 20px);
+      z-index: 2;
     }
   }
 
@@ -145,8 +150,10 @@ onMounted(() => {
     align-items: center;
 
     @include for-mobile {
-      grid-column: 2;
-      grid-row: 2;
+      position: absolute;
+      top: calc(100% - 65px);
+      left: calc(50% - 20px);
+      z-index: 3;
     }
   }
 }
