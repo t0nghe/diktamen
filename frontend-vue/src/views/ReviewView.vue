@@ -220,7 +220,7 @@ const constructNew = (tryTextArray, activeSentence) => {
 
   position: fixed;
   top: $topbar-height;
-  height: calc(100vh - $topbar-height);
+  height: calc(100% - $topbar-height);
 }
 
 .congrats-star {

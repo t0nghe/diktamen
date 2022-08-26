@@ -64,7 +64,10 @@ const nextHandler = () => {
   font-size: 1.5rem;
   color: $blue-primary;
   margin: 10px 0px;
-  text-shadow: 2px 2px 4px $azure-secondary, -2px -2px 4px $azure-secondary;
+  text-shadow: 2px 2px 2px $azure-secondary, -2px -2px 3px $azure-secondary;
+  background-color: rgba($azure-secondary, 0.4);
+  border-radius: 5px;
+  padding: 5px 30px;
 }
 
 .container-position-wide-side {

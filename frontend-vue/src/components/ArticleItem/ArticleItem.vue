@@ -101,7 +101,7 @@ const clickHandler = () => {
   margin-bottom: 30px;
 
   @include for-mobile {
-    width: 90vw;
+    width: 85vw;
     min-width: 300px;
     display: grid;
     grid-auto-columns: auto 1fr;
@@ -173,9 +173,10 @@ const clickHandler = () => {
     align-items: flex-begin;
 
     @include for-mobile {
+      width: calc(80vw - 80px);
+      min-width: 150px;
       grid-column: 1;
       grid-row: 1;
-      width: 97%;
     }
   }
 
@@ -184,7 +185,7 @@ const clickHandler = () => {
     font-weight: bold;
 
     @include for-mobile {
-      font-size: 1.5rem;
+      font-size: 1.2rem;
     }
   }
 
@@ -192,6 +193,11 @@ const clickHandler = () => {
     font-size: 1.2rem;
     line-height: 1.5rem;
     padding-top: 10px;
+
+    @include for-mobile {
+      font-size: 1rem;
+      line-height: 1.3rem;
+    }
   }
 
   &__progress {
@@ -200,10 +206,11 @@ const clickHandler = () => {
     padding: 10px;
 
     @include for-mobile {
+      width: 80px;
+      height: 80px;
       grid-column: 2;
       grid-row: 1;
-      margin-right: 10px;
-      transform: scale(0.8, 0.8);
+      transform: scale(0.6, 0.6);
     }
   }
 }

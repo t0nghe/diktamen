@@ -223,6 +223,7 @@ const logout = () => {
 
       @include for-mobile {
         margin: 5px;
+        font-size: 1.2rem;
       }
     }
   }
@@ -232,6 +233,10 @@ const logout = () => {
 
     span {
       font-size: 1.4rem;
+
+      @include for-mobile {
+        font-size: 1.2rem;
+      }
     }
 
     @include for-mobile {
@@ -278,12 +283,6 @@ const logout = () => {
 
     path {
       fill: $azure-secondary;
-    }
-
-    @include for-mobile {
-      margin: 6px;
-      width: 40px;
-      height: 40px;
     }
   }
 

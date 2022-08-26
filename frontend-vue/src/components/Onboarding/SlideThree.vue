@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import SentenceRev from "@/components/Sentence/SentenceRev.vue";
 import { sent3words, sent3audio } from "./data.ts";
 
-const showCtaRef = ref(false);
-
-const showCta = () => {
-  showCtaRef.value = true;
-};
+const handler = () => {
+  return true
+}
 </script>
 
 <template>
@@ -17,14 +14,12 @@ const showCta = () => {
       :media-uri="sent3audio"
       :sent-words="sent3words"
       :finns-next="false"
-      @submit-sent="showCta"
+      @submit-sent="handler"
     />
   </div>
-  <template v-if="showCtaRef">
-    <div class="slide-desc">
-      <router-link to="/test-signup">sign up</router-link> to try it out
-    </div>
-  </template>
+  <div class="slide-desc">
+    <router-link to="/test-signup">sign up</router-link> to try it out
+  </div>
 </template>
 
 <style lang="scss">
