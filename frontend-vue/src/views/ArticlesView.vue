@@ -145,6 +145,12 @@ const finishedSentsArray = computed(() => {
   justify-content: flex-start;
   align-items: center;
   overflow-y: scroll;
+
+  @include for-mobile {
+    padding: 20px;
+    height: calc(100% - $mobile-topbar-height - $mobile-navbar-height);
+    top: $mobile-topbar-height;
+  }
 }
 
 .articles-progress-section {

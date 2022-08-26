@@ -153,15 +153,9 @@ onMounted(() => trySubmitSent());
       <play-pause-rev
         :media-uri="props.mediaUri"
         :parent-play-pause="playPauseCounter"
-        :dimension="150"
+        :dimension="140"
       />
     </div>
-    <!-- <div>
-      {{ props.mediaUri }}
-      {{ props.sentWords.length }}
-      props.sentId: {{ props.sentId }}
-      {{ props.finnsNext }}
-    </div> -->
     <template v-if="props.sentWords && props.sentWords.length > 0">
       <div class="rev-sentence-input">
         <span
@@ -220,7 +214,7 @@ onMounted(() => trySubmitSent());
   align-items: center;
   justify-content: center;
   padding: 10px;
-  max-width: 700px;
+  max-width: 600px;
 }
 
 .rev-sentence-input {
@@ -228,7 +222,7 @@ onMounted(() => trySubmitSent());
   color: $blue-primary;
   text-align: center;
   line-height: 2.2rem;
-  margin: 80px 20px;
+  margin: 60px 20px;
 
   display: flex;
   flex-direction: row;
@@ -279,7 +273,7 @@ onMounted(() => trySubmitSent());
   height: 3rem;
   margin-left: 2rem;
   margin-right: 2rem;
-  margin-top: 0.5rem;
+  margin-top: 0rem;
   margin-bottom: 0.5rem;
   text-decoration: none;
   color: $yellow-gold;

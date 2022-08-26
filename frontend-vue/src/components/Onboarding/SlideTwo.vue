@@ -51,9 +51,16 @@ const emit = defineEmits<{ (e: "next-screen") }>();
 /* onboarding-content and arrow-onboarding are defined in `slideone` */
 .onboarding-screen2 {
   display: grid;
-  grid-auto-columns: auto 250px;
-  grid-auto-rows: auto 95px;
+  grid-auto-columns: auto 220px;
+  grid-auto-rows: auto 85px;
   gap: 10px;
+
+  @include for-mobile {
+    display: grid;
+    grid-auto-columns: 3fr 1fr;
+    grid-auto-rows: 2fr 1fr;
+    gap: 10px;
+  }
 
   .onboarding-screen2-left {
     grid-column: 1;
@@ -61,7 +68,17 @@ const emit = defineEmits<{ (e: "next-screen") }>();
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    padding: 30px;
+    padding: 20px;
+
+    @include for-mobile {
+      grid-column: 1;
+      grid-row: 1/3;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: space-between;
+    }
   }
 
   .onboarding-screen2-right {
@@ -72,9 +89,15 @@ const emit = defineEmits<{ (e: "next-screen") }>();
     justify-content: center;
     align-items: flex-start;
 
+    @include for-mobile {
+      grid-column: 2;
+      grid-row: 1;
+      transform: scale(0.75, 0.75);
+    }
+
     .onboarding-score-circle {
-      width: 220px;
-      height: 220px;
+      width: 200px;
+      height: 200px;
       border: 14px solid $blue-secondary;
       border-radius: 50%;
       display: flex;
@@ -94,6 +117,11 @@ const emit = defineEmits<{ (e: "next-screen") }>();
     display: flex;
     justify-content: center;
     align-items: center;
+
+    @include for-mobile {
+      grid-column: 2;
+      grid-row: 2;
+    }
   }
 }
 </style>

@@ -52,13 +52,19 @@ const nextHandler = () => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  @include for-mobile {
+    position: fixed;
+    top: $mobile-topbar-height;
+    height: calc(100% - $mobile-topbar-height - $mobile-navbar-height);
+  }
 }
 
 .slide-desc {
   font-size: 1.5rem;
   color: $blue-primary;
-  font-weight: 200;
   margin: 10px 0px;
+  text-shadow: 2px 2px 4px $azure-secondary, -2px -2px 4px $azure-secondary;
 }
 
 .container-position-wide-side {
@@ -66,6 +72,11 @@ const nextHandler = () => {
     100vw - $nav-sidebar-display-width-wide - $nav-sidebar-control-width
   );
   left: $nav-sidebar-display-width-wide + $nav-sidebar-control-width;
+
+  @include for-mobile {
+    width: 100vw;
+    left: 0px;
+  }
 }
 
 .container-position-narrow-side {
@@ -73,5 +84,10 @@ const nextHandler = () => {
     100vw - $nav-sidebar-display-width-narrow - $nav-sidebar-control-width
   );
   left: $nav-sidebar-display-width-narrow + $nav-sidebar-control-width;
+
+  @include for-mobile {
+    width: 100vw;
+    left: 0px;
+  }
 }
 </style>

@@ -174,13 +174,9 @@ const constructNew = (tryTextArray, activeSentence) => {
       <template
         v-if="wrongSentsArray && wrongSentsArray.length > 0 && showSummary"
       >
+        <p>You've made some mistakes.</p>
         <div class="rev-list-of-errors">
-          <p>Here are some mistakes:</p>
-          <div
-            v-for="(item, index) in wrongSentsArray"
-            :key="item.sentId"
-            class="rev-list-of-errors"
-          >
+          <div v-for="(item, index) in wrongSentsArray" :key="item.sentId">
             <sentence-tried
               :is-correct="false"
               :is-summary="false"
@@ -244,5 +240,6 @@ p {
 
 .rev-list-of-errors {
   max-width: 500px;
+  overflow-y: scroll;
 }
 </style>

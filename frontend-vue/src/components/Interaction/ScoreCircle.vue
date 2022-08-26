@@ -31,5 +31,14 @@ const props = defineProps<{ score: number }>();
   font-size: 20rem;
   color: $blue-secondary;
   font-weight: bold;
+
+  @include for-mobile {
+    width: 45vw;
+    height: 45vw;
+    top: 5vw;
+    left: 50vw;
+    border: 3vw solid $blue-secondary;
+    font-size: 18vw;
+  }
 }
 </style>

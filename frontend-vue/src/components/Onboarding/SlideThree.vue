@@ -2,7 +2,6 @@
 import { ref } from "vue";
 import SentenceRev from "@/components/Sentence/SentenceRev.vue";
 import { sent3words, sent3audio } from "./data.ts";
-import TextNavButton from "@/components/Interaction/TextNavButton.vue";
 
 const showCtaRef = ref(false);
 
@@ -22,7 +21,9 @@ const showCta = () => {
     />
   </div>
   <template v-if="showCtaRef">
-    <text-nav-button href="/test-signup">sign up to try it out</text-nav-button>
+    <div class="slide-desc">
+      <router-link to="/test-signup">sign up</router-link> to try it out
+    </div>
   </template>
 </template>
 

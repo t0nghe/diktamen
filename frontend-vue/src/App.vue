@@ -5,9 +5,7 @@ import NavSidebar from "./components/NavSidebar/NavSidebar.vue";
 
 <template>
   <nav-sidebar :wide="true" />
-  <div class="main">
-    <router-view />
-  </div>
+  <router-view />
 </template>
 
 <script lang="ts">
@@ -19,14 +17,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss">
-@import "@/assets/variables";
-
-.main {
-  top: $topbar-height;
-  left: $logo-width;
-  width: calc(100vw - $logo-width);
-  margin: 20px;
-}
-</style>

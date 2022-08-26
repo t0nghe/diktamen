@@ -56,6 +56,8 @@ const toggle = () => {
 </template>
 
 <style lang="scss">
+@import "@/assets/variables";
+
 .audio-play-pause {
   --max-dimension: max(100vw, 100vh);
   width: calc(var(--max-dimension) * 0.35);
@@ -65,6 +67,15 @@ const toggle = () => {
   position: fixed;
   background: transparent;
   z-index: 2;
+
+  @include for-mobile {
+    position: fixed;
+    width: 100vw;
+    height: 35vw;
+    top: 0px;
+    left: 0px;
+    z-index: 2;
+  }
 }
 
 .audio-play-pause__bg {
@@ -84,6 +95,21 @@ const toggle = () => {
       calc(var(--max-dimension) * -0.18),
       calc(var(--max-dimension) * -0.14)
     );
+
+    @include for-mobile {
+      width: 45vw;
+      height: 45vw;
+      transform: translate(50vw, 0);
+    }
+  }
+
+  @include for-mobile {
+    position: fixed;
+    width: 35vw;
+    height: 35vw;
+    top: 0px;
+    left: 0px;
+    z-index: -2;
   }
 }
 </style>

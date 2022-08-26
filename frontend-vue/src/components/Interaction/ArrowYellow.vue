@@ -82,5 +82,16 @@ const emit = defineEmits<{ (e: "click-down-arrow") }>();
   top: calc(100vh - 100px);
   z-index: 1;
   left: calc(50vw - $logo-width/3);
+
+  svg {
+    @include for-mobile {
+      width: 42px;
+      height: 50px;
+    }
+  }
+
+  @include for-mobile {
+    top: calc(95% - 90px);
+  }
 }
 </style>
