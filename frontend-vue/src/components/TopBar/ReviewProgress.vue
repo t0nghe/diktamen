@@ -54,7 +54,10 @@ const pct = computed(() => {
     margin-left: -8vw;
 
     @include for-mobile {
-      display: none;
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: right;
+      line-height: 1.4rem;
     }
   }
 
