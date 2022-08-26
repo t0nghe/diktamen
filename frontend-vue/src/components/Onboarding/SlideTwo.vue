@@ -62,7 +62,7 @@ const emit = defineEmits<{ (e: "next-screen") }>();
     padding: 20px;
 
     @include for-mobile {
-      padding-top: 35%;
+      padding-top: calc((35% + 45px) / 2);
       padding-left: 5%;
       padding-right: 10%;
       z-index: 3;
