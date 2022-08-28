@@ -87,6 +87,18 @@ const navWidthStore = useNavStore();
   position: fixed;
   top: calc(100vh - 100px);
   z-index: 1;
+
+  @include for-mobile {
+    top: calc(95% - 100px);
+    left: calc(50vw - 15px) !important;
+  }
+
+  svg {
+    @include for-mobile {
+      width: 42px;
+      height: 50px;
+    }
+  }
 }
 
 .rev-arrow-narrow-side {
