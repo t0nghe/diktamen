@@ -25,8 +25,8 @@ const login = () => {
     errorMessages.value.push("username needs to contain at lease 4 characters");
     return null;
   }
-  if (passwordField.value.length < 6) {
-    errorMessages.value.push("password needs to contain at lease 6 characters");
+  if (passwordField.value.length < 4) {
+    errorMessages.value.push("password needs to contain at lease 4 characters");
     return null;
   }
 

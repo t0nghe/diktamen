@@ -21,7 +21,7 @@ const clearErrors = () => {
 };
 
 const reLetter = /[A-Za-z]/;
-const reDigit = /[0-9]/;
+// const reDigit = /[0-9]/;
 
 const signupClickHandler = () => {
   const conditionsNotMet = [];
@@ -37,9 +37,6 @@ const signupClickHandler = () => {
 
   if (!reLetter.test(passwordField.value)) {
     conditionsNotMet.push("password needs to include at least 1 letter");
-  }
-  if (!reDigit.test(passwordField.value)) {
-    conditionsNotMet.push("password needs to include at least 1 digit");
   }
   if (passwordField.value !== passwordConfirmField.value) {
     conditionsNotMet.push("passwords do not match");
