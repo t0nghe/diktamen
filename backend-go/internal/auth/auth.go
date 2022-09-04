@@ -13,18 +13,18 @@ import (
 
 // validatePasswordNaive checks if the password contains at least chars, in which there are at least 1 letter, 1 digit and 1 symbol.
 func validatePasswordNaive(password string) bool {
-	re_letter := regexp.MustCompile(`[A-Za-z]`)
-	re_digit := regexp.MustCompile(`[0-9]`)
+	// re_letter := regexp.MustCompile(`[A-Za-z]`)
+	// re_digit := regexp.MustCompile(`[0-9]`)
 
 	if len(password) < 4 {
 		return false
 	}
-	if len(re_letter.FindStringSubmatchIndex(password)) == 0 {
-		return false
-	}
-	if len(re_digit.FindStringSubmatchIndex(password)) == 0 {
-		return false
-	}
+	// if len(re_letter.FindStringSubmatchIndex(password)) == 0 {
+	// 	return false
+	// }
+	// if len(re_digit.FindStringSubmatchIndex(password)) == 0 {
+	// 	return false
+	// }
 	return true
 }
 
@@ -41,7 +41,8 @@ func CreateUser(username string, email string, password string) error {
 		return fmt.Errorf("username needs to start with a letter and contain four characters (letter, number, _)")
 	}
 	if !validatePasswordNaive(password) {
-		return fmt.Errorf("password needs to contain six chars, including at least 1 letter, 1 digit and 1 symbol")
+		// return fmt.Errorf("password needs to contain six chars, including at least 1 letter, 1 digit and 1 symbol")
+		return fmt.Errorf("password needs to contain at least 4 chars")
 	}
 
 	stmt, err := dbconn.Db.Prepare("INSERT INTO user (username, email, passwordHash) VALUES (?, ?, ?);")

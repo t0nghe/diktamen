@@ -25,8 +25,8 @@ const login = () => {
     errorMessages.value.push("username needs to contain at lease 4 characters");
     return null;
   }
-  if (passwordField.value.length < 6) {
-    errorMessages.value.push("password needs to contain at lease 6 characters");
+  if (passwordField.value.length < 4) {
+    errorMessages.value.push("password needs to contain at lease 4 characters");
     return null;
   }
 
@@ -92,6 +92,7 @@ const login = () => {
                   v-model="passwordField"
                   @input="clearErrors"
                 />
+                <p>use <code>demo</code> for username and password for a demo</p>
               </td>
             </tr>
           </tbody>
@@ -131,6 +132,13 @@ const login = () => {
     text-align: left;
     vertical-align: top;
     height: 2.8rem;
+  }
+
+  p {
+    font-weight: 300;
+    font-size: 1rem;
+    margin-left: 1rem;
+    line-height: 1.5rem;
   }
 
   div {

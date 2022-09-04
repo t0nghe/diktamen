@@ -40,6 +40,7 @@
     "prettier": "^2.7.1",
     "sass": "^1.54.3",
     "sass-loader": "^13.0.2",
+    "scss-tokenizer": "^0.4.3",
     "typescript": "^4.6.4",
     "vite": "^3.0.0",
     "vitest": "^0.20.3",
