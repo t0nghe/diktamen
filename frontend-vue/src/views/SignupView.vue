@@ -124,8 +124,7 @@ const signupClickHandler = () => {
                     @input="clearErrors"
                   />
                   <p>
-                    at least 4 characters, containing<br />at least 1 letter and
-                    1 digit
+                    at least 4 characters
                   </p>
                 </td>
               </tr>
