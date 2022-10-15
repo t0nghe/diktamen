@@ -11,7 +11,7 @@ func QueryUserUnseenSents(userId int, articleId int) ([]*model.UnseenSent, error
 	var result []*model.UnseenSent
 
 	// Find out sentence index the user has reached in an article.
-	stmt1, err := dbconn.Db.Prepare("SELECT finished_sent_index FROM user_article WHERE user_id=? AND article_id=?;")
+	stmt1, err := dbconn.Db.Prepare("SELECT finished_sent_index FROM user_article WHERE user_id=$1 AND article_id=$2;")
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func QueryUserUnseenSents(userId int, articleId int) ([]*model.UnseenSent, error
 	}
 
 	// Get relevant fields in unseen sentences, namely sentences with index > finished index.
-	stmt2, err := dbconn.Db.Prepare("SELECT id, index_in_article, media_uri FROM sent WHERE article_id=? AND index_in_article>?;")
+	stmt2, err := dbconn.Db.Prepare("SELECT id, index_in_article, media_uri FROM sent WHERE article_id=$1 AND index_in_article>$2;")
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func QueryUserUnseenSents(userId int, articleId int) ([]*model.UnseenSent, error
 func GetUnseenSentWords(sentId int) (*[]*model.UnseenSentWord, error) {
 	var result []*model.UnseenSentWord
 
-	stmt, err := dbconn.Db.Prepare("SELECT length, is_cloze, wordform, index_in_sent FROM sent_word WHERE sent_id=?;")
+	stmt, err := dbconn.Db.Prepare("SELECT length, is_cloze, wordform, index_in_sent FROM sent_word WHERE sent_id=$1;")
 	if err != nil {
 		return nil, err
 	}

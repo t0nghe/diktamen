@@ -9,7 +9,7 @@ import (
 func QueryDueSents(userId int, daysAhead int) ([]*model.DueSent, error) {
 	dueTime := time.Now().Add(time.Duration(daysAhead*24) * time.Hour)
 
-	stmtDue, err := dbconn.Db.Prepare(`SELECT s.id, s.media_uri FROM (SELECT sent_id FROM (SELECT sent_id AS sid, MAX(try_count) AS mtc FROM user_dictation WHERE user_id=? GROUP BY sent_id) gauche LEFT JOIN user_dictation droid ON gauche.sid=droid.sent_id WHERE gauche.mtc=droid.try_count AND user_id=? AND next_try_time < ?) due JOIN sent s ON due.sent_id=s.id;`)
+	stmtDue, err := dbconn.Db.Prepare(`SELECT s.id, s.media_uri FROM (SELECT sent_id FROM (SELECT sent_id AS sid, MAX(try_count) AS mtc FROM user_dictation WHERE user_id=$1 GROUP BY sent_id) gauche LEFT JOIN user_dictation droid ON gauche.sid=droid.sent_id WHERE gauche.mtc=droid.try_count AND user_id=$2 AND next_try_time < $3) due JOIN sent s ON due.sent_id=s.id;`)
 	if err != nil {
 		return nil, err
 	}

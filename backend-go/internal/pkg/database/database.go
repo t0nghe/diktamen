@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 )
 
 var Db *sql.DB
@@ -19,7 +19,7 @@ func InitDb() {
 		log.Panic("No dbstring")
 	}
 
-	db, err := sql.Open("mysql", dbstr)
+	db, err := sql.Open("postgres", dbstr)
 	if err != nil {
 		log.Println("[diktamen] connection to db failed")
 		log.Panic(err)

@@ -30,7 +30,7 @@ type userDictationWordRecord struct {
 
 func BumpUpFinishedIndex(userId int, sentId int) (int, error) {
 	// get article_id; index_in_article
-	stmt, err := dbconn.Db.Prepare("SELECT article_id, index_in_article FROM sent WHERE id=?;")
+	stmt, err := dbconn.Db.Prepare("SELECT article_id, index_in_article FROM sent WHERE id=$1;")
 	if err != nil {
 		return -1, err
 	}
@@ -44,7 +44,7 @@ func BumpUpFinishedIndex(userId int, sentId int) (int, error) {
 
 	// ALAS... MySQL doens't support IF NOT EXISTS () ... ELSE...
 
-	stmtExists, err := dbconn.Db.Prepare("SELECT IF (EXISTS (SELECT id FROM user_article WHERE user_id=? AND article_id = ?), 1, 0);")
+	stmtExists, err := dbconn.Db.Prepare("SELECT IF (EXISTS (SELECT id FROM user_article WHERE user_id=$1 AND article_id = $2), 1, 0);")
 	if err != nil {
 		return -1, err
 	}
@@ -53,7 +53,7 @@ func BumpUpFinishedIndex(userId int, sentId int) (int, error) {
 	_ = stmtExists.QueryRow(userId, articleId).Scan(&exists)
 
 	if exists == 1 {
-		stmtBumpUp, err := dbconn.Db.Prepare("UPDATE user_article SET finished_sent_index=? WHERE finished_sent_index<? AND user_id=? AND article_id=?;")
+		stmtBumpUp, err := dbconn.Db.Prepare("UPDATE user_article SET finished_sent_index=$1 WHERE finished_sent_index<$2 AND user_id=$3 AND article_id=$4;")
 		if err != nil {
 			return -1, err
 		}
@@ -65,7 +65,7 @@ func BumpUpFinishedIndex(userId int, sentId int) (int, error) {
 		rc, _ := result.RowsAffected() // rows count
 		fmt.Println(rc)
 	} else {
-		stmtInsert, _ := dbconn.Db.Prepare("INSERT INTO user_article (article_id, finished_sent_index, user_id) VALUES (?, ?, ?);")
+		stmtInsert, _ := dbconn.Db.Prepare("INSERT INTO user_article (article_id, finished_sent_index, user_id) VALUES ($1, $2, $3);")
 		defer stmtInsert.Close()
 		resultInsert, err := stmtInsert.Exec(articleId, indexInArticle, userId)
 		if err != nil {
@@ -81,7 +81,7 @@ func BumpUpFinishedIndex(userId int, sentId int) (int, error) {
 // GetThisTryCount returns n, where n indicates the n-th time this is that a user tries a sentence. n is 1-based. If there is an error, 0 is returned.
 func GetThisTryCount(userId int, sentId int) (int, error) {
 	// Query SQL to get previous trycount+1.
-	stmtTryCount, err := dbconn.Db.Prepare("SELECT IF (EXISTS (SELECT try_count FROM user_dictation WHERE user_id=? AND sent_id=?), MAX(try_count) + 1, 1 ) AS this_try_count FROM user_dictation WHERE user_id=? AND sent_id=?;")
+	stmtTryCount, err := dbconn.Db.Prepare("SELECT IF (EXISTS (SELECT try_count FROM user_dictation WHERE user_id=$1 AND sent_id=$2), MAX(try_count) + 1, 1 ) AS this_try_count FROM user_dictation WHERE user_id=$3 AND sent_id=$4;")
 	if err != nil {
 		return 0, err
 	}
@@ -96,7 +96,7 @@ func GetThisTryCount(userId int, sentId int) (int, error) {
 }
 
 func GetWordforms(sentId int) ([]int, []string, []bool, []int, error) {
-	stmtWordforms, err := dbconn.Db.Prepare("SELECT index_in_sent, wordform, is_cloze, length FROM sent_word WHERE sent_id=?;")
+	stmtWordforms, err := dbconn.Db.Prepare("SELECT index_in_sent, wordform, is_cloze, length FROM sent_word WHERE sent_id=$1;")
 	if err != nil {
 		return nil, nil, nil, nil, err // haven't thought through what the return values look like
 	}
@@ -134,7 +134,7 @@ func GetWordforms(sentId int) ([]int, []string, []bool, []int, error) {
 
 // InsertUserDication inserts a record to user_dictation table and returns ID of the inserted record and a possible error.
 func InsertUserDictation(input userDictationRecord) (int64, error) {
-	stmtUD, err := dbconn.Db.Prepare("INSERT INTO user_dictation (next_try_time, sent_id, try_count, try_score, try_text, try_time, user_id) VALUES (?,?,?,?,?,?,?);")
+	stmtUD, err := dbconn.Db.Prepare("INSERT INTO user_dictation (next_try_time, sent_id, try_count, try_score, try_text, try_time, user_id) VALUES ($1,$2,$3,$4,$5,$6,$7);")
 	if err != nil {
 		return 0, err
 	}
@@ -150,7 +150,7 @@ func InsertUserDictation(input userDictationRecord) (int64, error) {
 
 // InsertUserDictationWord inserts a record to user_dictation_word, each user_dictation_word is one of the words associated with a user_dictation record.
 func InsertUserDictationWord(input userDictationWordRecord) (int64, error) {
-	stmtUDW, err := dbconn.Db.Prepare("INSERT INTO user_dictation_word (index_in_sent, sent_id, user_dictation_id, user_id, user_input_score, user_input_wordform) VALUES (?, ?, ?, ?, ?, ?);")
+	stmtUDW, err := dbconn.Db.Prepare("INSERT INTO user_dictation_word (index_in_sent, sent_id, user_dictation_id, user_id, user_input_score, user_input_wordform) VALUES ($1, $2, $3, $4, $5, $6);")
 	if err != nil {
 		return 0, err
 	}

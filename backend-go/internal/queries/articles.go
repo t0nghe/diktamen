@@ -19,7 +19,7 @@ type articleRow struct {
 func GetSingleArticle(userId int, articleId int) (*model.UserArticle, error) {
 	var record articleRow
 	// Get info about article
-	stmt, err := dbconn.Db.Prepare("SELECT id, title, sent_count, description FROM article WHERE id=?;")
+	stmt, err := dbconn.Db.Prepare("SELECT id, title, sent_count, description FROM article WHERE id=$1;")
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func GetSingleArticle(userId int, articleId int) (*model.UserArticle, error) {
 	}
 
 	// Get user `finished_sent_index`
-	stmt2, err := dbconn.Db.Prepare("SELECT finished_sent_index FROM user_article WHERE user_id=? AND article_id=?;")
+	stmt2, err := dbconn.Db.Prepare("SELECT finished_sent_index FROM user_article WHERE user_id=$1 AND article_id=$2;")
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func GetSingleArticle(userId int, articleId int) (*model.UserArticle, error) {
 }
 
 func GetUserArticlesList(userId int) ([]*model.UserArticle, error) {
-	stmt, err := dbconn.Db.Prepare("SELECT a.id, a.title, a.sent_count, a.description, ua.finished_sent_index FROM article a LEFT JOIN user_article ua ON a.id = ua.article_id WHERE ua.user_id = ?;")
+	stmt, err := dbconn.Db.Prepare("SELECT a.id, a.title, a.sent_count, a.description, ua.finished_sent_index FROM article a LEFT JOIN user_article ua ON a.id = ua.article_id WHERE ua.user_id = $1;")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -77,7 +77,7 @@ func GetUserArticlesList(userId int) ([]*model.UserArticle, error) {
 }
 
 func GetUserUnseenArticlesList(userId int) ([]*model.UserArticle, error) {
-	stmt, err := dbconn.Db.Prepare("SELECT DISTINCT a.id, a.title, a.sent_count, a.description FROM article a LEFT JOIN user_article ua ON a.id = ua.article_id WHERE a.id NOT IN (SELECT article_id FROM user_article WHERE user_id=?);")
+	stmt, err := dbconn.Db.Prepare("SELECT DISTINCT a.id, a.title, a.sent_count, a.description FROM article a LEFT JOIN user_article ua ON a.id = ua.article_id WHERE a.id NOT IN (SELECT article_id FROM user_article WHERE user_id=$1);")
 
 	if err != nil {
 		log.Fatal(err)

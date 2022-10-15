@@ -6,7 +6,7 @@ This document list all the actions a user can do.
 
 - Related story: US01
 - Related mutation: userSignUp
-    - input: username, email, passwordHash
+    - input: username, email, pwhash
     - response: success message, failure message (username taken, email taken)
 
 * Frontend needs to hash password.
@@ -15,7 +15,7 @@ This document list all the actions a user can do.
 
 - Related story: US02
 - Related mutation: userLogIn
-    - input: username, passwordHash
+    - input: username, pwhash
     - response: If success, auth token. If failure, failure message.
 
 ## A03 - list articles

@@ -10,7 +10,7 @@ func QuerySeenSentIds(userId int, articleId int) ([]int, []int, error) {
 	// We need to query user_article to get `finished_sent_index`
 
 	// Then query sent, to get `sent_id` field where `index_in_article` is lower than or equal to `finished_sent_index`
-	stmtSeenSentIds, err := dbconn.Db.Prepare("SELECT DISTINCT s.id, s.index_in_article FROM sent s LEFT JOIN user_article ua ON s.article_id=ua.article_id WHERE ua.user_id=? AND ua.article_id=? AND ua.finished_sent_index >= s.index_in_article;")
+	stmtSeenSentIds, err := dbconn.Db.Prepare("SELECT DISTINCT s.id, s.index_in_article FROM sent s LEFT JOIN user_article ua ON s.article_id=ua.article_id WHERE ua.user_id=$1 AND ua.article_id=$2 AND ua.finished_sent_index >= s.index_in_article;")
 	if err != nil {
 		return []int{0}, []int{0}, err
 	}
@@ -39,7 +39,7 @@ func QuerySeenSentIds(userId int, articleId int) ([]int, []int, error) {
 }
 
 func QueryLastTryText(userId int, sentId int) (string, error) {
-	stmtLastTryText, err := dbconn.Db.Prepare("SELECT try_text FROM user_dictation WHERE (try_count) IN (SELECT MAX(try_count) FROM user_dictation WHERE user_id=? AND sent_id=?) AND user_id=? AND sent_id=?;")
+	stmtLastTryText, err := dbconn.Db.Prepare("SELECT try_text FROM user_dictation WHERE (try_count) IN (SELECT MAX(try_count) FROM user_dictation WHERE user_id=$1 AND sent_id=$2) AND user_id=$3 AND sent_id=$4;")
 	if err != nil {
 		return "", err
 	}

@@ -19,12 +19,6 @@ func validatePasswordNaive(password string) bool {
 	if len(password) < 4 {
 		return false
 	}
-	// if len(re_letter.FindStringSubmatchIndex(password)) == 0 {
-	// 	return false
-	// }
-	// if len(re_digit.FindStringSubmatchIndex(password)) == 0 {
-	// 	return false
-	// }
 	return true
 }
 
@@ -45,19 +39,19 @@ func CreateUser(username string, email string, password string) error {
 		return fmt.Errorf("password needs to contain at least 4 chars")
 	}
 
-	stmt, err := dbconn.Db.Prepare("INSERT INTO user (username, email, passwordHash) VALUES (?, ?, ?);")
+	stmt, err := dbconn.Db.Prepare("INSERT INTO dktmuser (username, email, pwhash) VALUES ($1, $2, $3);")
 	if err != nil {
 		return fmt.Errorf("%s", err)
 	}
 	defer stmt.Close()
 
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	pwhash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
 		return fmt.Errorf("%s", err)
 	}
 
-	res, err := stmt.Exec(username, email, passwordHash)
+	res, err := stmt.Exec(username, email, pwhash)
 
 	if err != nil {
 		return fmt.Errorf("%s", err)
@@ -70,18 +64,18 @@ func CreateUser(username string, email string, password string) error {
 // UserLogin validates username and password, and if valid, returns a token to GraphQL client.
 func UserLogin(username string, password string) (string, error) {
 
-	var passwordHash []byte
-	stmt, err := dbconn.Db.Prepare("SELECT passwordHash FROM user WHERE username=?;")
+	var pwhash []byte
+	stmt, err := dbconn.Db.Prepare("SELECT pwhash FROM dktmuser WHERE username=$1;")
 	if err != nil {
 		return "", err
 	}
 
-	err = stmt.QueryRow(username).Scan(&passwordHash)
+	err = stmt.QueryRow(username).Scan(&pwhash)
 	if err != nil {
 		return "", err
 	}
 
-	err = bcrypt.CompareHashAndPassword(passwordHash, []byte(password))
+	err = bcrypt.CompareHashAndPassword(pwhash, []byte(password))
 	if err != nil {
 		return "", fmt.Errorf("password is wrong")
 	}
@@ -96,7 +90,7 @@ func UserLogin(username string, password string) (string, error) {
 }
 
 func GetUserId(username string) (int, error) {
-	stmt, err := dbconn.Db.Prepare("SELECT id FROM user WHERE username=?;")
+	stmt, err := dbconn.Db.Prepare("SELECT id FROM dktmuser WHERE username=$1;")
 	if err != nil {
 		log.Fatal(err)
 	}
