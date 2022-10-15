@@ -65,13 +65,11 @@ func CreateUser(username string, email string, password string) error {
 func UserLogin(username string, password string) (string, error) {
 
 	var pwhash []byte
-	stmt, err := dbconn.Db.Prepare("SELECT pwhash FROM dktmuser WHERE username=$1;")
-	if err != nil {
-		return "", err
-	}
+	row := dbconn.Db.QueryRow("SELECT pwhash FROM dktmuser WHERE username=$1;", username)
 
-	err = stmt.QueryRow(username).Scan(&pwhash)
+	err := row.Scan(&pwhash)
 	if err != nil {
+		log.Println(err)
 		return "", err
 	}
 
@@ -90,13 +88,10 @@ func UserLogin(username string, password string) (string, error) {
 }
 
 func GetUserId(username string) (int, error) {
-	stmt, err := dbconn.Db.Prepare("SELECT id FROM dktmuser WHERE username=$1;")
-	if err != nil {
-		log.Fatal(err)
-	}
+	row := dbconn.Db.QueryRow("SELECT id FROM dktmuser WHERE username=$1;", username)
 
 	var userId int
-	err = stmt.QueryRow(username).Scan(&userId)
+	err := row.Scan(&userId)
 	fmt.Println("userId in GetUserId", userId)
 	fmt.Println("&userId in GetUserId", &userId)
 	if err != nil {

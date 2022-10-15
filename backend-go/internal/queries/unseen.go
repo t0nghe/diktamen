@@ -4,6 +4,7 @@ import (
 	"backend-go/graph/model"
 	dbconn "backend-go/internal/pkg/database"
 	"database/sql"
+	"log"
 )
 
 // QueryUserUnseenSents searches and returns sentences a user hasn't seen in an article.
@@ -11,16 +12,14 @@ func QueryUserUnseenSents(userId int, articleId int) ([]*model.UnseenSent, error
 	var result []*model.UnseenSent
 
 	// Find out sentence index the user has reached in an article.
-	stmt1, err := dbconn.Db.Prepare("SELECT finished_sent_index FROM user_article WHERE user_id=$1 AND article_id=$2;")
-	if err != nil {
-		return nil, err
-	}
-	defer stmt1.Close()
+	row := dbconn.Db.QueryRow("SELECT finished_sent_index FROM user_article WHERE user_id=$1 AND article_id=$2;", userId, articleId)
 
 	var finishedSentIndex int
-	err = stmt1.QueryRow(userId, articleId).Scan(&finishedSentIndex)
+	err := row.Scan(&finishedSentIndex)
 	if err != nil {
 		if err != sql.ErrNoRows {
+			log.Println(err)
+			log.Println("SELECT finished_sent_index FROM user_article WHERE user_id=$1 AND article_id=$2;")
 			return nil, err
 		} else {
 			finishedSentIndex = 0
@@ -28,21 +27,21 @@ func QueryUserUnseenSents(userId int, articleId int) ([]*model.UnseenSent, error
 	}
 
 	// Get relevant fields in unseen sentences, namely sentences with index > finished index.
-	stmt2, err := dbconn.Db.Prepare("SELECT id, index_in_article, media_uri FROM sent WHERE article_id=$1 AND index_in_article>$2;")
+	rows, err := dbconn.Db.Query("SELECT id, index_in_article, media_uri FROM sent WHERE article_id=$1 AND index_in_article>$2;", articleId, finishedSentIndex)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
-	defer stmt2.Close()
-	rows, err := stmt2.Query(articleId, finishedSentIndex)
-	if err != nil {
-		return nil, err
-	}
+	defer rows.Close()
+
 	for rows.Next() {
 		var aid, iia int
 		var mu string
 
 		err = rows.Scan(&aid, &iia, &mu)
 		if err != nil {
+			log.Println(err)
+			log.Println("SELECT id, index_in_article, media_uri FROM sent WHERE article_id=$1 AND index_in_article>$2;")
 			return nil, err
 		}
 
@@ -65,16 +64,13 @@ func QueryUserUnseenSents(userId int, articleId int) ([]*model.UnseenSent, error
 func GetUnseenSentWords(sentId int) (*[]*model.UnseenSentWord, error) {
 	var result []*model.UnseenSentWord
 
-	stmt, err := dbconn.Db.Prepare("SELECT length, is_cloze, wordform, index_in_sent FROM sent_word WHERE sent_id=$1;")
+	rows, err := dbconn.Db.Query("SELECT length, is_cloze, wordform, index_in_sent FROM sent_word WHERE sent_id=$1;", sentId)
 	if err != nil {
+		log.Println("sentId: ", sentId)
+		log.Println("SELECT length, is_cloze, wordform, index_in_sent FROM sent_word WHERE sent_id=$1;")
 		return nil, err
 	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(sentId)
-	if err != nil {
-		return nil, err
-	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var wl int    // word length
