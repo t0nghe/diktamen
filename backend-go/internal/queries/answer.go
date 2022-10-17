@@ -30,44 +30,33 @@ type userDictationWordRecord struct {
 
 func BumpUpFinishedIndex(userId int, sentId int) (int, error) {
 	// get article_id; index_in_article
-	stmt, err := dbconn.Db.Prepare("SELECT article_id, index_in_article FROM sent WHERE id=$1;")
-	if err != nil {
-		return -1, err
-	}
-	defer stmt.Close()
+	row := dbconn.Db.QueryRow("SELECT article_id, index_in_article FROM sent WHERE id=$1;", sentId)
 
 	var articleId, indexInArticle int // article_id; index_in_article
-	err = stmt.QueryRow(sentId).Scan(&articleId, &indexInArticle)
+	err := row.Scan(&articleId, &indexInArticle)
 	if err != nil {
 		return -1, err // This error includes the case where sent.id doesn't exist.
 	}
 
 	// ALAS... MySQL doens't support IF NOT EXISTS () ... ELSE...
 
-	stmtExists, err := dbconn.Db.Prepare("SELECT IF (EXISTS (SELECT id FROM user_article WHERE user_id=$1 AND article_id = $2), 1, 0);")
+	stmtExists := dbconn.Db.QueryRow("SELECT IF (EXISTS (SELECT id FROM user_article WHERE user_id=$1 AND article_id = $2), 1, 0);", userId, articleId)
+
+	var exists int
+	err = stmtExists.Scan(&exists)
 	if err != nil {
 		return -1, err
 	}
-	defer stmtExists.Close()
-	var exists int
-	_ = stmtExists.QueryRow(userId, articleId).Scan(&exists)
 
 	if exists == 1 {
-		stmtBumpUp, err := dbconn.Db.Prepare("UPDATE user_article SET finished_sent_index=$1 WHERE finished_sent_index<$2 AND user_id=$3 AND article_id=$4;")
-		if err != nil {
-			return -1, err
-		}
-		defer stmtBumpUp.Close()
-		result, err := stmtBumpUp.Exec(indexInArticle, indexInArticle, userId, articleId)
+		result, err := dbconn.Db.Exec("UPDATE user_article SET finished_sent_index=$1 WHERE finished_sent_index<$2 AND user_id=$3 AND article_id=$4;", indexInArticle, indexInArticle, userId, articleId)
 		if err != nil {
 			return -1, err
 		}
 		rc, _ := result.RowsAffected() // rows count
-		fmt.Println(rc)
+		fmt.Println("rc", rc)
 	} else {
-		stmtInsert, _ := dbconn.Db.Prepare("INSERT INTO user_article (article_id, finished_sent_index, user_id) VALUES ($1, $2, $3);")
-		defer stmtInsert.Close()
-		resultInsert, err := stmtInsert.Exec(articleId, indexInArticle, userId)
+		resultInsert, err := dbconn.Db.Exec("INSERT INTO user_article (article_id, finished_sent_index, user_id) VALUES ($1, $2, $3);", articleId, indexInArticle, userId)
 		if err != nil {
 			return -1, err
 		}
@@ -81,14 +70,10 @@ func BumpUpFinishedIndex(userId int, sentId int) (int, error) {
 // GetThisTryCount returns n, where n indicates the n-th time this is that a user tries a sentence. n is 1-based. If there is an error, 0 is returned.
 func GetThisTryCount(userId int, sentId int) (int, error) {
 	// Query SQL to get previous trycount+1.
-	stmtTryCount, err := dbconn.Db.Prepare("SELECT IF (EXISTS (SELECT try_count FROM user_dictation WHERE user_id=$1 AND sent_id=$2), MAX(try_count) + 1, 1 ) AS this_try_count FROM user_dictation WHERE user_id=$3 AND sent_id=$4;")
-	if err != nil {
-		return 0, err
-	}
-	defer stmtTryCount.Close()
+	row := dbconn.Db.QueryRow("SELECT IF (EXISTS (SELECT try_count FROM user_dictation WHERE user_id=$1 AND sent_id=$2), MAX(try_count) + 1, 1 ) AS this_try_count FROM user_dictation WHERE user_id=$3 AND sent_id=$4;", userId, sentId, userId, sentId)
 
 	var thisTryCount int
-	err = stmtTryCount.QueryRow(userId, sentId, userId, sentId).Scan(&thisTryCount)
+	err := row.Scan(&thisTryCount)
 	if err != nil {
 		return 0, err
 	}
@@ -96,16 +81,12 @@ func GetThisTryCount(userId int, sentId int) (int, error) {
 }
 
 func GetWordforms(sentId int) ([]int, []string, []bool, []int, error) {
-	stmtWordforms, err := dbconn.Db.Prepare("SELECT index_in_sent, wordform, is_cloze, length FROM sent_word WHERE sent_id=$1;")
+	rows, err := dbconn.Db.Query("SELECT index_in_sent, wordform, is_cloze, length FROM sent_word WHERE sent_id=$1;", sentId)
 	if err != nil {
 		return nil, nil, nil, nil, err // haven't thought through what the return values look like
 	}
-	defer stmtWordforms.Close()
+	defer rows.Close()
 
-	rows, err := stmtWordforms.Query(sentId)
-	if err != nil {
-		return nil, nil, nil, nil, err
-	}
 	var indexesInSent []int
 	var wordforms []string
 	var areClozes []bool
@@ -134,29 +115,18 @@ func GetWordforms(sentId int) ([]int, []string, []bool, []int, error) {
 
 // InsertUserDication inserts a record to user_dictation table and returns ID of the inserted record and a possible error.
 func InsertUserDictation(input userDictationRecord) (int64, error) {
-	stmtUD, err := dbconn.Db.Prepare("INSERT INTO user_dictation (next_try_time, sent_id, try_count, try_score, try_text, try_time, user_id) VALUES ($1,$2,$3,$4,$5,$6,$7);")
+	result, err := dbconn.Db.Exec("INSERT INTO user_dictation (next_try_time, sent_id, try_count, try_score, try_text, try_time, user_id) VALUES ($1,$2,$3,$4,$5,$6,$7);", input.nextTryTime.Format(time.RFC3339), input.sentId, input.tryCount, input.tryScore, input.tryText, input.tryTime.Format(time.RFC3339), input.userId)
 	if err != nil {
 		return 0, err
 	}
-	defer stmtUD.Close()
 
-	result, err := stmtUD.Exec(input.nextTryTime.Format(time.RFC3339), input.sentId, input.tryCount, input.tryScore, input.tryText, input.tryTime.Format(time.RFC3339), input.userId)
-	if err != nil {
-		return 0, err
-	}
 	id, _ := result.LastInsertId()
 	return id, nil
 }
 
 // InsertUserDictationWord inserts a record to user_dictation_word, each user_dictation_word is one of the words associated with a user_dictation record.
 func InsertUserDictationWord(input userDictationWordRecord) (int64, error) {
-	stmtUDW, err := dbconn.Db.Prepare("INSERT INTO user_dictation_word (index_in_sent, sent_id, user_dictation_id, user_id, user_input_score, user_input_wordform) VALUES ($1, $2, $3, $4, $5, $6);")
-	if err != nil {
-		return 0, err
-	}
-	defer stmtUDW.Close()
-
-	result, err := stmtUDW.Exec(input.indexInSent, input.sentId, input.userDictationId, input.userId, input.userInputScore, input.userInputWordform)
+	result, err := dbconn.Db.Exec("INSERT INTO user_dictation_word (index_in_sent, sent_id, user_dictation_id, user_id, user_input_score, user_input_wordform) VALUES ($1, $2, $3, $4, $5, $6);", input.indexInSent, input.sentId, input.userDictationId, input.userId, input.userInputScore, input.userInputWordform)
 	if err != nil {
 		return 0, err
 	}

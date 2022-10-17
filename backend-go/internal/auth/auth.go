@@ -39,24 +39,16 @@ func CreateUser(username string, email string, password string) error {
 		return fmt.Errorf("password needs to contain at least 4 chars")
 	}
 
-	stmt, err := dbconn.Db.Prepare("INSERT INTO dktmuser (username, email, pwhash) VALUES ($1, $2, $3);")
-	if err != nil {
-		return fmt.Errorf("%s", err)
-	}
-	defer stmt.Close()
-
 	pwhash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-
 	if err != nil {
 		return fmt.Errorf("%s", err)
 	}
 
-	res, err := stmt.Exec(username, email, pwhash)
+	_, err = dbconn.Db.Exec("INSERT INTO dktmuser (username, email, pwhash) VALUES ($1, $2, $3);", username, email, pwhash)
 
 	if err != nil {
 		return fmt.Errorf("%s", err)
 	}
-	fmt.Println(res)
 
 	return nil
 }

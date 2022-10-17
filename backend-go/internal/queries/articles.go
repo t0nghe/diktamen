@@ -67,30 +67,42 @@ func GetUserArticlesList(userId int) ([]*model.UserArticle, error) {
 	return articleRecords, nil
 }
 
+type debugRow struct {
+	one   int    // article id
+	two   string // article title
+	three int    // article sentence count
+	four  string // article description
+}
+
 func GetUserUnseenArticlesList(userId int) ([]*model.UserArticle, error) {
 	rows, err := dbconn.Db.Query("SELECT DISTINCT a.id, a.title, a.sent_count, a.description FROM article a LEFT JOIN user_article ua ON a.id = ua.article_id WHERE a.id NOT IN (SELECT article_id FROM user_article WHERE user_id=$1);", userId)
 
 	if err != nil {
 		log.Println("SELECT DISTINCT a.id, a.title, a.sent_count, a.description FROM article a LEFT JOIN user_article ua ON a.id = ua.article_id WHERE a.id NOT IN (SELECT article_id FROM user_article WHERE user_id=$1);")
+		log.Println(rows)
 		log.Println("userId", userId)
 		log.Println(err)
 	}
 	defer rows.Close()
 
-	var articleRecords []*model.UserArticle
+	// var articleRecords []*model.UserArticle
 
 	for rows.Next() {
-		var row articleRow // Earlier I defined it as *articleRow type and it didn't work.
-		err := rows.Scan(&row.aid, &row.attl, &row.asc, &row.adesc)
+		// var row articleRow // Earlier I defined it as *articleRow type and it didn't work.
+		var row debugRow // Earlier I defined it as *articleRow type and it didn't work.
+		err := rows.Scan(&row.one, &row.two, &row.three, &row.four)
+
+		log.Println("debug line 96", row)
 
 		if err != nil {
 			log.Print("SELECT DISTINCT a.id, a.title, a.sent_count, a.description FROM article a LEFT JOIN user_article ua ON a.id = ua.article_id WHERE a.id NOT IN (SELECT article_id FROM user_article WHERE user_id=$1); - second half")
 			log.Println(err)
 		}
 
-		zero := 0
-		articleRecords = append(articleRecords, &model.UserArticle{ArticleID: &row.aid, ArticleTitle: row.attl, ArticleSentCount: row.asc, ArticleDescription: &row.adesc, UserFinishedIndex: &zero})
+		// zero := 0
+		// articleRecords = append(articleRecords, &model.UserArticle{ArticleID: &row.aid, ArticleTitle: row.attl, ArticleSentCount: row.asc, ArticleDescription: &row.adesc, UserFinishedIndex: &zero})
 	}
 
-	return articleRecords, nil
+	// return articleRecords, nil
+	return nil, nil
 }

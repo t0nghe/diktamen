@@ -68,6 +68,7 @@ func GetUnseenSentWords(sentId int) (*[]*model.UnseenSentWord, error) {
 	if err != nil {
 		log.Println("sentId: ", sentId)
 		log.Println("SELECT length, is_cloze, wordform, index_in_sent FROM sent_word WHERE sent_id=$1;")
+		log.Println(err.Error())
 		return nil, err
 	}
 	defer rows.Close()
